@@ -4,7 +4,9 @@ Reglas para todas las personas y agentes que trabajan en este repositorio. Los m
 
 ## Stack elegido
 
-**Versiones de `web/`** (creado el 13 de noviembre): Node 24, Next.js 16.4.6 (App Router con Cache Components), React 19.3, TypeScript 5, Tailwind CSS 4.3 y Vitest 5.1. shadcn/ui se agrega en la fase de interfaz. Las versiones de `pipeline/` se anotan cuando el Lote A lo cree.
+**Versiones de `web/`** (creado el 13 de noviembre): Node 24, Next.js 16.4.6 (App Router con Cache Components), React 19.3, TypeScript 5, Tailwind CSS 4.3 y Vitest 5.1. shadcn/ui se agrega en la fase de interfaz.
+
+**Versiones de `pipeline/`** (creado el 13 de noviembre): Python 3.13 (también funciona con 3.12), uv 0.11, DuckDB 2.0.0, `ocdscardinal` 0.0.9, pytest 9.2 y ruff 0.17. El paquete de Python de Cardinal solo trae `coverage`; `prepare` e `indicators` están en su herramienta de línea de comandos, que se compila desde la etiqueta 0.0.9 porque el binario de Windows publicado se cierra al arrancar.
 
 | Parte | Tecnología | Por qué | ADR |
 |---|---|---|---|
@@ -60,9 +62,30 @@ npm run build && npm run start   # demo local; ya construida, funciona sin inter
 npm run fixture             # regenera web/data/fixture (datos ficticios)
 PAQUETE_DATOS=publico npm run build              # usar el paquete real seudonimizado
 PAQUETE_DIR=data/publico npm test -- paquete     # validar un paquete contra el contrato
+
+# Datos (desde la raíz): descarga del OCP Data Registry; data/ nunca se sube
+mkdir -p data/raw
+curl -L -f -o data/raw/2026.jsonl.gz "https://data.open-contracting.org/en/publication/135/download?name=2026.jsonl.gz"
+
+# Pipeline (desde pipeline/)
+uv sync                       # crea .venv con Python 3.13 y las versiones exactas de uv.lock
+uv run pytest                 # pruebas
+uv run ruff check             # lint
+uv run ruff format --check    # formato
+uv run pipeline spike ../data/raw/2026.jsonl.gz    # spike Q1–Q7: data/derived/spike-2026.json
+uv run pipeline sample ../data/raw/2026.jsonl.gz ../data/interim/muestra-la-libertad-2026.jsonl
+uv run pipeline coverage ../data/interim/muestra-la-libertad-2026.jsonl   # Cardinal coverage (Python)
+
+# Cardinal prepare e indicators (desde pipeline/; necesita Rust y cargo; .tools/ no se sube)
+cargo install --git https://github.com/open-contracting/cardinal-rs --tag 0.0.9 --locked --root .tools/cargo ocdscardinal
+.tools/cargo/bin/ocdscardinal init ../data/interim/cardinal-settings.ini
+.tools/cargo/bin/ocdscardinal prepare -s ../data/interim/cardinal-settings.ini -o ../data/interim/muestra-preparada.jsonl -e ../data/derived/cardinal-prepare-problemas.csv ../data/interim/muestra-la-libertad-2026.jsonl
+.tools/cargo/bin/ocdscardinal indicators -s ../data/interim/cardinal-settings.ini --count ../data/interim/muestra-preparada.jsonl > ../data/derived/cardinal-indicadores.json
 ```
 
-Antes de escribir código de Next.js, lee `web/AGENTS.md`: Next 16 trae cambios y sus guías están en `web/node_modules/next/dist/docs/`. Los comandos de `pipeline/` se agregan aquí cuando el Lote A lo cree.
+Antes de escribir código de Next.js, lee `web/AGENTS.md`: Next 16 trae cambios y sus guías están en `web/node_modules/next/dist/docs/`.
+
+En `pipeline/`, `--department` y `--years` cambian la región y los años del spike (por defecto, LA LIBERTAD, 2025 y 2026). Cardinal solo calcula los indicadores que tienen su sección (`[R003]`, `[R018]`…) en el archivo de configuración: parte siempre del que genera `init`. Los resultados del spike están en [`docs/datos/fuente-de-datos.md`](docs/datos/fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a).
 
 ## Datos y seguridad
 

@@ -17,6 +17,21 @@ Una **señal** indica que un proceso, un proveedor o una entidad tiene una carac
 | S07 | Proveedor con sanción vigente adjudicado | Reputacional | Proveedor | Categoría reputacional de Arachne · desafío 1 | 1 y 2 | Fase 2 (falta la fuente) |
 | S08 | Conformidad o pago sin sustento, o funciones incompatibles | Trazabilidad interna | Expediente | Texto del desafío 2 | 2 | Datos sintéticos |
 
+## Viabilidad según el spike (13 de noviembre)
+
+Medida con `2026.jsonl.gz` sobre los 2 888 procesos de La Libertad convocados en 2025–2026. El detalle y las consultas están en el [spike de datos](fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a). Las reglas de abajo no cambian hasta que el equipo decida.
+
+| Código | ¿Se puede calcular? | Datos y cobertura | Qué hay que decidir |
+|---|---|---|---|
+| S01 | Sí, como "un solo participante registrado" | No hay `bids`. `tender.numberOfTenderers` está en 2 523 procesos (87,4 %) y, según la evidencia, cuenta participantes registrados, no ofertas | Confirmar en el SEACE (tarea 3.4). Cambiar el texto a "1 participante registrado" en lugar de "1 oferta". Definir la tabla de métodos competitivos |
+| S02 | **No**, como está definida | `tender.tenderPeriod` no tiene duración en el 99,99 % de los procesos: inicio y fin son el día de la convocatoria | Desactivarla y subir S05 al núcleo (recomendado), o redefinirla con `tender.enquiryPeriod` (plazo de consultas, 79,5 %) |
+| S03 | Sí | `buyer.id`, `awards[].suppliers`, `awards[].value` y `awards[].date` (todas las adjudicaciones tienen fecha) | Los consorcios reciben un código nuevo en cada adjudicación (23,3 % de los proveedores adjudicados), así que no acumulan adjudicaciones |
+| S04 | Sí | Ítems clasificados (CUBSO y UNSPSC) en 2 541 procesos (88,0 %); valor referencial en 2 653 | Agrupar por clase (6 dígitos) o familia (4) UNSPSC, no por segmento. Cargar los umbrales de los métodos de la Ley 32069 |
+| S05 | Sí | `tender.procurementMethodDetails` en el 100 %; 194 contrataciones directas | Tabla de métodos y grupo de entidades comparables |
+| S06 | En el límite | Monto final en 201 de 1 719 contratos (11,7 %). La razón final/contratado tiene mediana 1,11 y p75 1,25 | Calibrar el factor 1,15, que marcaría entre el 25 % y el 50 % de los contratos con monto final |
+| S07 | No | Falta la fuente | Sin cambios |
+| S08 | Sí, con datos sintéticos | Expedientes simulados | Sin cambios |
+
 ## Método común
 
 - **"Atípico"** significa que el valor supera la valla superior de Tukey (Q3 + 1,5 × RIC) de su grupo de comparación. Es el mismo enfoque de cuartiles y vallas que reporta Cardinal. El factor 1,5 es configurable.
@@ -43,6 +58,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Agregado por entidad:** porcentaje de procesos con oferta única. Si es atípico frente a entidades similares, se muestra en el panel.
 - **Qué revisar:** requisitos de calificación restrictivos, plazos, difusión de la convocatoria y especificaciones técnicas que favorezcan a un proveedor.
 - **Qué no significa:** en mercados pequeños o con bienes muy especializados puede haber un solo proveedor capaz.
+- **Spike:** no hay `bids` y `tender.numberOfTenderers` cuenta participantes registrados. Un solo participante implica a lo sumo una oferta, así que la señal no da falsos positivos de oferta única, pero no ve los procesos con varios registrados y una sola oferta. En la muestra de La Libertad, Cardinal R018 marca los mismos 57 procesos que nuestra consulta con su regla, pero no ve las licitaciones y concursos abreviados porque no traen `tender.procurementMethod`.
 
 ### S02 · Plazo corto para presentar ofertas
 
@@ -51,6 +67,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Regla v1:** la duración en días calendario está por debajo del percentil 10 de su grupo de comparación. El percentil es configurable. Si se verifica el mínimo legal de cada método en el reglamento vigente, se muestra como referencia.
 - **Qué revisar:** si hubo prórrogas, si el plazo cumple la norma y cuántos postores participaron.
 - **Qué no significa:** procesos simples o situaciones de urgencia pueden justificar plazos cortos.
+- **Spike:** con esta fuente la regla no se puede calcular. `tender.tenderPeriod` trae como inicio y fin la fecha de la convocatoria en el 99,99 % de los procesos, y Cardinal R003 marca por eso a casi todos. Decisión pendiente: desactivar S02 o redefinirla con el plazo de consultas (`tender.enquiryPeriod`).
 
 ### S03 · Proveedor recurrente atípico en una entidad
 
@@ -60,6 +77,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Se muestra en:** la ficha del proveedor, la ficha de cada proceso que ganó en esa entidad y el panel.
 - **Qué revisar:** cómo se definieron los requerimientos, si se repiten los mismos evaluadores y si hay relación entre el proveedor y quienes deciden.
 - **Qué no significa:** puede ser el único proveedor del rubro en la zona, tener un contrato marco o un buen desempeño comprobado.
+- **Spike:** los consorcios tienen un código que no es RUC y que cambia en cada adjudicación, así que la señal solo puede seguir a proveedores con RUC.
 
 ### S04 · Compras similares cercanas en el tiempo (posible fraccionamiento)
 
@@ -70,6 +88,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Norma:** la normativa de contrataciones prohíbe el fraccionamiento. Antes de citar el artículo exacto de la Ley 32069 y su reglamento en la interfaz, hay que verificarlo.
 - **Qué revisar:** el Plan Anual de Contrataciones, si la necesidad era previsible y si los requerimientos los hizo la misma área.
 - **Qué no significa:** pudo haber necesidades nuevas que no eran previsibles, o compras programadas por etapas.
+- **Spike:** los ítems traen CUBSO (16 dígitos) y UNSPSC (8 dígitos). El segmento UNSPSC (2 dígitos) es demasiado amplio; conviene la clase (6) o la familia (4), con el nivel como parámetro.
 
 ### S05 · Uso atípico de contratación directa (opcional)
 
@@ -86,6 +105,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Regla v1:** el monto final es mayor o igual al contratado × 1,15 (configurable).
 - **Qué revisar:** adicionales aprobados, su sustento y los plazos de aprobación.
 - **Qué no significa:** los adicionales pueden ser legales y estar justificados.
+- **Spike:** el monto final (`contracts[].implementation.finalValue`) está en el 11,7 % de los contratos de La Libertad 2025–2026. La razón final/contratado tiene mediana 1,11, así que el factor 1,15 hay que calibrarlo antes de activar la señal.
 
 ### S07 · Proveedor con sanción vigente adjudicado (fase 2)
 
