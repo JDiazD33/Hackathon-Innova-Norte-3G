@@ -4,7 +4,8 @@ Lote D · Revisión y transparencia · **André** · ★★ · carpetas `src/fea
 
 ## 1. D0 · Interfaces y bocetos (Fase 0, sáb 14)
 
-- [ ] 1.1 Definir los tipos de la revisión (entrada, estado y rol) y publicar la interfaz `ReviewStore` con una implementación vacía. Verificar que los lotes B y C compilan usándola.
+- [x] 1.1 Definir los tipos de la revisión (entrada, estado y rol) y publicar la interfaz `ReviewStore` con una implementación vacía. Verificar que los lotes B y C compilan usándola.
+  - Parte 1: contrato y `EmptyReviewStore` exportados desde `features/revision`; tres pruebas de consumo para bandeja y ficha sobre `DataSource`, y revisión de tipos aprobadas. La implementación vacía rechaza escrituras para no fingir que una revisión fue guardada.
 - [ ] 1.2 Publicar el componente "Dato simulado" para todos los lotes. Verificar que se ve en modo claro y oscuro.
 - [ ] 1.3 Bocetar la vista "Revisión", el diálogo de decisión, el reporte y la metodología. Verificar con los comentarios del equipo en el PR.
 
