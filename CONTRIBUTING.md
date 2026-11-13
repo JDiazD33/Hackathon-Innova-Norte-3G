@@ -66,6 +66,7 @@ PAQUETE_DIR=data/publico npm test -- paquete     # validar un paquete contra el 
 # Datos (desde la raíz): descarga del OCP Data Registry; data/ nunca se sube
 mkdir -p data/raw
 curl -L -f -o data/raw/2026.jsonl.gz "https://data.open-contracting.org/en/publication/135/download?name=2026.jsonl.gz"
+curl -L -f -o data/raw/2025.jsonl.gz "https://data.open-contracting.org/en/publication/135/download?name=2025.jsonl.gz"
 
 # Pipeline (desde pipeline/)
 uv sync                       # crea .venv con Python 3.13 y las versiones exactas de uv.lock
@@ -73,6 +74,7 @@ uv run pytest                 # pruebas
 uv run ruff check             # lint
 uv run ruff format --check    # formato
 uv run pipeline spike ../data/raw/2026.jsonl.gz    # spike Q1–Q7: data/derived/spike-2026.json
+uv run pipeline spike ../data/raw/2025.jsonl.gz ../data/raw/2026.jsonl.gz   # los dos años juntos: spike-2025-2026.json
 uv run pipeline sample ../data/raw/2026.jsonl.gz ../data/interim/muestra-la-libertad-2026.jsonl
 uv run pipeline coverage ../data/interim/muestra-la-libertad-2026.jsonl   # Cardinal coverage (Python)
 

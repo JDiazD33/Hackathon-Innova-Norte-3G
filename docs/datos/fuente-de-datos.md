@@ -50,7 +50,7 @@ Cada archivo anual agrupa los procesos según la **fecha de su última actualiza
 - El año de un proceso se toma de `tender.datePublished` (fecha de la convocatoria), nunca del nombre del archivo.
 - `2026.jsonl.gz` tiene **todos** los procesos convocados en 2026 hasta la fecha de corte.
 - Los procesos convocados en 2025 están repartidos entre `2025.jsonl.gz` (si su última actualización fue en 2025) y `2026.jsonl.gz` (si fue en 2026). Para tener 2025 completo hacen falta los dos archivos.
-- Cada proceso debería aparecer en un solo archivo, porque el release compilado tiene una sola fecha. La ingesta lo verifica igual y elimina duplicados por `ocid`.
+- Cada proceso aparece en un solo archivo. Con `2025.jsonl.gz` y `2026.jsonl.gz` juntos no se repite ningún `ocid` (`ocid_en_varios_archivos`), y en `2025.jsonl.gz` todos los `date` son de 2025 (`procesos_por_archivo`). La ingesta igual lo verifica y elimina duplicados por `ocid`.
 
 ## Límites que hay que decir en voz alta
 
@@ -112,18 +112,20 @@ Los consorcios reciben prácticamente un código nuevo en cada adjudicación (26
 
 | Archivo | URL | Fecha de descarga | Tamaño | Verificación |
 |---|---|---|---:|---|
-| `data/raw/2026.jsonl.gz` | <https://data.open-contracting.org/en/publication/135/download?name=2026.jsonl.gz> (redirige a `fastly.data.open-contracting.org/downloads/peru_oece_bulk/4263/2026.jsonl.gz`) | 13 de noviembre de 2026, 17:13 (hora de Lima) | 155 156 276 bytes (155 MB, igual al publicado); 1 485 344 603 bytes sin comprimir | `Last-Modified`: 4 de octubre de 2026. SHA-256 `fc4a7a9b299e342d061aaffe7d13f9c3beced15d0bc985c0f84905b3ba8b8515`. `git status` no muestra el archivo |
+| `data/raw/2026.jsonl.gz` | <https://data.open-contracting.org/en/publication/135/download?name=2026.jsonl.gz> (redirige a `fastly.data.open-contracting.org/downloads/peru_oece_bulk/4263/2026.jsonl.gz`) | 13 de noviembre de 2026, 17:13 (hora de Lima) | 155 156 276 bytes (155 MB, igual al publicado); 1 485 344 603 bytes sin comprimir; 134 917 procesos | `Last-Modified`: 4 de octubre de 2026. SHA-256 `fc4a7a9b299e342d061aaffe7d13f9c3beced15d0bc985c0f84905b3ba8b8515`. `git status` no muestra el archivo |
+| `data/raw/2025.jsonl.gz` | <https://data.open-contracting.org/en/publication/135/download?name=2025.jsonl.gz> (redirige a `fastly.data.open-contracting.org/downloads/peru_oece_bulk/4263/2025.jsonl.gz`) | 13 de noviembre de 2026, 17:48 (hora de Lima) | 148 719 573 bytes (149 MB, igual al publicado); 1 456 546 187 bytes sin comprimir; 124 538 procesos | `Last-Modified`: 4 de octubre de 2026. SHA-256 `65444cad90df5c559584d75124884734bff2875616de716d949aa5b858bd160b`. `git status` no muestra el archivo |
 
 ## Spike de datos (primer paso del Lote A)
 
-Respondido el 13 de noviembre de 2026 con `2026.jsonl.gz` (134 917 procesos). Las cifras salen de las consultas DuckDB de `pipeline/src/pipeline/spike.py`; cada respuesta cita el nombre de su consulta. Para repetirlas:
+Respondido el 13 de noviembre de 2026. Las cifras salen de las consultas DuckDB de `pipeline/src/pipeline/spike.py`; cada respuesta cita el nombre de su consulta. Las cifras nacionales son de `2026.jsonl.gz` (134 917 procesos), salvo que se diga otra cosa. Las de La Libertad salen de `2025.jsonl.gz` y `2026.jsonl.gz` juntos (259 455 procesos). Para repetirlas:
 
 ```bash
 cd pipeline
-uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spike-2026.json
+uv run pipeline spike ../data/raw/2026.jsonl.gz                             # data/derived/spike-2026.json
+uv run pipeline spike ../data/raw/2025.jsonl.gz ../data/raw/2026.jsonl.gz   # data/derived/spike-2025-2026.json
 ```
 
-"La Libertad 2025–2026" significa: comprador de La Libertad y convocatoria (`tender.datePublished`) en 2025 o 2026, dentro de `2026.jsonl.gz`. Son 2 888 procesos.
+"La Libertad 2025–2026" significa: comprador de La Libertad y convocatoria (`tender.datePublished`) en 2025 o 2026, en los dos archivos. Son 5 036 procesos. La muestra de Cardinal (Q8) y las coberturas marcadas como "muestra de `2026.jsonl.gz`" usan solo los 2 888 de ese archivo.
 
 ### Resumen
 
@@ -134,8 +136,8 @@ uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spik
 | Q3 · Postores | No hay `bids`. `tender.numberOfTenderers` (91,1 %) cuenta participantes registrados | S01 pasa a "un solo participante registrado" |
 | Q4 · Clasificación | CUBSO en `classification` y UNSPSC en `additionalClassifications` | S04 viable; conviene agrupar por clase o familia UNSPSC |
 | Q5 · Método | `procurementMethodDetails` en el 100 %; `procurementMethod` incompleto | El carácter competitivo sale de una tabla propia en la configuración |
-| Q6 · Culminación | `contracts[].implementation.finalValue` en el 10,3 % de los contratos (11,7 % en La Libertad 2025–2026) | S06 apenas pasa el mínimo y necesita calibrar el umbral |
-| Q7 · Tamaño | La Libertad: 2 092 procesos convocados en 2026; 796 de 2025 en este archivo | Falta `2025.jsonl.gz` para completar 2025 |
+| Q6 · Culminación | `contracts[].implementation.finalValue` en el 10,3 % de los contratos (9,1 % en La Libertad 2025–2026) | **S06 queda bajo el mínimo del 10 %**: con la regla actual se desactiva |
+| Q7 · Tamaño | La Libertad: 2 944 procesos convocados en 2025 y 2 092 en 2026 (5 036 en total) | Demo de unos 5 000 procesos |
 | Q8 · Cardinal | R018 y R048 se pueden calcular; R003 se ejecuta pero marca todo; los otros 8 necesitan `bids` | Contraste solo para S01 |
 
 ### Q1 · ¿Cómo se identifica el departamento (La Libertad) de cada proceso?
@@ -144,7 +146,7 @@ uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spik
 
 - **Campo:** la entrada de `parties` cuyo `id` es igual a `buyer.id`, en `address.department`. Está en los 134 917 procesos, esa entrada nunca se repite y `tender.procuringEntity.id` siempre es igual a `buyer.id` (`cobertura_del_departamento`).
 - `address.region` trae la **provincia** (por ejemplo, LA LIBERTAD → TRUJILLO) y `address.locality`, el distrito. Difieren de `department` en 65 857 procesos.
-- Hay 25 valores de departamento (los 24 departamentos y el Callao). La Libertad tiene 4 671 procesos en el archivo, 2 888 de ellos convocados en 2025–2026 (`procesos_por_departamento`). Provincias con más procesos en todo el archivo: Trujillo (2 391), Sánchez Carrión (633), Pataz (329), Santiago de Chuco (299) y Otuzco (265) (`provincias_del_departamento`).
+- Hay 25 valores de departamento (los 24 departamentos y el Callao). La Libertad tiene 4 671 procesos en `2026.jsonl.gz` (`procesos_por_departamento`) y 5 036 convocados en 2025–2026 entre los dos archivos. Con los dos archivos, la cobertura del departamento sigue siendo del 100 % (259 455 procesos). Provincias con más procesos en `2026.jsonl.gz`: Trujillo (2 391), Sánchez Carrión (633), Pataz (329), Santiago de Chuco (299) y Otuzco (265) (`provincias_del_departamento`).
 - **Cambio para la decisión 3 del diseño:** el orden "extensión de departamento del proceso → dirección del comprador" se reduce a la dirección del comprador. "Región indeterminada" es un comprador sin entrada en `parties` o sin `department`: 0 casos en 2026, pero la regla se mantiene.
 - **Límite:** es la ubicación de la entidad, no la del lugar de ejecución. Una entidad nacional con sede en Lima que compra para La Libertad queda fuera.
 
@@ -152,8 +154,8 @@ uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spik
 
 **Existe, pero no mide el plazo para presentar ofertas** (`cobertura_de_tenderPeriod`).
 
-- `tender.tenderPeriod.startDate` y `endDate` están en 124 874 procesos (92,6 %), pero en 124 856 (99,99 %) **el inicio y el fin son iguales**, a las 00:00 del mismo día de la convocatoria (120 460 procesos). `durationInDays` solo aparece en 3. En La Libertad 2025–2026, ninguno de los 2 888 procesos tiene un `tenderPeriod` con duración (`plazos_en_el_departamento`).
-- `tender.enquiryPeriod` (formulación de consultas y observaciones) sí tiene duración real. Está en 84 186 procesos (62,4 %) y en 2 296 de La Libertad 2025–2026 (79,5 %). Duración p10/p50/p90 en días: 3/5/7 en licitaciones y concursos abreviados; 9/11/16 en licitaciones públicas y concursos de servicios; 2/4/6 en adjudicaciones simplificadas (`plazos_por_metodo_en_los_anios`).
+- `tender.tenderPeriod.startDate` y `endDate` están en 124 874 procesos (92,6 %), pero en 124 856 (99,99 %) **el inicio y el fin son iguales**, a las 00:00 del mismo día de la convocatoria (120 460 procesos). `durationInDays` solo aparece en 3. Con los dos archivos, el inicio es igual al fin en 241 667 de 241 709 procesos (99,98 %). En La Libertad 2025–2026, ninguno de los 5 036 procesos tiene un `tenderPeriod` con duración (`plazos_en_el_departamento`).
+- `tender.enquiryPeriod` (formulación de consultas y observaciones) sí tiene duración real. Está en 84 186 procesos (62,4 %) y en 3 892 de los 5 036 de La Libertad 2025–2026 (77,3 %). Duración p10/p50/p90 en días: 3/5/7 en licitaciones y concursos abreviados; 9/11/16 en licitaciones públicas y concursos de servicios; 2/4/6 en adjudicaciones simplificadas (`plazos_por_metodo_en_los_anios`).
 - **Sustituto descartado:** los días entre la convocatoria y la primera acta de evaluación (`evaluationReports`). En licitaciones y concursos abreviados el p10 es 0 días, y en 383 de esos procesos el acta es anterior a la convocatoria, probablemente porque arrastran documentos de convocatorias anteriores (`dias_hasta_la_primera_acta_de_evaluacion`).
 - **Conclusión:** S02 no se puede calcular como está definida. Cardinal R003 da el mismo resultado: marca el 99,998 % de los procesos (Q8).
 - **Opciones para el equipo:**
@@ -165,16 +167,16 @@ uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spik
 **No hay `bids`. Hay número y lista de "postores", pero cuentan participantes registrados** (`cobertura_de_postores`).
 
 - `bids` no existe en ningún proceso (`campos_de_primer_nivel`; en Cardinal, `/bids/details[]` = 0).
-- `tender.numberOfTenderers` y `tender.tenderers[]` están en 122 894 procesos (91,1 %); en La Libertad 2025–2026, en 2 523 (87,4 %). El número coincide con el largo de la lista en 121 041 (98,5 %), nunca vale 0 y la lista no tiene duplicados. El ganador está en la lista en 113 829 de 114 128 adjudicaciones (99,7 %).
+- `tender.numberOfTenderers` y `tender.tenderers[]` están en 122 894 procesos (91,1 %); en la muestra de La Libertad de `2026.jsonl.gz`, en 2 523 de 2 888 (87,4 %). El número coincide con el largo de la lista en 121 041 (98,5 %), nunca vale 0 y la lista no tiene duplicados. El ganador está en la lista en 113 829 de 114 128 adjudicaciones (99,7 %).
 - **Evidencia de que son participantes y no ofertas:**
   - Los procesos con todos sus ítems desiertos tienen una mediana de 5 "postores" (q1 = 3, q3 = 12) y nunca 0 (`postores_en_procesos_desiertos`).
   - En los procesos adjudicados de 2025–2026, la mediana es de 10 en licitaciones abreviadas, 12 en concursos abreviados, 16 en licitaciones públicas, 17 en concursos de servicios y 23 en consultorías (`postores_por_metodo_en_los_anios`).
-  - En La Libertad hay procesos desiertos con 81, 57 y 54 "postores" (`casos_para_verificar_en_el_seace`).
+  - En La Libertad hay procesos desiertos con 81, 74 y 64 "postores" (`casos_para_verificar_en_el_seace`).
 - **Verificación pendiente en el SEACE** (tarea 3.4), con los casos de `casos_para_verificar_en_el_seace`:
-  - adjudicados con un solo participante: `LP-ABR-4-2025-MDA/CS-1`, `LP-ABR-11-2025-GRLL-GOB/PECH-2`, `LP-ABR-1-2025-DEC-1` y `LP-ABR-9-2025-MPO/CS-1`;
-  - desiertos con muchos participantes: `LP-SM-2-2026-GRLL-GRA-1` (81), `CP-ABR-17-2026-GRLL-GRCO-1` (54) y `LP-ABR-5-2026-UNT/C-3` (40).
+  - adjudicados con un solo participante: `COMPRE-SM-1-2025-MPSCH/OEC-1`, `LP-ABR-7-2025-UTES N°6 S.P.T.-1`, `LP-ABR-2-2025-HBT-1`, `LP-ABR-4-2025-MDA/CS-1` y `LP-ABR-11-2025-GRLL-GOB/PECH-2`;
+  - desiertos con muchos participantes: `LP-SM-2-2026-GRLL-GRA-1` (81), `LP-SM-22-2025-GRLL-GRCO-1` (74), `LP-SM-10-2025-GRLL-GRCO-1` (64), `AS-SM-4-2025-GRELL/CS-01-1` (59) y `LP-SM-18-2025-GRLL-GRCO-1` (59).
 - **Efecto en S01:** con `numberOfTenderers = 1`, la señal significa "un solo participante registrado". No da falsos positivos de oferta única, porque un solo participante implica a lo sumo una oferta, pero no ve los procesos con muchos registrados y una sola oferta. Su texto debe decir "participante registrado" hasta que el SEACE confirme otra cosa.
-- En La Libertad 2025–2026 hay 29 licitaciones abreviadas, 8 concursos abreviados y 21 subastas inversas con un solo participante (`metodos_en_el_departamento`).
+- En La Libertad 2025–2026 hay 35 licitaciones abreviadas, 8 concursos abreviados y 25 subastas inversas con un solo participante (`metodos_en_el_departamento`).
 
 ### Q4 · ¿Qué esquema de clasificación usan los ítems? (S04)
 
@@ -182,7 +184,7 @@ uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spik
 
 - `tender.items[].classification`: esquema `CUBSO` (Catálogo Único de Bienes, Servicios y Obras), normalmente de 16 dígitos (entre 2 y 18). Está en 144 417 ítems; el 86,4 % de los procesos tiene al menos un ítem clasificado. Hay 22 415 ítems sin clasificación, en 18 883 procesos.
 - `tender.items[].additionalClassifications[]`: esquema `UNSPSC`, de 8 dígitos, en los mismos 144 417 ítems. El código CUBSO empieza con el código UNSPSC en el 99,6 % de los casos (`cubso_empieza_con_unspsc`). Los ítems de `awards` y `contracts` tienen la misma estructura de clasificación.
-- En La Libertad 2025–2026 hay 2 541 de 2 888 procesos clasificados (88,0 %), con 51 segmentos (2 dígitos), 178 familias (4), 315 clases (6), 468 productos UNSPSC (8) y 779 códigos CUBSO (`niveles_de_clasificacion_en_el_departamento`).
+- En La Libertad 2025–2026 hay 4 417 de 5 036 procesos clasificados (87,7 %), con 53 segmentos (2 dígitos), 205 familias (4), 426 clases (6), 648 productos UNSPSC (8) y 1 141 códigos CUBSO (`niveles_de_clasificacion_en_el_departamento`).
 - **Efecto en S04:** el "primer nivel del código" (segmento, 2 dígitos) es demasiado amplio; por ejemplo, el segmento 72 junta todos los servicios de construcción y mantenimiento. Se recomienda agrupar por clase (6 dígitos) o familia (4 dígitos) UNSPSC, con el nivel como parámetro en `pipeline/config/senales.toml`.
 
 ### Q5 · ¿Cómo viene el método de contratación (`tender.procurementMethodDetails`)? (S05)
@@ -193,54 +195,54 @@ uv run pipeline spike ../data/raw/2026.jsonl.gz   # informe en data/derived/spik
 - `tender.procurementMethod` (lista de códigos OCDS) es incompleto e inconsistente:
   - es nulo en las licitaciones abreviadas (22 015 de 22 101), los concursos abreviados (19 332 de 19 337) y los concursos de servicios o para consultoría;
   - vale `direct` en contratación directa, adjudicación directa selectiva o pública y exoneración;
-  - en La Libertad 2025–2026 solo lo tienen 957 de 2 888 procesos (cobertura de Cardinal).
+  - en la muestra de La Libertad de `2026.jsonl.gz` solo lo tienen 957 de 2 888 procesos (cobertura de Cardinal).
 - La Libertad 2025–2026 (`metodos_en_el_departamento` y `categorias_en_el_departamento`):
 
 | Método | Procesos |
 |---|---:|
-| Licitación Pública Abreviada | 1 034 |
-| Concurso Público Abreviado | 719 |
-| Subasta Inversa Electrónica | 273 |
-| Licitación Pública | 226 |
-| Contratación Directa | 194 |
-| Concurso Público de Servicios | 124 |
-| Comparación de Precios | 102 |
-| Adjudicación Simplificada | 67 |
-| Concurso Público para Consultoría | 57 |
-| Regímen Especial (así viene escrito en la fuente) | 45 |
-| Contratación Internacional | 19 |
-| Otros 6 nombres | 28 |
+| Licitación Pública Abreviada | 1 533 |
+| Concurso Público Abreviado | 1 050 |
+| Adjudicación Simplificada | 585 |
+| Subasta Inversa Electrónica | 494 |
+| Contratación Directa | 377 |
+| Licitación Pública | 362 |
+| Comparación de Precios | 180 |
+| Concurso Público de Servicios | 146 |
+| Contratación Internacional | 82 |
+| Regímen Especial (así viene escrito en la fuente) | 82 |
+| Concurso Público para Consultoría | 67 |
+| Otros 8 nombres | 78 |
 
-  Por objeto: 1 114 de servicios, 953 de bienes y 821 de obras (`tender.mainProcurementCategory`).
+  Por objeto: 1 920 de servicios, 1 791 de bienes y 1 325 de obras (`tender.mainProcurementCategory`).
 
-- **Efecto en S01, S04 y S05:** qué método es competitivo y cuál es "menos exigente" debe salir de una tabla propia en la configuración, por nombre de `procurementMethodDetails`. Hay que decidir cómo tratar el Régimen Especial (obras por impuestos), la Contratación Internacional y los convenios. S05 es viable: el método está en el 100 % de los procesos y en La Libertad 2025–2026 hay 194 contrataciones directas.
+- **Efecto en S01, S04 y S05:** qué método es competitivo y cuál es "menos exigente" debe salir de una tabla propia en la configuración, por nombre de `procurementMethodDetails`. Hay que decidir cómo tratar el Régimen Especial (obras por impuestos), la Contratación Internacional y los convenios. S05 es viable: el método está en el 100 % de los procesos y en La Libertad 2025–2026 hay 377 contrataciones directas.
 
 ### Q6 · ¿Cuántos contratos tienen culminación con monto final? (S06)
 
-**El 10,3 % de todos los contratos y el 11,7 % de los de La Libertad 2025–2026.**
+**El 10,3 % de los contratos de `2026.jsonl.gz` y el 9,1 % de los de La Libertad 2025–2026.**
 
 - **Campos:** `contracts[].implementation.finalValue.amount` (monto final) y `contracts[].implementation.endDate` (fecha de término), de la extensión de culminación.
 - En todo el archivo hay 104 571 contratos. 10 737 tienen monto final y 6 816, fecha de término. Por año de convocatoria (`culminacion_por_anio_de_convocatoria`), tienen monto final el 24,3 % de los contratos de 2024, el 20,6 % de 2025 y el 3,0 % de 2026 (la mayoría sigue en ejecución).
-- La Libertad 2025–2026: 201 de 1 719 contratos (11,7 %), apenas por encima del 10 % mínimo del catálogo (`culminacion_en_el_departamento`).
+- La Libertad 2025–2026: 290 de 3 177 contratos (9,1 %), **por debajo del 10 % mínimo** del catálogo (`culminacion_en_el_departamento`). Con la regla actual, S06 se desactiva y se registra en el manifiesto. Solo con `2026.jsonl.gz` daba 11,7 % (201 de 1 719), porque los contratos cuya culminación se registró en 2026 quedaron en ese archivo.
 - **Razón entre el monto final y el contratado** (10 572 contratos en soles, `monto_final_frente_al_contratado`): p10 0,92; p25 1,02; mediana 1,11; p75 1,25; p90 1,34. El 80,9 % termina por encima de lo contratado. Con el factor 1,15 del catálogo se marcaría entre el 25 % y el 50 % de los contratos con monto final, así que hay que calibrar el umbral antes de usarlo (por ejemplo, con la valla de Tukey por tipo de objeto).
 
 ### Q7 · ¿Cuántos procesos de La Libertad hay en 2025 y 2026?
 
-**2026: 2 092 procesos (completo hasta el corte). 2025: 796 en este archivo; falta la parte que está en `2025.jsonl.gz`** (`departamento_por_anio_de_convocatoria`).
+**2025: 2 944 procesos. 2026: 2 092 (completo hasta el corte). En total, 5 036** (`departamento_por_anio_de_convocatoria`, con los dos archivos).
 
 | Año de convocatoria | Procesos | Entidades | Con adjudicación | Con contrato | Valor referencial (millones de soles) |
 |---|---:|---:|---:|---:|---:|
+| 2025 | 2 944 | 119 | 2 191 | 1 982 | 4 610,8 |
 | 2026 (1 de enero – 2 de octubre) | 2 092 | 125 | 1 332 | 982 | 2 699,8 |
-| 2025 (solo los actualizados en 2026) | 796 | 107 | 680 | 623 | 2 006,4 |
 
-- De los 2 888 procesos, 2 653 tienen valor referencial mayor que cero, 5 están en otra moneda y todos tienen `amount_PEN` (`montos_en_el_departamento`).
-- Todas las adjudicaciones de 2025–2026 tienen fecha (`awards[].date`; `fechas_de_adjudicacion`), lo que sirve para la ventana de 12 meses de S03.
-- **Tamaño de la demo:** unos 2 900 procesos con este archivo; algunos miles con 2025 completo. Es un tamaño cómodo para un paquete estático por entidad.
-- **Pendiente:** descargar `2025.jsonl.gz` (149 MB) para completar 2025.
+- Los procesos de 2025 están repartidos: 2 148 en `2025.jsonl.gz` y 796 en `2026.jsonl.gz` (`departamento_por_archivo_y_anio`). Con un solo archivo se habría perdido casi tres cuartos de 2025.
+- De los 5 036 procesos, 4 671 tienen valor referencial mayor que cero, 8 están en otra moneda y todos tienen `amount_PEN` (`montos_en_el_departamento`).
+- Las adjudicaciones de 2025–2026 tienen fecha en 108 427 de 108 430 casos (`awards[].date`; `fechas_de_adjudicacion`, nacional), lo que sirve para la ventana de 12 meses de S03.
+- **Tamaño de la demo:** unos 5 000 procesos. Es un tamaño cómodo para un paquete estático por entidad.
 
 ### Q8 · ¿Qué devuelven `ocdscardinal coverage` y `ocdscardinal prepare` sobre una muestra?
 
-**Muestra:** los 2 888 procesos de La Libertad 2025–2026, copiados sin cambios con `uv run pipeline sample`.
+**Muestra:** los 2 888 procesos de La Libertad 2025–2026 que están en `2026.jsonl.gz`, copiados sin cambios con `uv run pipeline sample`.
 
 **Instalación:**
 
@@ -294,7 +296,7 @@ Ningún hallazgo **obliga** a cambiar el JSON Schema: los campos afectados ya ad
 | `procesos[].url_seace` | No hay URL por proceso | `null`, o la página del buscador público. **Se recomienda agregar `nomenclatura`** (`tender.title`), con la que se busca el proceso en el SEACE | Sí, si se agrega `nomenclatura` |
 | `procesos[].estado` | No hay `tender.status` | Derivarlo de `tender.items[].statusDetails` | No |
 | `proveedores[].tipo` y `ruc` | El 23,3 % de los proveedores adjudicados tiene un código que no es RUC (consorcios) | `tipo: "desconocido"` y `ruc: null`. Opcional: agregar el tipo `consorcio` | No (sí, con `consorcio`) |
-| `manifest.senales_activas` y `senales_desactivadas` | S02 no se puede calcular | S02 desactivada con su motivo; S05 al núcleo | No |
+| `manifest.senales_activas` y `senales_desactivadas` | S02 no se puede calcular y S06 queda bajo el mínimo de cobertura | S02 y S06 desactivadas con su motivo; S05 al núcleo | No |
 | `manifest.fuente.archivos` | 2025 está repartido entre dos archivos | `["2025.jsonl.gz", "2026.jsonl.gz"]` | No |
 
 ## Atribución obligatoria

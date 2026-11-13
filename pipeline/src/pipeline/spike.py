@@ -94,8 +94,36 @@ QUERIES: tuple[Query, ...] = (
     ),
     Query(
         "general",
+        "procesos_por_archivo",
+        """
+        SELECT archivo,
+               count(*) AS procesos,
+               min(date)::VARCHAR AS primera_actualizacion,
+               max(date)::VARCHAR AS ultima_actualizacion,
+               min(anio_convocatoria) AS primer_anio_de_convocatoria,
+               max(anio_convocatoria) AS ultimo_anio_de_convocatoria
+        FROM procesos
+        GROUP BY ALL
+        ORDER BY archivo
+        """,
+    ),
+    Query(
+        "general",
+        "ocid_en_varios_archivos",
+        """
+        SELECT count(*) AS ocid_repetidos
+        FROM (SELECT ocid FROM procesos GROUP BY ocid HAVING count(*) > 1)
+        """,
+    ),
+    Query(
+        "general",
         "campos_de_primer_nivel",
-        "SELECT column_name AS campo FROM (DESCRIBE releases) ORDER BY campo",
+        """
+        SELECT column_name AS campo
+        FROM (DESCRIBE releases)
+        WHERE column_name <> 'archivo'
+        ORDER BY campo
+        """,
     ),
     Query(
         "Q1",
@@ -295,7 +323,10 @@ QUERIES: tuple[Query, ...] = (
         (SELECT 'adjudicado con un solo postor' AS caso, ocid, nomenclatura, entidad, metodo,
                 postores
          FROM r
-         WHERE postores = 1 AND adjudicado AND procurementMethod IS DISTINCT FROM 'direct'
+         WHERE postores = 1 AND adjudicado
+           -- Only competitive methods; the signal itself will read them from the config.
+           AND regexp_matches(metodo, '^(Licitación|Concurso|Adjudicación Simplificada'
+                                      || '|Subasta Inversa|Comparación de Precios)')
          ORDER BY ocid
          LIMIT 5)
         UNION ALL
@@ -469,6 +500,17 @@ QUERIES: tuple[Query, ...] = (
     ),
     Query(
         "Q7",
+        "departamento_por_archivo_y_anio",
+        """
+        SELECT anio_convocatoria, archivo, count(*) AS procesos
+        FROM procesos
+        WHERE departamento = $department AND list_contains($years, anio_convocatoria)
+        GROUP BY ALL
+        ORDER BY anio_convocatoria, archivo
+        """,
+    ),
+    Query(
+        "Q7",
         "montos_en_el_departamento",
         """
         SELECT count(*) AS procesos,
@@ -596,20 +638,25 @@ def connect(database: Path | str = ":memory:") -> duckdb.DuckDBPyConnection:
     return con
 
 
-def load_releases(con: duckdb.DuckDBPyConnection, source: Path) -> int:
-    """Load every compiled release of ``source`` into the ``releases`` table.
+def load_releases(con: duckdb.DuckDBPyConnection, *sources: Path) -> int:
+    """Load every compiled release of ``sources`` into the ``releases`` table.
 
-    The schema is inferred from the whole file, so fields present in only a few releases are kept.
+    The schema is inferred from all the files, so fields present in only a few releases are kept.
+    The ``archivo`` column keeps the name of the file each release came from.
     Returns the number of loaded releases.
     """
+    if not sources:
+        raise ValueError("load_releases needs at least one file")
     con.execute(
         """
         CREATE OR REPLACE TABLE releases AS
-        SELECT * FROM read_json(
-            $source, format = 'newline_delimited', sample_size = -1,
-            maximum_object_size = $max_size)
+        SELECT * EXCLUDE (filename),
+               string_split(replace(filename, '\\', '/'), '/')[-1] AS archivo
+        FROM read_json(
+            $sources, format = 'newline_delimited', sample_size = -1,
+            maximum_object_size = $max_size, filename = true)
         """,
-        {"source": str(source), "max_size": MAX_OBJECT_SIZE},
+        {"sources": [str(source) for source in sources], "max_size": MAX_OBJECT_SIZE},
     )
     con.execute(PROCESOS_VIEW)
     row = con.execute("SELECT count(*) FROM releases").fetchone()
@@ -645,11 +692,11 @@ def run_queries(
 
 
 def build_report(
-    source: Path, results: list[dict[str, Any]], department: str, years: Iterable[int]
+    sources: Iterable[Path], results: list[dict[str, Any]], department: str, years: Iterable[int]
 ) -> dict[str, Any]:
     """Wrap the query results with the metadata needed to reproduce them."""
     return {
-        "fuente": source.name,
+        "archivos": [source.name for source in sources],
         "generado": datetime.now(UTC).isoformat(timespec="seconds"),
         "departamento": department,
         "anios": list(years),

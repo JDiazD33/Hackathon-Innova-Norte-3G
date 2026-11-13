@@ -11,7 +11,7 @@ import duckdb
 import pytest
 
 from pipeline import spike
-from pipeline.cli import main
+from pipeline.cli import _file_stem, main
 
 DEPARTMENT = "LA LIBERTAD"
 YEARS = [2025, 2026]
@@ -111,6 +111,37 @@ def test_bids_are_reported_missing(loaded: duckdb.DuckDBPyConnection) -> None:
     fields = {row["campo"] for row in rows(loaded, "campos_de_primer_nivel")}
     assert {"tender", "awards", "contracts"} <= fields
     assert "bids" not in fields
+    assert "archivo" not in fields
+
+
+def test_load_several_files_keeps_the_file_name(split_releases_paths: tuple[Path, Path]) -> None:
+    con = spike.connect()
+    assert spike.load_releases(con, *split_releases_paths) == 7
+    by_file = {row["archivo"]: row["procesos"] for row in rows(con, "procesos_por_archivo")}
+    assert by_file == {"a.jsonl": 3, "b.jsonl": 4}
+    assert rows(con, "ocid_en_varios_archivos") == [{"ocid_repetidos": 0}]
+    by_year_and_file = [
+        (row["anio_convocatoria"], row["archivo"], row["procesos"])
+        for row in rows(con, "departamento_por_archivo_y_anio")
+    ]
+    assert by_year_and_file == [(2025, "b.jsonl", 1), (2026, "a.jsonl", 3)]
+    con.close()
+
+
+def test_process_repeated_across_files_is_reported(releases_path: Path, tmp_path: Path) -> None:
+    copy = tmp_path / "copia.jsonl"
+    copy.write_bytes(releases_path.read_bytes())
+    con = spike.connect()
+    assert spike.load_releases(con, releases_path, copy) == 14
+    assert rows(con, "ocid_en_varios_archivos") == [{"ocid_repetidos": 7}]
+    con.close()
+
+
+def test_load_needs_a_file() -> None:
+    con = spike.connect()
+    with pytest.raises(ValueError, match="at least one file"):
+        spike.load_releases(con)
+    con.close()
 
 
 def test_tenderers_of_failed_processes(loaded: duckdb.DuckDBPyConnection) -> None:
@@ -217,6 +248,7 @@ def test_cli_spike_writes_a_report(releases_path: Path, tmp_path: Path) -> None:
     db_path = tmp_path / "spike.duckdb"
     assert main(["spike", str(releases_path), "--db", str(db_path), "--out", str(report_path)]) == 0
     report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["archivos"] == ["releases.jsonl"]
     assert report["departamento"] == DEPARTMENT
     assert report["anios"] == YEARS
     assert [result["nombre"] for result in report["consultas"]] == [
@@ -224,6 +256,24 @@ def test_cli_spike_writes_a_report(releases_path: Path, tmp_path: Path) -> None:
     ]
     # A second run reuses the database instead of reloading the file.
     assert main(["spike", str(releases_path), "--db", str(db_path), "--out", str(report_path)]) == 0
+
+
+def test_cli_spike_reads_several_files(
+    split_releases_paths: tuple[Path, Path], tmp_path: Path
+) -> None:
+    first, second = split_releases_paths
+    report_path = tmp_path / "spike.json"
+    arguments = [str(first), str(second), "--db", str(tmp_path / "spike.duckdb")]
+    assert main(["spike", *arguments, "--out", str(report_path)]) == 0
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["archivos"] == ["a.jsonl", "b.jsonl"]
+    (summary,) = next(r for r in report["consultas"] if r["nombre"] == "resumen")["filas"]
+    assert summary[:2] == [7, 7]
+
+
+def test_default_names_join_the_file_years() -> None:
+    sources = [Path("data/raw/2025.jsonl.gz"), Path("data/raw/2026.jsonl.gz")]
+    assert _file_stem(sources) == "2025-2026"
 
 
 def test_cli_sample_and_coverage(

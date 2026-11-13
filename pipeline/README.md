@@ -19,6 +19,6 @@ Todas van a `data/`, que no se sube.
 
 | Archivo | Contenido |
 |---|---|
-| `data/interim/spike-<año>.duckdb` | Base DuckDB con los releases cargados. Se reutiliza; `--reload` la vuelve a crear |
-| `data/derived/spike-<año>.json` | Informe del spike: cada consulta con su pregunta, su SQL, sus columnas y sus filas |
+| `data/interim/spike-<años>.duckdb` | Base DuckDB con los releases cargados (por ejemplo, `spike-2025-2026.duckdb` con los dos archivos). Se reutiliza; `--reload` la vuelve a crear |
+| `data/derived/spike-<años>.json` | Informe del spike: cada consulta con su pregunta, su SQL, sus columnas y sus filas |
 | `data/interim/muestra-*.jsonl` | Procesos de una región y unos años, copiados sin cambios, para Cardinal |

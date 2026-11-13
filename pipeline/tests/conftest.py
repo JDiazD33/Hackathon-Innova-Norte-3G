@@ -295,13 +295,28 @@ for number, release in enumerate(RELEASES, start=1):
     release["tender"]["title"] = f"PRUEBA-{number}-2026-EP-1"
 
 
+def write_jsonl(path: Path, releases: list[dict[str, Any]]) -> Path:
+    """Write ``releases`` as line-delimited JSON and return ``path``."""
+    lines = (json.dumps(release, ensure_ascii=False) + "\n" for release in releases)
+    path.write_text("".join(lines), encoding="utf-8")
+    return path
+
+
 @pytest.fixture
 def releases_path(tmp_path: Path) -> Path:
     """The synthetic releases as a line-delimited JSON file."""
-    path = tmp_path / "releases.jsonl"
-    lines = (json.dumps(release, ensure_ascii=False) + "\n" for release in RELEASES)
-    path.write_text("".join(lines), encoding="utf-8")
-    return path
+    return write_jsonl(tmp_path / "releases.jsonl", RELEASES)
+
+
+@pytest.fixture
+def split_releases_paths(tmp_path: Path) -> tuple[Path, Path]:
+    """The synthetic releases split in two files, like the yearly files of the registry.
+
+    ``a.jsonl`` has the three La Libertad processes of 2026; ``b.jsonl`` has the other four.
+    """
+    first = write_jsonl(tmp_path / "a.jsonl", [RELEASES[0], RELEASES[1], RELEASES[3]])
+    second = write_jsonl(tmp_path / "b.jsonl", [RELEASES[2], RELEASES[4], RELEASES[5], RELEASES[6]])
+    return first, second
 
 
 @pytest.fixture

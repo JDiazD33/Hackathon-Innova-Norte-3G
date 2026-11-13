@@ -14,9 +14,9 @@ DEFAULT_DEPARTMENT = "LA LIBERTAD"
 DEFAULT_YEARS = (2025, 2026)
 
 
-def _file_stem(source: Path) -> str:
-    """``2026.jsonl.gz`` -> ``2026``."""
-    return source.name.split(".")[0]
+def _file_stem(sources: list[Path]) -> str:
+    """``[2025.jsonl.gz, 2026.jsonl.gz]`` -> ``2025-2026``."""
+    return "-".join(source.name.split(".")[0] for source in sources)
 
 
 def _data_dir(source: Path) -> Path:
@@ -49,16 +49,18 @@ def _build_parser() -> argparse.ArgumentParser:
     spike_parser = commands.add_parser(
         "spike", help="responde Q1-Q7 con consultas DuckDB y escribe un informe JSON"
     )
-    spike_parser.add_argument("source", type=Path, help="archivo OCDS .jsonl o .jsonl.gz")
+    spike_parser.add_argument(
+        "sources", type=Path, nargs="+", help="uno o más archivos OCDS .jsonl o .jsonl.gz"
+    )
     _add_scope_arguments(spike_parser)
     spike_parser.add_argument(
-        "--db", type=Path, help="base DuckDB (por defecto, data/interim/spike-<año>.duckdb)"
+        "--db", type=Path, help="base DuckDB (por defecto, data/interim/spike-<años>.duckdb)"
     )
     spike_parser.add_argument(
-        "--out", type=Path, help="informe JSON (por defecto, data/derived/spike-<año>.json)"
+        "--out", type=Path, help="informe JSON (por defecto, data/derived/spike-<años>.json)"
     )
     spike_parser.add_argument(
-        "--reload", action="store_true", help="vuelve a cargar el archivo aunque la base exista"
+        "--reload", action="store_true", help="vuelve a cargar los archivos aunque la base exista"
     )
 
     sample_parser = commands.add_parser(
@@ -77,25 +79,27 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _run_spike(args: argparse.Namespace) -> int:
-    stem = _file_stem(args.source)
-    db = args.db or _data_dir(args.source) / "interim" / f"spike-{stem}.duckdb"
-    out = args.out or _data_dir(args.source) / "derived" / f"spike-{stem}.json"
+    sources: list[Path] = args.sources
+    stem = _file_stem(sources)
+    db = args.db or _data_dir(sources[0]) / "interim" / f"spike-{stem}.duckdb"
+    out = args.out or _data_dir(sources[0]) / "derived" / f"spike-{stem}.json"
     db.parent.mkdir(parents=True, exist_ok=True)
     reload = args.reload or not db.exists()
     con = spike.connect(db)
     try:
         if reload:
             started = time.perf_counter()
-            loaded = spike.load_releases(con, args.source)
+            loaded = spike.load_releases(con, *sources)
             elapsed = time.perf_counter() - started
-            print(f"Cargados {loaded} procesos de {args.source.name} en {elapsed:.0f} s")
+            names = ", ".join(source.name for source in sources)
+            print(f"Cargados {loaded} procesos de {names} en {elapsed:.0f} s")
         else:
             con.execute(spike.PROCESOS_VIEW)
             print(f"Usando la base existente {db} (usa --reload para recargar)")
         results = spike.run_queries(con, args.department, args.years)
     finally:
         con.close()
-    spike.write_json(spike.build_report(args.source, results, args.department, args.years), out)
+    spike.write_json(spike.build_report(sources, results, args.department, args.years), out)
     for result in results:
         print()
         print(spike.format_result(result))
