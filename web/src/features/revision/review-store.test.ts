@@ -18,7 +18,7 @@ describe("Contrato inicial de revisión para los lotes B y C", () => {
   });
 
   it("una ficha puede leer el historial vacío", () => {
-    const store: ReviewStore = new EmptyReviewStore();
+    const store = new EmptyReviewStore();
     expect(store.listReviews("ocds-fixture-e1-007")).toEqual([]);
     expect(store.listAssignedTo("analista")).toEqual([]);
     expect(store.listAssignedBy("jefatura")).toEqual([]);

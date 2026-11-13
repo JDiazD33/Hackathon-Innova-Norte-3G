@@ -1,5 +1,5 @@
 import type { ReviewStore } from "./review-store";
-import type { AssignmentEntry, DecisionEntry, ImportResult, ReviewSnapshot } from "./types";
+import type { ReviewSnapshot } from "./types";
 
 export const EMPTY_REVIEW_SNAPSHOT: ReviewSnapshot = Object.freeze({
   entries: Object.freeze([]), persistence: "memory", warning: null,
@@ -11,18 +11,18 @@ function unavailable(): never {
 
 /** Permite integrar lecturas antes de conectar el almacenamiento de la demo. */
 export class EmptyReviewStore implements ReviewStore {
-  listReviews() { return EMPTY_REVIEW_SNAPSHOT.entries; }
-  getState() { return "sin_revisar" as const; }
-  listAssignedTo(): readonly AssignmentEntry[] { return []; }
-  listAssignedBy(): readonly AssignmentEntry[] { return []; }
-  listDecided(): readonly DecisionEntry[] { return []; }
+  listReviews: ReviewStore["listReviews"] = () => EMPTY_REVIEW_SNAPSHOT.entries;
+  getState: ReviewStore["getState"] = () => "sin_revisar";
+  listAssignedTo: ReviewStore["listAssignedTo"] = () => [];
+  listAssignedBy: ReviewStore["listAssignedBy"] = () => [];
+  listDecided: ReviewStore["listDecided"] = () => [];
   getSnapshot() { return EMPTY_REVIEW_SNAPSHOT; }
   getServerSnapshot() { return EMPTY_REVIEW_SNAPSHOT; }
-  subscribe() { return () => {}; }
+  subscribe: ReviewStore["subscribe"] = () => () => {};
   syncFromStorage() {}
   exportReviews() { return JSON.stringify({ version: 1, entradas: [] }); }
-  saveDecision(): DecisionEntry { return unavailable(); }
-  assign(): AssignmentEntry { return unavailable(); }
-  importReviews(): ImportResult { return unavailable(); }
-  resetDemo(): void { unavailable(); }
+  saveDecision: ReviewStore["saveDecision"] = unavailable;
+  assign: ReviewStore["assign"] = unavailable;
+  importReviews: ReviewStore["importReviews"] = unavailable;
+  resetDemo: ReviewStore["resetDemo"] = unavailable;
 }
