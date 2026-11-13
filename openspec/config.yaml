@@ -1,0 +1,16 @@
+schema: spec-driven
+
+context: |
+  Language: Spanish
+  All artifacts must be written in Spanish.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+  Project: prototype for the Hackathon Innova Norte 3G (UNT, Peru). Stage-Gate 1 deadline: 2026-11-25 23:59 (America/Lima); internal target 18:00.
+  The official rules (docs/bases/requisitos-y-entregables.md) prevail: no connection to production systems, no scraping, respect third-party licenses, protect personal data (Ley 29733).
+  Signals are never accusations: no corruption probability, explainable review priority, red only for human decisions (docs/adr/0007-senales-no-acusaciones.md).
+  Code identifiers in English; UI text, docs and derived data tables in Spanish (docs/adr/0006-convencion-de-nombres.md).
+
+rules:
+  tasks:
+    - Each change belongs to one lote and one owner (docs/plan/cronograma-y-lotes.md); group tasks under the lote's partes (A1, A2, B1...) in plan order
+    - Keep each task under 2 hours of work
+    - The last group of each change is a lote verification task that names the exact checks to run

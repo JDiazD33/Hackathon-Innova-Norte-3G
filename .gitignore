@@ -1,0 +1,42 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Datos: nunca se suben (ver docs/datos/fuente-de-datos.md)
+data/raw/
+data/interim/
+data/derived/
+*.jsonl
+*.jsonl.gz
+*.csv.tar.gz
+*.parquet
+*.duckdb
+*.duckdb.wal
+!**/fixtures/**
+# Paquete local con nombres reales: solo para sesiones de validación
+web/data/local/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Editores
+.idea/
+
+# Herramientas locales
+graphify-out/
