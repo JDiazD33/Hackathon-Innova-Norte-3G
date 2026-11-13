@@ -57,7 +57,7 @@ Los tokens se definen en `web/src/app/globals.css` como variables CSS de shadcn/
 
 - **Fuente:** Geist Sans, la fuente por defecto de Next.js, o Inter. Las cifras usan números tabulares (`tabular-nums`).
 - **Escala:** 12 / 14 / 16 / 20 / 24 / 30 px. El texto base es de 14 px en tablas y 16 px en el contenido.
-- **Montos:** en soles, con separador de miles (S/ 1 250 000). Las fechas se escriben como "4 oct 2026".
+- **Montos y fechas:** formato es-PE con las funciones de `web/src/lib/format.ts`: "S/ 1,250,000", "4 oct 2026" y "31%". Un dato que falta se muestra como "Sin dato".
 - **Espaciado:** múltiplos de 4 px. Las tarjetas usan un radio de 12 px y una sombra suave.
 
 ## Estructura de la pantalla

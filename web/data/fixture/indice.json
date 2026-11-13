@@ -1,0 +1,88 @@
+{
+  "procesos": {
+    "ocds-fixture-e1-001": "entidad-0001",
+    "ocds-fixture-e1-002": "entidad-0001",
+    "ocds-fixture-e1-003": "entidad-0001",
+    "ocds-fixture-e1-004": "entidad-0001",
+    "ocds-fixture-e1-005": "entidad-0001",
+    "ocds-fixture-e1-006": "entidad-0001",
+    "ocds-fixture-e1-007": "entidad-0001",
+    "ocds-fixture-e1-008": "entidad-0001",
+    "ocds-fixture-e1-009": "entidad-0001",
+    "ocds-fixture-e1-010": "entidad-0001",
+    "ocds-fixture-e1-011": "entidad-0001",
+    "ocds-fixture-e1-012": "entidad-0001",
+    "ocds-fixture-e1-013": "entidad-0001",
+    "ocds-fixture-e1-014": "entidad-0001",
+    "ocds-fixture-e1-015": "entidad-0001",
+    "ocds-fixture-e1-016": "entidad-0001",
+    "ocds-fixture-e1-017": "entidad-0001",
+    "ocds-fixture-e1-018": "entidad-0001",
+    "ocds-fixture-e1-019": "entidad-0001",
+    "ocds-fixture-e1-020": "entidad-0001",
+    "ocds-fixture-e1-021": "entidad-0001",
+    "ocds-fixture-e1-022": "entidad-0001",
+    "ocds-fixture-e2-001": "entidad-0002",
+    "ocds-fixture-e2-002": "entidad-0002",
+    "ocds-fixture-e2-003": "entidad-0002",
+    "ocds-fixture-e2-004": "entidad-0002",
+    "ocds-fixture-e2-005": "entidad-0002",
+    "ocds-fixture-e2-006": "entidad-0002",
+    "ocds-fixture-e2-007": "entidad-0002",
+    "ocds-fixture-e2-008": "entidad-0002",
+    "ocds-fixture-e2-009": "entidad-0002",
+    "ocds-fixture-e2-010": "entidad-0002",
+    "ocds-fixture-e2-011": "entidad-0002",
+    "ocds-fixture-e2-012": "entidad-0002",
+    "ocds-fixture-e2-013": "entidad-0002",
+    "ocds-fixture-e2-014": "entidad-0002",
+    "ocds-fixture-e2-015": "entidad-0002",
+    "ocds-fixture-e2-016": "entidad-0002",
+    "ocds-fixture-e2-017": "entidad-0002",
+    "ocds-fixture-e2-018": "entidad-0002"
+  },
+  "proveedores": {
+    "P0001": [
+      "entidad-0001",
+      "entidad-0002"
+    ],
+    "P0002": [
+      "entidad-0001",
+      "entidad-0002"
+    ],
+    "P0003": [
+      "entidad-0001"
+    ],
+    "P0004": [
+      "entidad-0001",
+      "entidad-0002"
+    ],
+    "P0005": [
+      "entidad-0001",
+      "entidad-0002"
+    ],
+    "P0006": [
+      "entidad-0001",
+      "entidad-0002"
+    ],
+    "P0007": [
+      "entidad-0001"
+    ],
+    "P0008": [
+      "entidad-0001",
+      "entidad-0002"
+    ],
+    "P0009": [
+      "entidad-0001"
+    ],
+    "P0010": [
+      "entidad-0002"
+    ],
+    "P0011": [
+      "entidad-0002"
+    ],
+    "P0012": [
+      "entidad-0002"
+    ]
+  }
+}

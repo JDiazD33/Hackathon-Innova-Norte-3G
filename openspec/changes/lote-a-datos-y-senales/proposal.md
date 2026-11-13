@@ -2,7 +2,7 @@
 
 ## Why
 
-Todas las pantallas dependen de datos confiables y de señales reproducibles. Sin un pipeline que convierta los datos abiertos del OECE en señales explicables, el MVP no puede demostrar su valor con datos reales, y ese es el principal diferencial frente a los equipos que usarán datos sintéticos. Este lote (Estefano, ★★★★) es el más exigente del proyecto y, además, integra el trabajo de los demás antes de la entrega del 25 de noviembre.
+Todas las pantallas dependen de datos confiables y de señales reproducibles. Sin un pipeline que convierta los datos abiertos del OECE en señales explicables, el MVP no puede demostrar su valor con datos reales, y ese es el principal diferencial frente a los equipos que usarán datos sintéticos. Este lote (Stefano, ★★★★) es el más exigente del proyecto y, además, integra el trabajo de los demás antes de la entrega del 25 de noviembre.
 
 ## What Changes
 

@@ -4,8 +4,8 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 
 ## 1. B1 · Base web (Fase 0, sáb 14)
 
-- [ ] 1.1 Crear `web/` con create-next-app (TypeScript, App Router, Tailwind CSS, ESLint, carpeta `src/`) y anotar en `CONTRIBUTING.md` la versión de Next.js y los comandos reales. Verificar que `npm run build` termina sin errores.
-- [ ] 1.2 Configurar Vitest y Testing Library. Verificar con una prueba de ejemplo que `npm test` pasa.
+- [x] 1.1 Crear `web/` con create-next-app (TypeScript, App Router, Tailwind CSS, ESLint, carpeta `src/`) y anotar en `CONTRIBUTING.md` la versión de Next.js y los comandos reales. Verificar que `npm run build` termina sin errores.
+- [x] 1.2 Configurar Vitest y Testing Library. Verificar con una prueba de ejemplo que `npm test` pasa.
 - [ ] 1.3 Inicializar shadcn/ui y agregar los componentes base del sistema de diseño. Verificar que una página de prueba los muestra en modo claro y oscuro.
 - [ ] 1.4 Definir en `globals.css` los tokens de color, de prioridad y de estado, la tipografía y el modo oscuro. Verificar con una herramienta de contraste que todos los pares de texto llegan a 4,5:1.
 - [ ] 1.5 Construir la estructura común: barra lateral, cabecera (entidad, buscador, espacio para el rol, fecha de corte y modo demostración) y pie. Verificar navegando solo con el teclado y revisando la vista a 375, 768 y 1280 px.
@@ -13,9 +13,9 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 
 ## 2. B2 · Contrato y acceso a datos (Fase 0, sáb 14)
 
-- [ ] 2.1 Escribir `contracts/paquete-de-datos.schema.json` a partir del contrato v1, junto con el Lote A. Verificar que los ejemplos del documento del contrato validan.
-- [ ] 2.2 Crear el fixture sintético en `web/data/fixture/`: 2 entidades, unos 40 procesos, todas las señales y un expediente simulado. Verificar que valida contra el schema.
-- [ ] 2.3 Definir la interfaz `DataSource` y los tipos del contrato, e implementar `StaticDataSource` con `DATA_DIR`. Verificar con pruebas unitarias sobre el fixture.
+- [x] 2.1 Escribir `contracts/paquete-de-datos.schema.json` a partir del contrato v1, junto con el Lote A. Verificar con `npm test -- paquete` que el fixture valida y que un paquete roto falla.
+- [x] 2.2 Crear el fixture sintético en `web/data/fixture/`: 2 entidades, unos 40 procesos, todas las señales y un expediente simulado. Verificar que valida contra el schema.
+- [x] 2.3 Definir la interfaz `DataSource` y los tipos del contrato, e implementar `StaticDataSource` con `PAQUETE_DATOS`. Verificar con pruebas unitarias sobre el fixture.
 
 ## 3. B3 · Panel de la entidad
 
@@ -32,7 +32,7 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 
 ## 5. B5 · Despliegue y ejecución local
 
-- [ ] 5.1 Desplegar en Vercel con `DATA_DIR=data/publico`. Verificar desde otro dispositivo que el enlace abre el panel, la bandeja y una ficha.
+- [ ] 5.1 Desplegar en Vercel con `PAQUETE_DATOS=publico`. Verificar desde otro dispositivo que el enlace abre el panel, la bandeja y una ficha.
 - [ ] 5.2 Documentar en `CONTRIBUTING.md` la ejecución local para la demo (`npm run build` y `npm run start`). Verificar con el Wi-Fi apagado.
 
 ## 6. Verificación del lote

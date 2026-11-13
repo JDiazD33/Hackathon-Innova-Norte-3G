@@ -1,0 +1,66 @@
+{
+  "version_contrato": "1.0",
+  "version_reglas": "fixture-1",
+  "generado": "2026-11-13T12:00:00-05:00",
+  "fecha_corte": "2026-10-04",
+  "fuente": {
+    "nombre": "Fixture sintético con datos ficticios (no proviene del OECE)",
+    "url": "https://data.open-contracting.org/en/publication/135",
+    "archivos": []
+  },
+  "licencia": "CC BY 4.0",
+  "atribucion": "Datos ficticios generados para pruebas; no corresponden a procesos ni a proveedores reales.",
+  "region": "LA LIBERTAD",
+  "anios": [
+    2025,
+    2026
+  ],
+  "modo": "publico",
+  "conteos": {
+    "procesos": 40,
+    "senales": 13,
+    "proveedores": 12,
+    "entidades": 2
+  },
+  "exclusiones": [
+    {
+      "motivo": "S01: sin dato de postores",
+      "cantidad": 1
+    }
+  ],
+  "correcciones": [
+    {
+      "tipo": "postor duplicado",
+      "cantidad": 1
+    }
+  ],
+  "senales_activas": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S08"
+  ],
+  "senales_desactivadas": [
+    {
+      "codigo": "S07",
+      "motivo": "falta una fuente abierta de proveedores sancionados"
+    }
+  ],
+  "prioridad": {
+    "pesos": {
+      "S01": 3,
+      "S02": 2,
+      "S03": 3,
+      "S04": 3,
+      "S06": 2,
+      "S08": 3
+    },
+    "cortes": {
+      "alta": 5,
+      "media": 3
+    }
+  }
+}

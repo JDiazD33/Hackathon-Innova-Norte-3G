@@ -1,0 +1,378 @@
+[
+  {
+    "id": "S01-ocds-fixture-e1-003",
+    "codigo": "S01",
+    "categoria": "competencia",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e1-003"
+    },
+    "ocids": [
+      "ocds-fixture-e1-003"
+    ],
+    "valor": 1,
+    "unidad": "postores",
+    "umbral": {
+      "operador": "igual",
+      "valor": 1,
+      "descripcion": "procedimiento competitivo con un solo postor"
+    },
+    "comparacion": {
+      "n": 20,
+      "q1": null,
+      "mediana": null,
+      "q3": null,
+      "valla_superior": null,
+      "percentil_del_caso": null,
+      "proporcion_referencia": 0.85,
+      "descripcion": "Procesos competitivos de la entidad (2025–2026)",
+      "ambito": "region"
+    },
+    "referencia": {
+      "cardinal": "R018",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S01@1",
+    "entradas": {
+      "numero_postores": 1,
+      "metodo": "Adjudicación simplificada"
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S01-ocds-fixture-e1-009",
+    "codigo": "S01",
+    "categoria": "competencia",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e1-009"
+    },
+    "ocids": [
+      "ocds-fixture-e1-009"
+    ],
+    "valor": 1,
+    "unidad": "postores",
+    "umbral": {
+      "operador": "igual",
+      "valor": 1,
+      "descripcion": "procedimiento competitivo con un solo postor"
+    },
+    "comparacion": {
+      "n": 20,
+      "q1": null,
+      "mediana": null,
+      "q3": null,
+      "valla_superior": null,
+      "percentil_del_caso": null,
+      "proporcion_referencia": 0.85,
+      "descripcion": "Procesos competitivos de la entidad (2025–2026)",
+      "ambito": "region"
+    },
+    "referencia": {
+      "cardinal": "R018",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S01@1",
+    "entradas": {
+      "numero_postores": 1,
+      "metodo": "Adjudicación simplificada"
+    },
+    "calidad": [
+      "Se corrigió un postor duplicado en este proceso."
+    ],
+    "simulado": false
+  },
+  {
+    "id": "S01-ocds-fixture-e1-014",
+    "codigo": "S01",
+    "categoria": "competencia",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e1-014"
+    },
+    "ocids": [
+      "ocds-fixture-e1-014"
+    ],
+    "valor": 1,
+    "unidad": "postores",
+    "umbral": {
+      "operador": "igual",
+      "valor": 1,
+      "descripcion": "procedimiento competitivo con un solo postor"
+    },
+    "comparacion": {
+      "n": 20,
+      "q1": null,
+      "mediana": null,
+      "q3": null,
+      "valla_superior": null,
+      "percentil_del_caso": null,
+      "proporcion_referencia": 0.85,
+      "descripcion": "Procesos competitivos de la entidad (2025–2026)",
+      "ambito": "region"
+    },
+    "referencia": {
+      "cardinal": "R018",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S01@1",
+    "entradas": {
+      "numero_postores": 1,
+      "metodo": "Adjudicación simplificada"
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S02-ocds-fixture-e1-003",
+    "codigo": "S02",
+    "categoria": "tiempos",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e1-003"
+    },
+    "ocids": [
+      "ocds-fixture-e1-003"
+    ],
+    "valor": 2,
+    "unidad": "días calendario",
+    "umbral": {
+      "operador": "menor_que",
+      "valor": 8,
+      "descripcion": "percentil 10 del plazo de presentación de procesos competitivos comparables"
+    },
+    "comparacion": {
+      "descripcion": "Procesos competitivos de la región (2025–2026)",
+      "ambito": "region",
+      "n": 31,
+      "q1": 9,
+      "mediana": 14,
+      "q3": 15.5,
+      "valla_superior": null,
+      "percentil_del_caso": 9.7,
+      "proporcion_referencia": null
+    },
+    "referencia": {
+      "cardinal": "R003",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S02@1",
+    "entradas": {
+      "dias_presentacion": 2,
+      "metodo": "Adjudicación simplificada",
+      "percentil_configurado": 10
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S02-ocds-fixture-e1-017",
+    "codigo": "S02",
+    "categoria": "tiempos",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e1-017"
+    },
+    "ocids": [
+      "ocds-fixture-e1-017"
+    ],
+    "valor": 2,
+    "unidad": "días calendario",
+    "umbral": {
+      "operador": "menor_que",
+      "valor": 8,
+      "descripcion": "percentil 10 del plazo de presentación de procesos competitivos comparables"
+    },
+    "comparacion": {
+      "descripcion": "Procesos competitivos de la región (2025–2026)",
+      "ambito": "region",
+      "n": 31,
+      "q1": 9,
+      "mediana": 14,
+      "q3": 15.5,
+      "valla_superior": null,
+      "percentil_del_caso": 9.7,
+      "proporcion_referencia": null
+    },
+    "referencia": {
+      "cardinal": "R003",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S02@1",
+    "entradas": {
+      "dias_presentacion": 2,
+      "metodo": "Adjudicación simplificada",
+      "percentil_configurado": 10
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S03-P0003-entidad-0001",
+    "codigo": "S03",
+    "categoria": "concentracion",
+    "nivel": "proveedor_entidad",
+    "objeto": {
+      "tipo": "proveedor",
+      "id": "P0003"
+    },
+    "ocids": [
+      "ocds-fixture-e1-001",
+      "ocds-fixture-e1-003",
+      "ocds-fixture-e1-005",
+      "ocds-fixture-e1-007",
+      "ocds-fixture-e1-009",
+      "ocds-fixture-e1-012",
+      "ocds-fixture-e1-014",
+      "ocds-fixture-e1-017",
+      "ocds-fixture-e1-020"
+    ],
+    "valor": 0.4091,
+    "unidad": "participación en las adjudicaciones",
+    "umbral": {
+      "operador": "mayor_que",
+      "valor": 0.1591,
+      "descripcion": "valla superior de Tukey (Q3 + 1,5 × RIC) de la participación de los proveedores de la entidad"
+    },
+    "comparacion": {
+      "descripcion": "Proveedores con adjudicaciones en la entidad durante el periodo",
+      "ambito": "region",
+      "n": 9,
+      "q1": 0.0455,
+      "mediana": 0.0909,
+      "q3": 0.0909,
+      "valla_superior": 0.1591,
+      "percentil_del_caso": 100,
+      "proporcion_referencia": null
+    },
+    "referencia": {
+      "cardinal": null,
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S03@1",
+    "entradas": {
+      "adjudicaciones_proveedor": 9,
+      "adjudicaciones_entidad": 22,
+      "minimo_adjudicaciones": 3
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S04-entidad-0001-g01",
+    "codigo": "S04",
+    "categoria": "fraccionamiento",
+    "nivel": "grupo",
+    "objeto": {
+      "tipo": "grupo",
+      "id": "entidad-0001-g01"
+    },
+    "ocids": [
+      "ocds-fixture-e1-010",
+      "ocds-fixture-e1-011"
+    ],
+    "valor": 440000,
+    "unidad": "soles",
+    "umbral": {
+      "operador": "mayor_que",
+      "valor": 400000,
+      "descripcion": "umbral configurado del método superior (valor ficticio del fixture)"
+    },
+    "comparacion": null,
+    "referencia": {
+      "cardinal": null,
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S04@1",
+    "entradas": {
+      "ventana_dias": 60,
+      "dias_entre_convocatorias": 20,
+      "clase_item": "Mobiliario",
+      "metodos": [
+        "Comparación de precios",
+        "Comparación de precios"
+      ],
+      "montos_referenciales": [
+        230000,
+        210000
+      ]
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S06-ocds-fixture-e1-015",
+    "codigo": "S06",
+    "categoria": "ejecucion",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e1-015"
+    },
+    "ocids": [
+      "ocds-fixture-e1-015"
+    ],
+    "valor": 1.22,
+    "unidad": "veces el monto contratado",
+    "umbral": {
+      "operador": "mayor_o_igual",
+      "valor": 1.15,
+      "descripcion": "monto final igual o mayor que el contratado más 15 %"
+    },
+    "comparacion": null,
+    "referencia": {
+      "cardinal": null,
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S06@1",
+    "entradas": {
+      "monto_contratado": 214797.31,
+      "monto_final": 262052.72
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S08-ocds-fixture-e1-007",
+    "codigo": "S08",
+    "categoria": "trazabilidad",
+    "nivel": "expediente",
+    "objeto": {
+      "tipo": "expediente",
+      "id": "ocds-fixture-e1-007"
+    },
+    "ocids": [
+      "ocds-fixture-e1-007"
+    ],
+    "valor": 3,
+    "unidad": "etapas a cargo de la misma persona",
+    "umbral": {
+      "operador": "mayor_o_igual",
+      "valor": 2,
+      "descripcion": "una misma persona en dos o más etapas que deberían estar separadas"
+    },
+    "comparacion": null,
+    "referencia": {
+      "cardinal": null,
+      "ocp": null
+    },
+    "version_regla": "S08@1",
+    "entradas": {
+      "persona": "Persona A",
+      "etapas": [
+        "requerimiento",
+        "evaluacion",
+        "conformidad"
+      ],
+      "conformidad_sin_documento": true
+    },
+    "calidad": [],
+    "simulado": true
+  }
+]

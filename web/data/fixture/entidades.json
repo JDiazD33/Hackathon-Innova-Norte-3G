@@ -1,0 +1,271 @@
+[
+  {
+    "id": "entidad-0001",
+    "nombre": "Universidad Pública Ficticia del Norte",
+    "tipo": "universidad",
+    "resumen": {
+      "procesos": 22,
+      "monto_total": 7843215.79,
+      "procesos_con_senales": 12,
+      "por_categoria": {
+        "competencia": 3,
+        "tiempos": 2,
+        "concentracion": 1,
+        "fraccionamiento": 1,
+        "ejecucion": 1,
+        "trazabilidad": 1
+      },
+      "tendencia_mensual": [
+        {
+          "mes": "2025-01",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-02",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-03",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-04",
+          "procesos": 2,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-05",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-06",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-07",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-08",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-09",
+          "procesos": 2,
+          "con_senales": 2
+        },
+        {
+          "mes": "2025-10",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-11",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-12",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2026-01",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2026-02",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-03",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2026-04",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-05",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-06",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2026-07",
+          "procesos": 2,
+          "con_senales": 0
+        }
+      ],
+      "top_proveedores": [
+        {
+          "proveedor_id": "P0003",
+          "participacion": 0.4091,
+          "adjudicaciones": 9
+        },
+        {
+          "proveedor_id": "P0001",
+          "participacion": 0.0909,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0002",
+          "participacion": 0.0909,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0004",
+          "participacion": 0.0909,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0005",
+          "participacion": 0.0909,
+          "adjudicaciones": 2
+        }
+      ]
+    },
+    "senales_entidad": []
+  },
+  {
+    "id": "entidad-0002",
+    "nombre": "Municipalidad Provincial Ficticia",
+    "tipo": "municipalidad",
+    "resumen": {
+      "procesos": 18,
+      "monto_total": 5464229.84,
+      "procesos_con_senales": 2,
+      "por_categoria": {
+        "competencia": 3,
+        "tiempos": 1
+      },
+      "tendencia_mensual": [
+        {
+          "mes": "2025-01",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-02",
+          "procesos": 1,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-03",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-04",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-05",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-06",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-07",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-08",
+          "procesos": 2,
+          "con_senales": 1
+        },
+        {
+          "mes": "2025-09",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-10",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-11",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2025-12",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-01",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-02",
+          "procesos": 1,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-03",
+          "procesos": 2,
+          "con_senales": 0
+        },
+        {
+          "mes": "2026-04",
+          "procesos": 1,
+          "con_senales": 0
+        }
+      ],
+      "top_proveedores": [
+        {
+          "proveedor_id": "P0001",
+          "participacion": 0.1111,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0002",
+          "participacion": 0.1111,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0004",
+          "participacion": 0.1111,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0005",
+          "participacion": 0.1111,
+          "adjudicaciones": 2
+        },
+        {
+          "proveedor_id": "P0006",
+          "participacion": 0.1111,
+          "adjudicaciones": 2
+        }
+      ]
+    },
+    "senales_entidad": [
+      "S05-entidad-0002"
+    ]
+  }
+]

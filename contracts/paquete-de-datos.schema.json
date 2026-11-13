@@ -1,0 +1,402 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JDiazD33/Hackathon-Innova-Norte-3G/contracts/paquete-de-datos.schema.json",
+  "title": "Paquete de datos v1",
+  "description": "Contrato entre el pipeline (Lote A) y la web (lotes B, C y D). Documentación: docs/arquitectura/contrato-paquete-de-datos.md. Cada archivo del paquete valida contra uno de los $defs: manifest, entidades, procesos, senales, proveedores, expedientes o indice.",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "fecha": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2})?([+-]\\d{2}:\\d{2}|Z)?)?$"
+    },
+    "fechaONula": {
+      "anyOf": [{ "$ref": "#/$defs/fecha" }, { "type": "null" }]
+    },
+    "montoONulo": {
+      "anyOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }]
+    },
+    "numeroONulo": {
+      "type": ["number", "null"]
+    },
+    "codigoSenal": {
+      "enum": ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08"]
+    },
+    "categoria": {
+      "enum": ["competencia", "tiempos", "concentracion", "fraccionamiento", "ejecucion", "reputacional", "trazabilidad"]
+    },
+    "nivelPrioridad": {
+      "enum": ["alta", "media", "baja"]
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version_contrato", "version_reglas", "generado", "fecha_corte", "fuente", "licencia", "atribucion",
+        "region", "anios", "modo", "conteos", "exclusiones", "correcciones", "senales_activas",
+        "senales_desactivadas", "prioridad"
+      ],
+      "properties": {
+        "version_contrato": { "type": "string", "pattern": "^1\\.\\d+$" },
+        "version_reglas": { "type": "string", "minLength": 1 },
+        "generado": { "$ref": "#/$defs/fecha" },
+        "fecha_corte": { "$ref": "#/$defs/fecha" },
+        "fuente": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nombre", "url", "archivos"],
+          "properties": {
+            "nombre": { "type": "string", "minLength": 1 },
+            "url": { "type": "string", "format": "uri" },
+            "archivos": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "licencia": { "type": "string", "minLength": 1 },
+        "atribucion": { "type": "string", "minLength": 1 },
+        "region": { "type": "string", "minLength": 1 },
+        "anios": { "type": "array", "items": { "type": "integer", "minimum": 2003 }, "minItems": 1 },
+        "modo": { "enum": ["publico", "local"] },
+        "conteos": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["procesos", "senales", "proveedores", "entidades"],
+          "properties": {
+            "procesos": { "type": "integer", "minimum": 0 },
+            "senales": { "type": "integer", "minimum": 0 },
+            "proveedores": { "type": "integer", "minimum": 0 },
+            "entidades": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "exclusiones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["motivo", "cantidad"],
+            "properties": {
+              "motivo": { "type": "string", "minLength": 1 },
+              "cantidad": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "correcciones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tipo", "cantidad"],
+            "properties": {
+              "tipo": { "type": "string", "minLength": 1 },
+              "cantidad": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "senales_activas": { "type": "array", "items": { "$ref": "#/$defs/codigoSenal" }, "uniqueItems": true },
+        "senales_desactivadas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["codigo", "motivo"],
+            "properties": {
+              "codigo": { "$ref": "#/$defs/codigoSenal" },
+              "motivo": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "prioridad": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pesos", "cortes"],
+          "properties": {
+            "pesos": {
+              "type": "object",
+              "propertyNames": { "$ref": "#/$defs/codigoSenal" },
+              "additionalProperties": { "type": "integer", "minimum": 1 }
+            },
+            "cortes": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["alta", "media"],
+              "properties": {
+                "alta": { "type": "integer", "minimum": 1 },
+                "media": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "entidad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "nombre", "tipo", "resumen", "senales_entidad"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "nombre": { "type": "string", "minLength": 1 },
+        "tipo": { "type": "string", "minLength": 1 },
+        "resumen": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["procesos", "monto_total", "procesos_con_senales", "por_categoria", "tendencia_mensual", "top_proveedores"],
+          "properties": {
+            "procesos": { "type": "integer", "minimum": 0 },
+            "monto_total": { "type": "number", "minimum": 0 },
+            "procesos_con_senales": { "type": "integer", "minimum": 0 },
+            "por_categoria": {
+              "type": "object",
+              "propertyNames": { "$ref": "#/$defs/categoria" },
+              "additionalProperties": { "type": "integer", "minimum": 0 }
+            },
+            "tendencia_mensual": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["mes", "procesos", "con_senales"],
+                "properties": {
+                  "mes": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+                  "procesos": { "type": "integer", "minimum": 0 },
+                  "con_senales": { "type": "integer", "minimum": 0 }
+                }
+              }
+            },
+            "top_proveedores": {
+              "type": "array",
+              "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["proveedor_id", "participacion", "adjudicaciones"],
+                "properties": {
+                  "proveedor_id": { "$ref": "#/$defs/id" },
+                  "participacion": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "adjudicaciones": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "senales_entidad": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "entidades": { "type": "array", "items": { "$ref": "#/$defs/entidad" } },
+    "prioridad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["puntaje", "nivel", "desglose"],
+      "properties": {
+        "puntaje": { "type": "integer", "minimum": 1 },
+        "nivel": { "$ref": "#/$defs/nivelPrioridad" },
+        "desglose": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["codigo", "peso"],
+            "properties": {
+              "codigo": { "$ref": "#/$defs/codigoSenal" },
+              "peso": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "proceso": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ocid", "entidad_id", "descripcion", "metodo", "objeto", "moneda", "monto_referencial", "monto_adjudicado",
+        "monto_final", "fechas", "numero_postores", "estado", "ganadores", "documentos", "url_seace", "senales",
+        "prioridad", "simulado"
+      ],
+      "properties": {
+        "ocid": { "$ref": "#/$defs/id" },
+        "entidad_id": { "$ref": "#/$defs/id" },
+        "descripcion": { "type": "string", "minLength": 1 },
+        "metodo": { "type": "string", "minLength": 1 },
+        "objeto": { "enum": ["bienes", "servicios", "obras", "consultoria_de_obras", "otro"] },
+        "moneda": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "monto_referencial": { "$ref": "#/$defs/montoONulo" },
+        "monto_adjudicado": { "$ref": "#/$defs/montoONulo" },
+        "monto_final": { "$ref": "#/$defs/montoONulo" },
+        "fechas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["convocatoria", "inicio_presentacion", "fin_presentacion", "adjudicacion", "contrato", "culminacion"],
+          "properties": {
+            "convocatoria": { "$ref": "#/$defs/fechaONula" },
+            "inicio_presentacion": { "$ref": "#/$defs/fechaONula" },
+            "fin_presentacion": { "$ref": "#/$defs/fechaONula" },
+            "adjudicacion": { "$ref": "#/$defs/fechaONula" },
+            "contrato": { "$ref": "#/$defs/fechaONula" },
+            "culminacion": { "$ref": "#/$defs/fechaONula" }
+          }
+        },
+        "numero_postores": { "type": ["integer", "null"], "minimum": 0 },
+        "estado": { "type": ["string", "null"] },
+        "ganadores": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "documentos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tipo", "titulo", "url"],
+            "properties": {
+              "tipo": { "type": "string", "minLength": 1 },
+              "titulo": { "type": "string", "minLength": 1 },
+              "url": { "type": "string", "format": "uri" }
+            }
+          }
+        },
+        "url_seace": { "anyOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] },
+        "senales": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "prioridad": { "anyOf": [{ "$ref": "#/$defs/prioridad" }, { "type": "null" }] },
+        "simulado": { "type": "boolean" }
+      }
+    },
+    "procesos": { "type": "array", "items": { "$ref": "#/$defs/proceso" } },
+    "senal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "codigo", "categoria", "nivel", "objeto", "ocids", "valor", "unidad", "umbral", "comparacion",
+        "referencia", "version_regla", "entradas", "calidad", "simulado"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "codigo": { "$ref": "#/$defs/codigoSenal" },
+        "categoria": { "$ref": "#/$defs/categoria" },
+        "nivel": { "enum": ["proceso", "proveedor_entidad", "grupo", "entidad", "expediente"] },
+        "objeto": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tipo", "id"],
+          "properties": {
+            "tipo": { "enum": ["proceso", "proveedor", "entidad", "grupo", "expediente"] },
+            "id": { "$ref": "#/$defs/id" }
+          }
+        },
+        "ocids": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "valor": { "type": "number" },
+        "unidad": { "type": "string", "minLength": 1 },
+        "umbral": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["operador", "valor", "descripcion"],
+          "properties": {
+            "operador": { "enum": ["igual", "menor_que", "mayor_que", "mayor_o_igual"] },
+            "valor": { "type": "number" },
+            "descripcion": { "type": "string", "minLength": 1 }
+          }
+        },
+        "comparacion": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["descripcion", "ambito", "n", "q1", "mediana", "q3", "valla_superior", "percentil_del_caso", "proporcion_referencia"],
+              "properties": {
+                "descripcion": { "type": "string", "minLength": 1 },
+                "ambito": { "enum": ["region", "nacional"] },
+                "n": { "type": ["integer", "null"], "minimum": 0 },
+                "q1": { "$ref": "#/$defs/numeroONulo" },
+                "mediana": { "$ref": "#/$defs/numeroONulo" },
+                "q3": { "$ref": "#/$defs/numeroONulo" },
+                "valla_superior": { "$ref": "#/$defs/numeroONulo" },
+                "percentil_del_caso": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+                "proporcion_referencia": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "referencia": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cardinal", "ocp"],
+          "properties": {
+            "cardinal": { "type": ["string", "null"], "pattern": "^R\\d{3}$" },
+            "ocp": { "type": ["string", "null"] }
+          }
+        },
+        "version_regla": { "type": "string", "pattern": "^S\\d{2}@\\d+$" },
+        "entradas": { "type": "object" },
+        "calidad": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "simulado": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "codigo": { "const": "S08" } } },
+          "then": { "properties": { "simulado": { "const": true } } }
+        }
+      ]
+    },
+    "senales": { "type": "array", "items": { "$ref": "#/$defs/senal" } },
+    "proveedor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "alias", "nombre", "ruc", "tipo", "url_ficha_unica"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "alias": { "type": "string", "minLength": 1 },
+        "nombre": { "type": ["string", "null"] },
+        "ruc": { "type": ["string", "null"], "pattern": "^\\d{11}$" },
+        "tipo": { "enum": ["persona_juridica", "persona_natural", "desconocido"] },
+        "url_ficha_unica": { "anyOf": [{ "type": "string", "format": "uri" }, { "type": "null" }] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "tipo": { "const": "persona_natural" } } },
+          "then": { "properties": { "nombre": { "type": "null" } } }
+        }
+      ]
+    },
+    "proveedores": { "type": "array", "items": { "$ref": "#/$defs/proveedor" } },
+    "expediente": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ocid", "simulado", "etapas"],
+      "properties": {
+        "ocid": { "$ref": "#/$defs/id" },
+        "simulado": { "const": true },
+        "etapas": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["etapa", "responsable", "fecha", "documento"],
+            "properties": {
+              "etapa": { "enum": ["requerimiento", "evaluacion", "conformidad", "pago"] },
+              "responsable": { "type": "string", "minLength": 1 },
+              "fecha": { "$ref": "#/$defs/fechaONula" },
+              "documento": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "expedientes": { "type": "array", "items": { "$ref": "#/$defs/expediente" } },
+    "indice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["procesos", "proveedores"],
+      "properties": {
+        "procesos": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/id" },
+          "additionalProperties": { "$ref": "#/$defs/id" }
+        },
+        "proveedores": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/id" },
+          "additionalProperties": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+        }
+      }
+    }
+  }
+}

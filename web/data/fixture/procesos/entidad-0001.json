@@ -1,0 +1,1033 @@
+[
+  {
+    "ocid": "ocds-fixture-e1-001",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de reactivos químicos",
+    "metodo": "Comparación de precios",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 36900,
+    "monto_adjudicado": 35631.33,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-01-07",
+      "inicio_presentacion": "2025-01-08",
+      "fin_presentacion": "2025-01-23",
+      "adjudicacion": "2025-01-31",
+      "contrato": "2025-02-06",
+      "culminacion": null
+    },
+    "numero_postores": 6,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-001/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-001/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-001",
+    "senales": [
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 3,
+      "nivel": "media",
+      "desglose": [
+        {
+          "codigo": "S03",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-002",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de computadoras de escritorio",
+    "metodo": "Contratación directa",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 363500,
+    "monto_adjudicado": 331409.59,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-02-06",
+      "inicio_presentacion": "2025-02-07",
+      "fin_presentacion": "2025-02-17",
+      "adjudicacion": "2025-02-23",
+      "contrato": "2025-02-28",
+      "culminacion": null
+    },
+    "numero_postores": 1,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0001"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-002/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-002/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-002",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-003",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Servicio de limpieza de ambientes",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "servicios",
+    "moneda": "PEN",
+    "monto_referencial": 196000,
+    "monto_adjudicado": 181133.22,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-03-01",
+      "inicio_presentacion": "2025-03-02",
+      "fin_presentacion": "2025-03-04",
+      "adjudicacion": "2025-03-12",
+      "contrato": "2025-03-19",
+      "culminacion": null
+    },
+    "numero_postores": 1,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-003/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-003/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-003",
+    "senales": [
+      "S01-ocds-fixture-e1-003",
+      "S02-ocds-fixture-e1-003",
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 8,
+      "nivel": "alta",
+      "desglose": [
+        {
+          "codigo": "S01",
+          "peso": 3
+        },
+        {
+          "codigo": "S03",
+          "peso": 3
+        },
+        {
+          "codigo": "S02",
+          "peso": 2
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-004",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Consultoría para el expediente técnico de un auditorio",
+    "metodo": "Concurso público",
+    "objeto": "consultoria_de_obras",
+    "moneda": "PEN",
+    "monto_referencial": 145500,
+    "monto_adjudicado": 129353.91,
+    "monto_final": 135268.07,
+    "fechas": {
+      "convocatoria": "2025-04-01",
+      "inicio_presentacion": "2025-04-02",
+      "fin_presentacion": "2025-04-21",
+      "adjudicacion": "2025-04-26",
+      "contrato": "2025-05-08",
+      "culminacion": "2025-08-08"
+    },
+    "numero_postores": 3,
+    "estado": "Culminado",
+    "ganadores": [
+      "P0002"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-004/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-004/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-004",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-005",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Servicio de seguridad y vigilancia",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "servicios",
+    "moneda": "PEN",
+    "monto_referencial": 238800,
+    "monto_adjudicado": 230413.63,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-04-27",
+      "inicio_presentacion": "2025-04-28",
+      "fin_presentacion": "2025-05-07",
+      "adjudicacion": "2025-05-15",
+      "contrato": "2025-05-27",
+      "culminacion": null
+    },
+    "numero_postores": 3,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-005/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-005/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-005",
+    "senales": [
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 3,
+      "nivel": "media",
+      "desglose": [
+        {
+          "codigo": "S03",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-006",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de material de escritorio",
+    "metodo": "Licitación pública",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 141400,
+    "monto_adjudicado": 126595.17,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-05-22",
+      "inicio_presentacion": "2025-05-23",
+      "fin_presentacion": "2025-06-01",
+      "adjudicacion": "2025-06-04",
+      "contrato": "2025-06-13",
+      "culminacion": null
+    },
+    "numero_postores": 2,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0004"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-006/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-006/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-006",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-007",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de combustible para vehículos",
+    "metodo": "Licitación pública",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 33700,
+    "monto_adjudicado": 30978.5,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-06-21",
+      "inicio_presentacion": "2025-06-22",
+      "fin_presentacion": "2025-07-06",
+      "adjudicacion": "2025-07-10",
+      "contrato": "2025-07-21",
+      "culminacion": null
+    },
+    "numero_postores": 2,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-007/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-007/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-007",
+    "senales": [
+      "S03-P0003-entidad-0001",
+      "S08-ocds-fixture-e1-007"
+    ],
+    "prioridad": {
+      "puntaje": 6,
+      "nivel": "alta",
+      "desglose": [
+        {
+          "codigo": "S03",
+          "peso": 3
+        },
+        {
+          "codigo": "S08",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-008",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Mejoramiento de servicios higiénicos del pabellón B",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "obras",
+    "moneda": "PEN",
+    "monto_referencial": 1732100,
+    "monto_adjudicado": 1580117.17,
+    "monto_final": 1651463.93,
+    "fechas": {
+      "convocatoria": "2025-07-17",
+      "inicio_presentacion": "2025-07-18",
+      "fin_presentacion": "2025-08-03",
+      "adjudicacion": "2025-08-10",
+      "contrato": "2025-08-16",
+      "culminacion": "2025-12-04"
+    },
+    "numero_postores": 4,
+    "estado": "Culminado",
+    "ganadores": [
+      "P0005"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-008/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-008/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-008",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-009",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Servicio de mantenimiento de aire acondicionado",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "servicios",
+    "moneda": "PEN",
+    "monto_referencial": 327500,
+    "monto_adjudicado": 322501.15,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-08-11",
+      "inicio_presentacion": "2025-08-12",
+      "fin_presentacion": "2025-08-24",
+      "adjudicacion": "2025-09-01",
+      "contrato": "2025-09-12",
+      "culminacion": null
+    },
+    "numero_postores": 1,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-009/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-009/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-009",
+    "senales": [
+      "S01-ocds-fixture-e1-009",
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 6,
+      "nivel": "alta",
+      "desglose": [
+        {
+          "codigo": "S01",
+          "peso": 3
+        },
+        {
+          "codigo": "S03",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-010",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de mobiliario para aulas",
+    "metodo": "Comparación de precios",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 230000,
+    "monto_adjudicado": 218878.26,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-09-08",
+      "inicio_presentacion": "2025-09-09",
+      "fin_presentacion": "2025-09-27",
+      "adjudicacion": "2025-10-03",
+      "contrato": "2025-10-10",
+      "culminacion": null
+    },
+    "numero_postores": 3,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0006"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-010/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-010/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-010",
+    "senales": [
+      "S04-entidad-0001-g01"
+    ],
+    "prioridad": {
+      "puntaje": 3,
+      "nivel": "media",
+      "desglose": [
+        {
+          "codigo": "S04",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-011",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de mobiliario para aulas",
+    "metodo": "Comparación de precios",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 210000,
+    "monto_adjudicado": 186221.62,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-09-28",
+      "inicio_presentacion": "2025-09-29",
+      "fin_presentacion": "2025-10-08",
+      "adjudicacion": "2025-10-13",
+      "contrato": "2025-10-18",
+      "culminacion": null
+    },
+    "numero_postores": 5,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0007"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-011/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-011/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-011",
+    "senales": [
+      "S04-entidad-0001-g01"
+    ],
+    "prioridad": {
+      "puntaje": 3,
+      "nivel": "media",
+      "desglose": [
+        {
+          "codigo": "S04",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-012",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de computadoras de escritorio",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 227300,
+    "monto_adjudicado": 212188.13,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-10-31",
+      "inicio_presentacion": "2025-11-01",
+      "fin_presentacion": "2025-11-15",
+      "adjudicacion": "2025-11-23",
+      "contrato": "2025-11-29",
+      "culminacion": null
+    },
+    "numero_postores": 4,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-012/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-012/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-012",
+    "senales": [
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 3,
+      "nivel": "media",
+      "desglose": [
+        {
+          "codigo": "S03",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-013",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Servicio de limpieza de ambientes",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "servicios",
+    "moneda": "PEN",
+    "monto_referencial": 163200,
+    "monto_adjudicado": 156871.92,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-11-27",
+      "inicio_presentacion": "2025-11-28",
+      "fin_presentacion": "2025-12-13",
+      "adjudicacion": "2025-12-18",
+      "contrato": "2025-12-26",
+      "culminacion": null
+    },
+    "numero_postores": 2,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0008"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-013/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-013/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-013",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-014",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Consultoría para el expediente técnico de un auditorio",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "consultoria_de_obras",
+    "moneda": "PEN",
+    "monto_referencial": 181600,
+    "monto_adjudicado": 174134.7,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2025-12-24",
+      "inicio_presentacion": "2025-12-25",
+      "fin_presentacion": "2026-01-08",
+      "adjudicacion": "2026-01-15",
+      "contrato": "2026-01-25",
+      "culminacion": null
+    },
+    "numero_postores": 1,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-014/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-014/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-014",
+    "senales": [
+      "S01-ocds-fixture-e1-014",
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 6,
+      "nivel": "alta",
+      "desglose": [
+        {
+          "codigo": "S01",
+          "peso": 3
+        },
+        {
+          "codigo": "S03",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-015",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Servicio de seguridad y vigilancia",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "servicios",
+    "moneda": "PEN",
+    "monto_referencial": 232400,
+    "monto_adjudicado": 214797.31,
+    "monto_final": 262052.72,
+    "fechas": {
+      "convocatoria": "2026-01-23",
+      "inicio_presentacion": "2026-01-24",
+      "fin_presentacion": "2026-02-01",
+      "adjudicacion": "2026-02-07",
+      "contrato": "2026-02-17",
+      "culminacion": "2026-05-21"
+    },
+    "numero_postores": 3,
+    "estado": "Culminado",
+    "ganadores": [
+      "P0009"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-015/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-015/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-015",
+    "senales": [
+      "S06-ocds-fixture-e1-015"
+    ],
+    "prioridad": {
+      "puntaje": 2,
+      "nivel": "baja",
+      "desglose": [
+        {
+          "codigo": "S06",
+          "peso": 2
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-016",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de material de escritorio",
+    "metodo": "Contratación directa",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 284400,
+    "monto_adjudicado": 257101.03,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-02-15",
+      "inicio_presentacion": "2026-02-16",
+      "fin_presentacion": "2026-03-02",
+      "adjudicacion": "2026-03-05",
+      "contrato": "2026-03-14",
+      "culminacion": null
+    },
+    "numero_postores": 1,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0001"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-016/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-016/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-016",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-017",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de combustible para vehículos",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 407800,
+    "monto_adjudicado": 364182.99,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-03-15",
+      "inicio_presentacion": "2026-03-16",
+      "fin_presentacion": "2026-03-18",
+      "adjudicacion": "2026-03-26",
+      "contrato": "2026-04-06",
+      "culminacion": null
+    },
+    "numero_postores": 5,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-017/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-017/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-017",
+    "senales": [
+      "S02-ocds-fixture-e1-017",
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 5,
+      "nivel": "alta",
+      "desglose": [
+        {
+          "codigo": "S03",
+          "peso": 3
+        },
+        {
+          "codigo": "S02",
+          "peso": 2
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-018",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Mejoramiento de servicios higiénicos del pabellón B",
+    "metodo": "Licitación pública",
+    "objeto": "obras",
+    "moneda": "PEN",
+    "monto_referencial": 2112300,
+    "monto_adjudicado": 1976421.03,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-04-14",
+      "inicio_presentacion": "2026-04-15",
+      "fin_presentacion": "2026-05-05",
+      "adjudicacion": "2026-05-12",
+      "contrato": "2026-05-18",
+      "culminacion": null
+    },
+    "numero_postores": 3,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0002"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-018/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-018/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-018",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-019",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Servicio de mantenimiento de aire acondicionado",
+    "metodo": "Adjudicación simplificada",
+    "objeto": "servicios",
+    "moneda": "PEN",
+    "monto_referencial": 124400,
+    "monto_adjudicado": 121143.1,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-05-09",
+      "inicio_presentacion": "2026-05-10",
+      "fin_presentacion": "2026-05-20",
+      "adjudicacion": "2026-05-26",
+      "contrato": "2026-05-31",
+      "culminacion": null
+    },
+    "numero_postores": 4,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0004"
+    ],
+    "documentos": [],
+    "url_seace": null,
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-020",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de equipos de laboratorio",
+    "metodo": "Comparación de precios",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 412500,
+    "monto_adjudicado": 371694.18,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-06-04",
+      "inicio_presentacion": "2026-06-05",
+      "fin_presentacion": "2026-06-23",
+      "adjudicacion": "2026-06-28",
+      "contrato": "2026-07-06",
+      "culminacion": null
+    },
+    "numero_postores": 3,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0003"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-020/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-020/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-020",
+    "senales": [
+      "S03-P0003-entidad-0001"
+    ],
+    "prioridad": {
+      "puntaje": 3,
+      "nivel": "media",
+      "desglose": [
+        {
+          "codigo": "S03",
+          "peso": 3
+        }
+      ]
+    },
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-021",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de reactivos químicos",
+    "metodo": "Subasta inversa electrónica",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 387100,
+    "monto_adjudicado": 353797.66,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-07-05",
+      "inicio_presentacion": "2026-07-06",
+      "fin_presentacion": "2026-07-21",
+      "adjudicacion": "2026-07-27",
+      "contrato": "2026-08-03",
+      "culminacion": null
+    },
+    "numero_postores": 3,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0005"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-021/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-021/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-021",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  },
+  {
+    "ocid": "ocds-fixture-e1-022",
+    "entidad_id": "entidad-0001",
+    "descripcion": "Adquisición de computadoras de escritorio",
+    "metodo": "Licitación pública",
+    "objeto": "bienes",
+    "moneda": "PEN",
+    "monto_referencial": 281400,
+    "monto_adjudicado": 267650.19,
+    "monto_final": null,
+    "fechas": {
+      "convocatoria": "2026-07-29",
+      "inicio_presentacion": "2026-07-30",
+      "fin_presentacion": "2026-08-10",
+      "adjudicacion": "2026-08-14",
+      "contrato": "2026-08-25",
+      "culminacion": null
+    },
+    "numero_postores": 3,
+    "estado": "Contratado",
+    "ganadores": [
+      "P0006"
+    ],
+    "documentos": [
+      {
+        "tipo": "bases",
+        "titulo": "Bases integradas",
+        "url": "https://example.org/fixture/ocds-fixture-e1-022/bases.pdf"
+      },
+      {
+        "tipo": "acta",
+        "titulo": "Acta de otorgamiento de la buena pro",
+        "url": "https://example.org/fixture/ocds-fixture-e1-022/acta.pdf"
+      }
+    ],
+    "url_seace": "https://example.org/fixture/seace/ocds-fixture-e1-022",
+    "senales": [],
+    "prioridad": null,
+    "simulado": false
+  }
+]

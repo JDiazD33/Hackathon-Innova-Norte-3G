@@ -6,11 +6,11 @@ Mismo esquema que en la hackathon anterior: **fases** con criterios de salida, *
 
 ## Equipo y lotes
 
-> Reparto propuesto, con el mismo patrón de la vez anterior: Estefano lleva el lote más difícil y la integración; André entra en el lugar de Kenzo. El equipo puede intercambiar partes; si lo hace, actualiza esta tabla.
+> Reparto propuesto, con el mismo patrón de la vez anterior: Stefano lleva el lote más difícil y la integración; André entra en el lugar de Kenzo. El equipo puede intercambiar partes; si lo hace, actualiza esta tabla.
 
 | Lote | Persona | Dificultad | Qué entrega | Change de OpenSpec | Dónde trabaja |
 |---|---|---|---|---|---|
-| **A · Datos y señales** | Estefano | ★★★★ | Spike, ingesta, señales S01–S06, Cardinal, prioridad, paquete de datos seudonimizado e **integración** | [`lote-a-datos-y-senales`](../../openspec/changes/lote-a-datos-y-senales/) | `pipeline/` |
+| **A · Datos y señales** | Stefano | ★★★★ | Spike, ingesta, señales S01–S06, Cardinal, prioridad, paquete de datos seudonimizado e **integración** | [`lote-a-datos-y-senales`](../../openspec/changes/lote-a-datos-y-senales/) | `pipeline/` |
 | **B · Base web, panel y bandeja** | Joaquín (líder) | ★★★ | Proyecto Next.js, tema, estructura, contrato y fixture, `DataSource`, panel, bandeja, búsqueda y despliegue | [`lote-b-base-web-panel-y-bandeja`](../../openspec/changes/lote-b-base-web-panel-y-bandeja/) | `web/` (base, panel y bandeja), `contracts/` |
 | **C · Fichas y explicación** | Sebastián | ★★★ | Ficha del proceso, tarjeta de señal (el corazón del producto), comparación visual y ficha del proveedor | [`lote-c-fichas-y-explicacion`](../../openspec/changes/lote-c-fichas-y-explicacion/) | `web/` (fichas y explicación) |
 | **D · Revisión y transparencia** | André | ★★ | Roles simulados, decisiones, asignación, historial, reporte de trazabilidad, metodología, atribución y lenguaje no acusatorio | [`lote-d-revision-y-transparencia`](../../openspec/changes/lote-d-revision-y-transparencia/) | `web/` (revisión, reporte y metodología) |
@@ -21,10 +21,10 @@ Mismo esquema que en la hackathon anterior: **fases** con criterios de salida, *
 |---|---|---|
 | Contacto con la organización y preguntas abiertas | Joaquín | — |
 | Ficha del problema y coordinación de entrevistas | Joaquín | Todos (cada uno hace al menos una entrevista) |
-| Ficha técnica | Estefano | Joaquín |
+| Ficha técnica | Stefano | Joaquín |
 | Plan de validación y pruebas con usuarios | Sebastián | Todos |
 | Diapositivas del pitch | André | Joaquín (guion) |
-| Video de respaldo de la demo | Estefano | André |
+| Video de respaldo de la demo | Stefano | André |
 
 ## Cómo encajan los lotes
 
@@ -41,7 +41,20 @@ Mismo esquema que en la hackathon anterior: **fases** con criterios de salida, *
 
 - Cada lote toca solo sus carpetas. Lo compartido (estructura, tema, contrato) lo cambia su dueño mediante un PR.
 - Un PR por parte, pequeño y revisado por otra persona.
-- **Integración:** Estefano integra los PR en `main`, como en la hackathon anterior. Es una propuesta y el equipo la confirma.
+- **Integración:** Stefano integra los PR en `main`, como en la hackathon anterior. Es una propuesta y el equipo la confirma.
+
+## Orden de trabajo: primero el código, después la interfaz
+
+Acordado el 13 de noviembre. Cada lote termina primero su **lógica con pruebas**: funciones puras, sin pantallas ni estilos. Después construye la **interfaz visual** encima. Así las pantallas se montan sobre código que ya funciona y no hay que rehacerlas. Los números son tareas del `tasks.md` de cada lote.
+
+| Lote | 1. Código (ahora) | 2. Interfaz (después) |
+|---|---|---|
+| A · Stefano | Todo el lote es código: grupos 1 a 5 (spike, ingesta, señales, prioridad y paquete de datos) | — |
+| B · Joaquín | **Hecho el 13:** 1.1, 1.2, 2.1, 2.2 y 2.3 (base web, pruebas, contrato, fixture y `DataSource`). **Sigue:** la lógica de 3.2 (cifras del panel), 4.1 (orden), 4.2 (filtros) y 4.4 (índice de búsqueda) | 1.3 a 1.6 (shadcn/ui, tema y estructura), 3.1, 3.3, las pantallas de 3.2 y 4.x, y 5.x (despliegue) |
+| C · Sebastián | 1.2 y 3.2 (textos de explicación como plantillas con pruebas), y la lógica de 2.3 (línea de tiempo), 3.4 (desglose de la prioridad), 4.1 (frase de comparación) y 5.2 (identidad según el modo) | 1.1, 2.1, 2.2, 2.4, 2.5, 3.1, 3.3, los gráficos de 4.1 y 5.1 |
+| D · André | 1.1 (tipos e interfaz `ReviewStore`, **primero**), 2.2, 2.3, la lógica de 3.1, 3.2 y 4.1, 4.3, 6.3 (prueba de vocabulario) y el contenido de 6.1 | 1.2, 1.3, 2.1, los diálogos de 3.x, 4.2, 5.1, la página de 6.1, 6.2 y 7.x |
+
+**La interfaz empieza** cuando B tenga el tema y la estructura (1.3 a 1.5), porque C y D construyen sus pantallas encima.
 
 ## Fase 0 · Cimientos (vie 13 – sáb 14)
 
@@ -51,7 +64,7 @@ Mismo esquema que en la hackathon anterior: **fases** con criterios de salida, *
 |---|---|
 | — | Documentos, ADR y changes de OpenSpec (**hecho el 13**) |
 | A | **A1 · Spike de datos:** responder Q1–Q8 de `docs/datos/fuente-de-datos.md` con un año de datos |
-| B | **B1 · Base web:** proyecto Next.js, tema y estructura. **B2 · Contrato:** JSON Schema, fixture sintético y `DataSource` |
+| B | **B1 · Base web** y **B2 · Contrato:** hechos el 13 (proyecto Next.js con pruebas, JSON Schema, fixture sintético y `DataSource`). Del B1 falta la parte visual (tema y estructura), que va en la fase de interfaz |
 | C | **C0 · Bocetos:** ficha del proceso y tarjeta de señal en papel o en Figma; textos v0 de S01–S04 |
 | D | **D0 · Bocetos:** modelo de revisión (estados, roles e historial) y página de metodología |
 | Joaquín | Inscripción; agenda de entrevistas desde el lunes 16 |

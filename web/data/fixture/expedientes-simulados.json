@@ -1,0 +1,62 @@
+[
+  {
+    "ocid": "ocds-fixture-e1-001",
+    "simulado": true,
+    "etapas": [
+      {
+        "etapa": "requerimiento",
+        "responsable": "Área usuaria · Persona B",
+        "fecha": "2024-12-23",
+        "documento": "Requerimiento N.° 004-2025"
+      },
+      {
+        "etapa": "evaluacion",
+        "responsable": "Comité de selección · Persona D",
+        "fecha": "2025-01-31",
+        "documento": "Acta de evaluación"
+      },
+      {
+        "etapa": "conformidad",
+        "responsable": "Área usuaria · Persona B",
+        "fecha": "2025-03-08",
+        "documento": "Acta de conformidad N.° 004"
+      },
+      {
+        "etapa": "pago",
+        "responsable": "Tesorería · Persona C",
+        "fecha": "2025-03-12",
+        "documento": "Comprobante de pago N.° 0118"
+      }
+    ]
+  },
+  {
+    "ocid": "ocds-fixture-e1-007",
+    "simulado": true,
+    "etapas": [
+      {
+        "etapa": "requerimiento",
+        "responsable": "Área usuaria · Persona A",
+        "fecha": "2025-06-01",
+        "documento": "Requerimiento N.° 015-2025"
+      },
+      {
+        "etapa": "evaluacion",
+        "responsable": "Comité de selección · Persona A",
+        "fecha": "2025-07-10",
+        "documento": "Acta de evaluación"
+      },
+      {
+        "etapa": "conformidad",
+        "responsable": "Área usuaria · Persona A",
+        "fecha": "2025-08-20",
+        "documento": null
+      },
+      {
+        "etapa": "pago",
+        "responsable": "Tesorería · Persona C",
+        "fecha": "2025-08-23",
+        "documento": "Comprobante de pago N.° 0231"
+      }
+    ]
+  }
+]

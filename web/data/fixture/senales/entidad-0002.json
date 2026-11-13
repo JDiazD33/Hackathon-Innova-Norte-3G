@@ -1,0 +1,177 @@
+[
+  {
+    "id": "S01-ocds-fixture-e2-002",
+    "codigo": "S01",
+    "categoria": "competencia",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e2-002"
+    },
+    "ocids": [
+      "ocds-fixture-e2-002"
+    ],
+    "valor": 1,
+    "unidad": "postores",
+    "umbral": {
+      "operador": "igual",
+      "valor": 1,
+      "descripcion": "procedimiento competitivo con un solo postor"
+    },
+    "comparacion": {
+      "n": 10,
+      "q1": null,
+      "mediana": null,
+      "q3": null,
+      "valla_superior": null,
+      "percentil_del_caso": null,
+      "proporcion_referencia": 0.8,
+      "descripcion": "Procesos competitivos de la entidad (2025–2026)",
+      "ambito": "region"
+    },
+    "referencia": {
+      "cardinal": "R018",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S01@1",
+    "entradas": {
+      "numero_postores": 1,
+      "metodo": "Comparación de precios"
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S01-ocds-fixture-e2-008",
+    "codigo": "S01",
+    "categoria": "competencia",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e2-008"
+    },
+    "ocids": [
+      "ocds-fixture-e2-008"
+    ],
+    "valor": 1,
+    "unidad": "postores",
+    "umbral": {
+      "operador": "igual",
+      "valor": 1,
+      "descripcion": "procedimiento competitivo con un solo postor"
+    },
+    "comparacion": {
+      "n": 10,
+      "q1": null,
+      "mediana": null,
+      "q3": null,
+      "valla_superior": null,
+      "percentil_del_caso": null,
+      "proporcion_referencia": 0.8,
+      "descripcion": "Procesos competitivos de la entidad (2025–2026)",
+      "ambito": "region"
+    },
+    "referencia": {
+      "cardinal": "R018",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S01@1",
+    "entradas": {
+      "numero_postores": 1,
+      "metodo": "Adjudicación simplificada"
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S02-ocds-fixture-e2-008",
+    "codigo": "S02",
+    "categoria": "tiempos",
+    "nivel": "proceso",
+    "objeto": {
+      "tipo": "proceso",
+      "id": "ocds-fixture-e2-008"
+    },
+    "ocids": [
+      "ocds-fixture-e2-008"
+    ],
+    "valor": 2,
+    "unidad": "días calendario",
+    "umbral": {
+      "operador": "menor_que",
+      "valor": 8,
+      "descripcion": "percentil 10 del plazo de presentación de procesos competitivos comparables"
+    },
+    "comparacion": {
+      "descripcion": "Procesos competitivos de la región (2025–2026)",
+      "ambito": "region",
+      "n": 31,
+      "q1": 9,
+      "mediana": 14,
+      "q3": 15.5,
+      "valla_superior": null,
+      "percentil_del_caso": 9.7,
+      "proporcion_referencia": null
+    },
+    "referencia": {
+      "cardinal": "R003",
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S02@1",
+    "entradas": {
+      "dias_presentacion": 2,
+      "metodo": "Adjudicación simplificada",
+      "percentil_configurado": 10
+    },
+    "calidad": [],
+    "simulado": false
+  },
+  {
+    "id": "S05-entidad-0002",
+    "codigo": "S05",
+    "categoria": "competencia",
+    "nivel": "entidad",
+    "objeto": {
+      "tipo": "entidad",
+      "id": "entidad-0002"
+    },
+    "ocids": [
+      "ocds-fixture-e2-001",
+      "ocds-fixture-e2-003",
+      "ocds-fixture-e2-006",
+      "ocds-fixture-e2-009",
+      "ocds-fixture-e2-012",
+      "ocds-fixture-e2-015",
+      "ocds-fixture-e2-018"
+    ],
+    "valor": 0.3889,
+    "unidad": "proporción de procesos por contratación directa",
+    "umbral": {
+      "operador": "mayor_que",
+      "valor": 0.305,
+      "descripcion": "valla superior de Tukey de entidades del mismo tipo (referencia ficticia del fixture)"
+    },
+    "comparacion": {
+      "descripcion": "Entidades del mismo tipo (referencia ficticia del fixture)",
+      "ambito": "region",
+      "n": 12,
+      "q1": 0.08,
+      "mediana": 0.12,
+      "q3": 0.17,
+      "valla_superior": 0.305,
+      "percentil_del_caso": 100,
+      "proporcion_referencia": null
+    },
+    "referencia": {
+      "cardinal": null,
+      "ocp": "Guía de banderas rojas de OCP"
+    },
+    "version_regla": "S05@1",
+    "entradas": {
+      "procesos_directos": 7,
+      "procesos_totales": 18
+    },
+    "calidad": [],
+    "simulado": false
+  }
+]

@@ -26,6 +26,7 @@ Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, 
 | `senales/<entidad_id>.json` | Señales de una entidad, con su comparación y sus entradas | B, C, D |
 | `proveedores.json` | Proveedores (seudónimo en modo público) | C |
 | `expedientes-simulados.json` | Expedientes internos sintéticos para S08 y la línea de tiempo interna | C, D |
+| `indice.json` | Índice para abrir fichas desde una URL: ocid → entidad y proveedor → entidades | B, C |
 
 ## `manifest.json`
 
@@ -49,9 +50,15 @@ Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, 
   "exclusiones": [{ "motivo": "región indeterminada", "cantidad": 0 }],
   "correcciones": [{ "tipo": "postor duplicado", "cantidad": 0 }],
   "senales_activas": ["S01", "S02", "S03", "S04"],
-  "senales_desactivadas": [{ "codigo": "S06", "motivo": "menos del 10 % de contratos con monto final" }]
+  "senales_desactivadas": [{ "codigo": "S06", "motivo": "menos del 10 % de contratos con monto final" }],
+  "prioridad": {
+    "pesos": { "S01": 3, "S02": 2, "S03": 3, "S04": 3, "S06": 2, "S08": 3 },
+    "cortes": { "alta": 5, "media": 3 }
+  }
 }
 ```
+
+`prioridad` lleva los pesos y cortes con que el pipeline calculó la prioridad. La web los muestra en la metodología y no los recalcula.
 
 ## `entidades.json`
 
@@ -146,7 +153,7 @@ Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, 
 ]
 ```
 
-Los campos de `comparacion` que no apliquen a una señal valen `null`. Los textos explicativos no viajan en el paquete: la web los arma a partir de estos valores ([Lote C](../plan/cronograma-y-lotes.md)).
+Los campos de `comparacion` que no apliquen a una señal valen `null`. `percentil_del_caso` es el porcentaje (0–100) de casos del grupo con un valor igual o menor que el del caso. Los textos explicativos no viajan en el paquete: la web los arma a partir de estos valores ([Lote C](../plan/cronograma-y-lotes.md)).
 
 ## `proveedores.json`
 
@@ -185,3 +192,22 @@ Los campos de `comparacion` que no apliquen a una señal valen `null`. Los texto
 ```
 
 Este ejemplo dispara S08: la misma persona solicita, evalúa y da conformidad, y la conformidad no tiene documento.
+
+## `indice.json`
+
+```json
+{
+  "procesos": { "ocds-dgv273-…": "entidad-0001" },
+  "proveedores": { "P0137": ["entidad-0001"] }
+}
+```
+
+Permite abrir `/procesos/[ocid]` y `/proveedores/[id]` sin recorrer todas las entidades.
+
+## Dónde vive el paquete y cómo se valida
+
+- La web lee `web/data/<paquete>/`. El `<paquete>` es `fixture` (por defecto), `publico` o `local`, según la variable de entorno `PAQUETE_DATOS`.
+- `npm run fixture` (desde `web/`) regenera el fixture sintético con `web/scripts/generate-fixture.mjs`.
+- La prueba de contrato (`web/src/lib/data/paquete.contract.test.ts`) valida cualquier paquete contra el JSON Schema y revisa su coherencia: conteos, índice, prioridad, seudónimos y datos simulados.
+  - `npm test -- paquete` revisa el fixture.
+  - `PAQUETE_DIR=data/publico npm test -- paquete` revisa el paquete real.

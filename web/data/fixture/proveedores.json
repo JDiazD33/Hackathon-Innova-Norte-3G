@@ -1,0 +1,98 @@
+[
+  {
+    "id": "P0001",
+    "alias": "Proveedor 0001",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0002",
+    "alias": "Proveedor 0002",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0003",
+    "alias": "Proveedor 0003",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0004",
+    "alias": "Proveedor 0004",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0005",
+    "alias": "Proveedor 0005",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0006",
+    "alias": "Proveedor 0006",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0007",
+    "alias": "Proveedor 0007",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_natural",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0008",
+    "alias": "Proveedor 0008",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0009",
+    "alias": "Proveedor 0009",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0010",
+    "alias": "Proveedor 0010",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0011",
+    "alias": "Proveedor 0011",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  },
+  {
+    "id": "P0012",
+    "alias": "Proveedor 0012",
+    "nombre": null,
+    "ruc": null,
+    "tipo": "persona_juridica",
+    "url_ficha_unica": null
+  }
+]

@@ -10,10 +10,10 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 
 | | |
 |---|---|
-| Fase | Cimientos: arquitectura, plan y especificación del MVP |
+| Fase | Fase 0 casi cerrada: documentación, OpenSpec y base de código web. Ahora va el código de cada lote; después, la interfaz ([orden de trabajo](docs/plan/cronograma-y-lotes.md#orden-de-trabajo-primero-el-código-después-la-interfaz)) |
 | Desafío | **Por confirmar.** Recomendado: 2 · Integridad institucional y compliance. Alternativa: 1 · Contrataciones públicas y ejecución de obras ([encaje](docs/producto/vision-y-encaje.md#encaje-con-los-desafíos)) |
 | Próximo hito | Entrega del Stage-Gate 1: **miércoles 25 de noviembre de 2026, 11:59 p. m.** (meta interna: 6:00 p. m.) |
-| Equipo y lotes | A · Datos y señales: Estefano · B · Base web, panel y bandeja: Joaquín (líder) · C · Fichas y explicación: Sebastián · D · Revisión y transparencia: André ([fases y lotes](docs/plan/cronograma-y-lotes.md)) |
+| Equipo y lotes | A · Datos y señales: Stefano · B · Base web, panel y bandeja: Joaquín (líder) · C · Fichas y explicación: Sebastián · D · Revisión y transparencia: André ([fases y lotes](docs/plan/cronograma-y-lotes.md)) |
 | Especificación | Un change de OpenSpec por lote en [`openspec/changes/`](openspec/changes/) |
 
 ## Empieza aquí
@@ -39,9 +39,9 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 |---|---|---|
 | `docs/` | Bases, producto, datos, arquitectura, ADR, diseño, plan y entregables | Listo |
 | `openspec/` | Un change por lote (OpenSpec, en español) y skills de OpenSpec para Claude Code y Codex | Listo |
-| `contracts/` | JSON Schema del paquete de datos | Por crear (Lote B con A) |
+| `contracts/` | JSON Schema del paquete de datos | Listo (contrato v1) |
 | `pipeline/` | Descarga, normalización y cálculo de señales (Python + DuckDB) | Por crear (Lote A) |
-| `web/` | Aplicación web (Next.js + TypeScript + Tailwind CSS + shadcn/ui) | Por crear (Lote B; C y D construyen encima) |
+| `web/` | Aplicación web (Next.js 16 + TypeScript + Tailwind CSS; shadcn/ui en la fase de interfaz) | Base lista: pruebas, contrato, fixture y acceso a datos. Faltan las pantallas |
 | `data/` | Datos crudos y derivados; no se suben al repositorio | Por crear (Lote A) |
 
 ## Datos y licencias

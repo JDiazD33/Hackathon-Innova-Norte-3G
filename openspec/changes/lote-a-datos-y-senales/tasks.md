@@ -1,6 +1,6 @@
 # Tasks
 
-Lote A · Datos y señales · **Estefano** · ★★★★ · carpeta `pipeline/` · plan en `docs/plan/cronograma-y-lotes.md`
+Lote A · Datos y señales · **Stefano** · ★★★★ · carpeta `pipeline/` · plan en `docs/plan/cronograma-y-lotes.md`
 
 ## 1. A1 · Spike de datos (Fase 0, sáb 14)
 
@@ -38,7 +38,7 @@ Lote A · Datos y señales · **Estefano** · ★★★★ · carpeta `pipeline/
 
 - [ ] 5.1 Implementar la prioridad con su desglose. Verificar con pruebas: S01 + S03 da 6 (alta) y un proceso sin señales tiene prioridad nula.
 - [ ] 5.2 Implementar los seudónimos con HMAC (`PSEUDONYM_SECRET` en `.env`, documentado en `pipeline/.env.example`) y la regla de personas naturales. Verificar con una prueba que busca RUC y nombres en el paquete público y no encuentra ninguno.
-- [ ] 5.3 Exportar el paquete por entidad y validarlo contra `contracts/paquete-de-datos.schema.json`. Verificar que la validación pasa y que un `ocid` faltante hace fallar la exportación.
+- [ ] 5.3 Exportar el paquete por entidad (con `indice.json` y los pesos de prioridad en el manifiesto) y validarlo contra `contracts/paquete-de-datos.schema.json`. Verificar que la validación pasa, que un `ocid` faltante hace fallar la exportación y que, desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete` termina en verde.
 - [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local.
 
 ## 6. A6 · Señales opcionales e integración (Fase 2)

@@ -4,7 +4,7 @@ Reglas para todas las personas y agentes que trabajan en este repositorio. Los m
 
 ## Stack elegido
 
-Las versiones exactas se fijan al crear cada proyecto (Lote A y Lote B) y se anotan aquí.
+**Versiones de `web/`** (creado el 13 de noviembre): Node 24, Next.js 16.4.6 (App Router con Cache Components), React 19.3, TypeScript 5, Tailwind CSS 4.3 y Vitest 5.1. shadcn/ui se agrega en la fase de interfaz. Las versiones de `pipeline/` se anotan cuando el Lote A lo cree.
 
 | Parte | Tecnología | Por qué | ADR |
 |---|---|---|---|
@@ -46,11 +46,23 @@ Las versiones exactas se fijan al crear cada proyecto (Lote A y Lote B) y se ano
 ## Comandos disponibles hoy
 
 ```bash
+# Especificaciones (desde la raíz)
 openspec list
 openspec validate --all --strict
+
+# Web (desde web/)
+npm ci                      # instala las dependencias exactas
+npm run dev                 # http://localhost:3000 con el fixture
+npm test                    # pruebas (Vitest)
+npm run typecheck           # tipos
+npm run lint                # ESLint
+npm run build && npm run start   # demo local; ya construida, funciona sin internet
+npm run fixture             # regenera web/data/fixture (datos ficticios)
+PAQUETE_DATOS=publico npm run build              # usar el paquete real seudonimizado
+PAQUETE_DIR=data/publico npm test -- paquete     # validar un paquete contra el contrato
 ```
 
-Los comandos de `pipeline/` y `web/` se agregan aquí cuando esos proyectos existan.
+Antes de escribir código de Next.js, lee `web/AGENTS.md`: Next 16 trae cambios y sus guías están en `web/node_modules/next/dist/docs/`. Los comandos de `pipeline/` se agregan aquí cuando el Lote A lo cree.
 
 ## Datos y seguridad
 
