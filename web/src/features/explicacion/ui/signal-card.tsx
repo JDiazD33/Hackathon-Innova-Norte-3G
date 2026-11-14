@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
 
 import { explainSignal, type ExplanationContext } from "../index";
 import { SimulatedDataBadge } from "./simulated-data-badge";
+import { buildComparisonChart } from "../comparison-chart";
+import { ComparisonChart } from "./comparison-chart";
 
 const CATEGORY_ICONS = {
   competencia: Users,
@@ -82,6 +84,7 @@ export function SignalCard({
   const dataUsed = explanation.dataUsed.filter(
     (item) => !item.startsWith("Ver en el SEACE:"),
   );
+  const comparisonChart = buildComparisonChart(signal, context?.process?.ocid);
 
   function block(
     title: string,
@@ -127,7 +130,18 @@ export function SignalCard({
         )}
         {block(
           "Con qué lo comparamos",
-          <p>{explanation.comparison}</p>,
+          <>
+            <p>{explanation.comparison}</p>
+            {expanded &&
+              comparisonChart &&
+              (isPrint ? (
+                <p className="text-subtitulo text-muted-foreground">
+                  {comparisonChart.summary}
+                </p>
+              ) : (
+                <ComparisonChart model={comparisonChart} />
+              ))}
+          </>,
           !expanded,
         )}
         {block(

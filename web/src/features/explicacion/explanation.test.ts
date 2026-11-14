@@ -109,6 +109,15 @@ describe("Explicaciones sobre el paquete de prueba", () => {
     expect(explanation.limitation).toContain("8 UIT");
   });
 
+  it("S03 muestra su ventana real y omite un periodo incompleto", () => {
+    const signal = sample("S03");
+    signal.entradas.ventana_inicio = "2025-10-05";
+    signal.entradas.ventana_fin = "2026-10-04";
+    expect(explainSignal(signal)!.dataUsed).toContain("Periodo de la señal: del 5 oct 2025 al 4 oct 2026.");
+    signal.entradas.ventana_fin = null;
+    expect(explainSignal(signal)!.dataUsed.join(" ")).not.toContain("Periodo de la señal");
+  });
+
   it("S05 permanece en el nivel de entidad y explica el denominador", () => {
     const explanation = explainSignal(sample("S05"))!;
     expect(explanation.finding).toContain("7 procesos por contratación directa de un total de 18");
