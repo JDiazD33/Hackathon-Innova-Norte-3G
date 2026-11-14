@@ -2,6 +2,8 @@
 
 Lote A · Datos y señales · **Stefano** · ★★★★ · carpeta `pipeline/` · plan en `docs/plan/cronograma-y-lotes.md`
 
+Cada parte tiene su ficha (contexto, diseño propuesto, verificación) y su rama en [`docs/datos/partes-lote-a/`](../../../docs/datos/partes-lote-a/README.md).
+
 ## 1. A1 · Spike de datos (Fase 0, sáb 14)
 
 - [x] 1.1 Crear `pipeline/` con uv (Python 3.12 o 3.13), DuckDB, pytest y ruff, y anotar los comandos en `CONTRIBUTING.md`. Verificar que `uv run pytest` y `uv run ruff check` terminan sin errores.
