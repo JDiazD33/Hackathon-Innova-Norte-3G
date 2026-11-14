@@ -260,7 +260,7 @@
   --estado-justificada-foreground: #4cd964;
   --estado-requiere-atencion: #2e0e10;
   --estado-requiere-atencion-foreground: #ff6961;
-  --sombra-tarjeta: none;
+  --sombra-tarjeta: 0 0 #0000; /* sin sombra; "none" anularía el borde (ring) en la lista de box-shadow */
   --sombra-material: 0 8px 32px rgb(0 0 0 / 0.6);
   --velo: rgb(0 0 0 / 0.6);
 }
