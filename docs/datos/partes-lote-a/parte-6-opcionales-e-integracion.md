@@ -17,7 +17,7 @@ La tarea 6.1 puede adelantarse a la parte 5 si se quiere que S05 salga en el pri
   - **Tipo de entidad:** la clasificación por nombre pasó a `pipeline/src/pipeline/entities.py`, y la usan S05 y el paquete.
   - **Parámetro nuevo, `minimo_directas` (3):** sin él, 8 de las 14 entidades marcadas tenían menos de 3 contrataciones directas, porque la mayoría de las municipalidades no hace ninguna y la valla del monto queda en 0,9 %.
   - **En el paquete:** las señales van en `senales_entidad` de cada entidad y no suman a la prioridad. Pasa de 121 a 130 señales.
-- **S06 desactivada por cobertura.** El manifiesto la lista con el motivo "Solo el 9,1 % de los contratos de La Libertad tiene monto final (contracts[].implementation.finalValue); el mínimo es 10 %".
+- **S06 desactivada por cobertura.** El manifiesto la lista con el motivo "Solo el 9.1% de los contratos de La Libertad tiene monto final (contracts[].implementation.finalValue); el mínimo es 10%." Los porcentajes de ese texto usan el formato de la web (es-PE), porque se muestra en la interfaz.
   - **Implementación:** la regla está completa y probada. Si el equipo baja el mínimo, marcaría 61 contratos con el factor 1,15.
   - **Cómo se desactiva:** cuando los datos no alcanzan, una regla activa en `senales.toml` puede quedar desactivada con su motivo (`SignalUnavailable`).
 - **Verificación:**
@@ -28,6 +28,40 @@ La tarea 6.1 puede adelantarse a la parte 5 si se quiere que S05 salga en el pri
   - aprobar los grupos de comparación de S05;
   - decidir una proporción mínima (`proporcion_minima`): con 5 % quedarían 7 señales;
   - decidir si se baja la cobertura mínima de S06.
+
+## Integración de prueba (tarea 6.2, 14 de noviembre)
+
+La tarea 6.2 todavía no se puede cerrar:
+
+- no hay PR de los lotes B, C ni D. Solo están los seis del Lote A, sin revisión, y la tarea integra solo PR aprobados;
+- la web tiene solo la página provisional de la Fase 0, así que todavía no existe el recorrido bandeja → ficha → explicación → decisión → reporte.
+
+Para adelantarla, se armó una integración local de prueba, sin tocar `main` ni subir nada: `main` + Lote A (partes 1 a 6) + `lote-c/parte-1-textos-y-logica` + `lote-d/parte-1-revision-logica`.
+
+| Comprobación | Resultado |
+|---|---|
+| Fusión | Sin conflictos |
+| `npm test` | 158 pruebas en verde (13 archivos, con las de C y D) |
+| `npm run lint` | Sin observaciones |
+| `npm run typecheck` | En verde después de `npm run build`. En una copia nueva falla con `LayoutProps` hasta que Next.js genera sus tipos; pasa lo mismo en `main` (Lote B) |
+| Paquete público | `PAQUETE_DIR=data/publico npm test -- paquete`: 10 de 10. `PAQUETE_DATOS=publico npm run build` termina bien, y la página muestra los datos reales |
+| Textos del Lote C con las 130 señales reales | Todas tienen explicación, pero se perdían frases porque algunas claves de `entradas` tenían otro nombre (ver abajo) |
+
+**Claves de `entradas`.** El contrato no las fija; ahora están en el [catálogo](../catalogo-de-senales.md#entradas-de-cada-señal).
+
+- **Lote A (hecho en esta rama):** S05 usa `procesos_totales`, y S04 usa `clase_item` y agrega `dias_entre_convocatorias`, como esperan los textos de C. Con eso, la explicación de S05 queda completa ("Se registraron 29 procesos por contratación directa de un total de 78").
+- **Lote C (pendiente, Sebastián):**
+  - el texto de S03 lee `adjudicaciones_proveedor` y `adjudicaciones_entidad`, que no existen. Debe leer `procesos_ganados` y `procesos_entidad` y hablar de "procesos adjudicados", porque la participación se mide en procesos. Hoy falta la frase "Obtuvo X de Y" en las 46 señales de S03;
+  - el texto de S01 dice "recibió 1 oferta" y "dos o más ofertas", pero el dato son participantes registrados (tarea 1.6).
+- **Formato de números:** la web usa es-PE en todos los lotes ("46.3%"). El motivo y el umbral de S06 ahora también.
+
+**Para cerrar la 6.2 hace falta que:**
+
+- B, C y D abran sus PR y otra persona del equipo los apruebe;
+- existan las pantallas;
+- Stefano fusione en `main` los PR aprobados (los del Lote A también necesitan la revisión de otra persona).
+
+Después se regenera el paquete y se recorre la demo con el paquete público y con el fixture.
 
 ## Diseño propuesto
 

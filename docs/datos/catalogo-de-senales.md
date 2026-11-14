@@ -166,6 +166,20 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Cuándo hay señal:** si se cumple alguna de las dos condiciones. Todo lleva `simulado: true` y un proceso sin expediente no se evalúa.
   - **Resultado actual:** 6 señales simuladas.
 
+## Entradas de cada señal
+
+`entradas` guarda los valores con que se calculó cada señal. El contrato no fija sus claves, así que esta tabla es la referencia para los textos del Lote C. Una clave nueva se agrega aquí antes de usarla en un texto.
+
+| Señal | Claves de `entradas` |
+|---|---|
+| S01 | `numero_postores` (participantes registrados) y `metodo` |
+| S02 | `dias` (plazo en días), `inicio`, `fin` y `metodo` |
+| S03 | `proveedor_id` (seudónimo), `procesos_ganados`, `procesos_entidad` (procesos adjudicados por la entidad en la ventana), `monto_proveedor_pen`, `monto_entidad_pen`, `participacion_procesos`, `participacion_monto`, `medida` (`procesos` o `monto`), `ventana_inicio` y `ventana_fin` |
+| S04 | `clase_item` (clase UNSPSC), `metodo`, `categoria`, `anio`, `procesos`, `suma_pen`, `umbral_pen`, `ventana_dias`, `dias_entre_convocatorias`, `norma`, `fechas` y `montos` |
+| S05 | `tipo_entidad`, `procesos_totales`, `procesos_directos`, `monto_pen`, `monto_directo_pen`, `proporcion_procesos`, `proporcion_monto`, `medida` (`procesos` o `monto`) y `metodos_directos` |
+| S06 | `contrato_id`, `monto_contratado`, `monto_final`, `moneda` y `cobertura_monto_final` |
+| S08 | `misma_persona`, `persona` (ficticia) y `pago_sin_conformidad_documentada` |
+
 ## Plantilla de explicación
 
 Cada señal se muestra con esta estructura ([diseño de la tarjeta](../diseno/sistema-de-diseno.md#tarjeta-de-señal)):

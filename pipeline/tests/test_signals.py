@@ -236,8 +236,8 @@ def test_s02_s04_and_s06_are_deactivated_by_default(tmp_path: Path) -> None:
         {"codigo": "S04", "motivo": defaults.s04.switch.reason},
         {
             "codigo": "S06",
-            "motivo": "Solo el 0 % de los contratos de La Libertad tiene monto final "
-            "(contracts[].implementation.finalValue); el mínimo es 10 %.",
+            "motivo": "Solo el 0% de los contratos de La Libertad tiene monto final "
+            "(contracts[].implementation.finalValue); el mínimo es 10%.",
         },
     ]
     assert manifest["versiones"] == {"S01": "S01@1", "S03": "S03@1", "S05": "S05@1", "S08": "S08@1"}

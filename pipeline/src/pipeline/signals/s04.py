@@ -81,6 +81,7 @@ def compute(
                    list(strftime(b.fecha, '%Y-%m-%d') ORDER BY b.fecha, b.ocid) AS fechas,
                    list(round(b.monto, 2) ORDER BY b.fecha, b.ocid) AS montos,
                    count(*) AS procesos,
+                   date_diff('day', min(b.fecha), max(b.fecha)) AS dias,
                    sum(b.monto) AS suma
             FROM k a
             JOIN k b
@@ -121,7 +122,7 @@ def compute(
                NULL AS comparacion,
                {'cardinal': NULL::VARCHAR, 'ocp': NULL::VARCHAR} AS referencia,
                $version AS version_regla,
-               to_json({'clase': clase,
+               to_json({'clase_item': clase,
                         'metodo': metodo_base,
                         'categoria': categoria,
                         'anio': anio,
@@ -129,6 +130,7 @@ def compute(
                         'suma_pen': round(suma, 2),
                         'umbral_pen': umbral_pen,
                         'ventana_dias': $window,
+                        'dias_entre_convocatorias': dias,
                         'norma': norma,
                         'fechas': fechas,
                         'montos': montos}) AS entradas,

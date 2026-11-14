@@ -113,6 +113,7 @@ def test_s05_flags_an_entity_above_the_fence_of_its_type(tmp_path: Path) -> None
     )
     assert signal["entradas"]["tipo_entidad"] == "municipalidad"
     assert signal["entradas"]["procesos_directos"] == 6
+    assert signal["entradas"]["procesos_totales"] == 6
     assert manifest["conteos"]["S05"] == 1
 
 
@@ -188,10 +189,10 @@ def awarded(ocid: str, final_amount: float | None, amount: float = 1000.0) -> di
     )
 
 
-def test_percent_is_written_as_in_spanish() -> None:
-    assert percent(1 / 11) == "9,1 %"
-    assert percent(0.10) == "10 %"
-    assert percent(0) == "0 %"
+def test_percent_uses_the_format_of_the_web() -> None:
+    assert percent(1 / 11) == "9.1%"
+    assert percent(0.10) == "10%"
+    assert percent(0) == "0%"
 
 
 def test_s06_is_deactivated_when_few_contracts_have_a_final_amount(tmp_path: Path) -> None:
@@ -202,8 +203,8 @@ def test_s06_is_deactivated_when_few_contracts_have_a_final_amount(tmp_path: Pat
     assert {
         "codigo": "S06",
         "motivo": (
-            "Solo el 9,1 % de los contratos de La Libertad tiene monto final "
-            "(contracts[].implementation.finalValue); el mínimo es 10 %."
+            "Solo el 9.1% de los contratos de La Libertad tiene monto final "
+            "(contracts[].implementation.finalValue); el mínimo es 10%."
         ),
     } in manifest["senales_desactivadas"]
     assert by_code(rows, "S06") == []

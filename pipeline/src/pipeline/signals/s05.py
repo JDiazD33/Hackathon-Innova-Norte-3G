@@ -173,7 +173,7 @@ def compute(
                {{'cardinal': NULL::VARCHAR, 'ocp': NULL::VARCHAR}} AS referencia,
                $version AS version_regla,
                to_json({{'tipo_entidad': tipo,
-                         'procesos': procesos,
+                         'procesos_totales': procesos,
                          'procesos_directos': directas,
                          'monto_pen': round(monto, 2),
                          'monto_directo_pen': round(monto_directas, 2),

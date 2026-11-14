@@ -19,9 +19,9 @@ CODE = "S06"
 
 
 def percent(value: float) -> str:
-    """0.0913 -> '9,1 %', as the Spanish texts write it."""
+    """0.0913 -> '9.1%', in the es-PE format that the web uses for every number."""
     text = f"{value * 100:.1f}"
-    return (text[:-2] if text.endswith(".0") else text).replace(".", ",") + " %"
+    return (text[:-2] if text.endswith(".0") else text) + "%"
 
 
 def compute(
@@ -91,9 +91,7 @@ def compute(
         """,
         {
             "factor": s06.factor,
-            "threshold": f"monto final de {s06.factor:g} veces el monto contratado o más".replace(
-                ".", ","
-            ),
+            "threshold": f"monto final de {s06.factor:g} veces el monto contratado o más",
             "version": s06.switch.rule_version,
             "coverage": coverage,
         },

@@ -128,7 +128,8 @@ def test_s04_flags_purchases_within_the_window(tmp_path: Path) -> None:
     assert signal["unidad"] == "soles"
     assert signal["umbral"]["valor"] == 150000.0
     assert "Norma de prueba" in signal["umbral"]["descripcion"]
-    assert signal["entradas"]["clase"] == "421115"
+    assert signal["entradas"]["clase_item"] == "421115"
+    assert signal["entradas"]["dias_entre_convocatorias"] == 20
     assert signal["entradas"]["fechas"] == ["2026-03-02", "2026-03-22"]
     assert signal["comparacion"] is None
 
