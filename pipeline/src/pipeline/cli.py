@@ -9,6 +9,15 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from pipeline import spike
+from pipeline.cardinal import contrast, find_cardinal
+from pipeline.config import DEFAULT_CONFIG, DEFAULT_DATA_DIR, ConfigError, load_config
+from pipeline.download import DownloadError, SourceNotAllowedError, download_all
+from pipeline.export import MODES, WEB_DATA_DIR, ExportError, export
+from pipeline.fingerprint import compare, fingerprints, read_fingerprints, write_fingerprints
+from pipeline.ingest import ingest
+from pipeline.normalize import StaleIngestError, normalize
+from pipeline.signals.compute import compute_signals
+from pipeline.signals.settings import DEFAULT_SIGNALS_CONFIG, load_signals_config
 
 DEFAULT_DEPARTMENT = "LA LIBERTAD"
 DEFAULT_YEARS = (2025, 2026)
@@ -75,7 +84,214 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     coverage_parser.add_argument("source", type=Path, help="archivo OCDS .jsonl")
     coverage_parser.add_argument("--out", type=Path, help="guarda la cobertura completa en JSON")
+
+    download_parser = commands.add_parser(
+        "download", help="descarga los archivos configurados, solo desde fuentes permitidas"
+    )
+    _add_pipeline_arguments(download_parser)
+    download_parser.add_argument(
+        "--force", action="store_true", help="vuelve a descargar aunque el archivo ya exista"
+    )
+
+    ingest_parser = commands.add_parser(
+        "ingest", help="conserva los procesos del departamento y los años configurados"
+    )
+    _add_pipeline_arguments(ingest_parser)
+
+    normalize_parser = commands.add_parser(
+        "normalize", help="escribe las tablas normalizadas en Parquet y el manifiesto"
+    )
+    _add_pipeline_arguments(normalize_parser)
+
+    signals_parser = commands.add_parser(
+        "signals", help="calcula las señales activas sobre las tablas normalizadas"
+    )
+    _add_pipeline_arguments(signals_parser)
+    signals_parser.add_argument(
+        "--signals-config",
+        type=Path,
+        default=DEFAULT_SIGNALS_CONFIG,
+        help="parámetros de las señales (por defecto, config/senales.toml)",
+    )
+
+    cardinal_parser = commands.add_parser(
+        "cardinal", help="contrasta S01 y S02 con los indicadores R018 y R003 de Cardinal"
+    )
+    _add_pipeline_arguments(cardinal_parser)
+    cardinal_parser.add_argument(
+        "--signals-config",
+        type=Path,
+        default=DEFAULT_SIGNALS_CONFIG,
+        help="parámetros de las señales (por defecto, config/senales.toml)",
+    )
+    cardinal_parser.add_argument(
+        "--cardinal",
+        type=Path,
+        help="ejecutable de Cardinal (por defecto, el del PATH o el de .tools/)",
+    )
+
+    export_parser = commands.add_parser(
+        "export", help="exporta el paquete de datos del contrato, público o local"
+    )
+    _add_pipeline_arguments(export_parser)
+    export_parser.add_argument(
+        "--signals-config",
+        type=Path,
+        default=DEFAULT_SIGNALS_CONFIG,
+        help="parámetros de las señales (por defecto, config/senales.toml)",
+    )
+    export_parser.add_argument(
+        "--modo",
+        choices=MODES,
+        required=True,
+        help="publico (seudonimizado) o local (con nombres de empresas; nunca se sube)",
+    )
+    export_parser.add_argument(
+        "--out", type=Path, help="carpeta del paquete (por defecto, web/data/<modo>)"
+    )
+
+    fingerprint_parser = commands.add_parser(
+        "fingerprint",
+        help="huellas SHA-256 de las salidas de la cadena, para comparar dos ejecuciones",
+    )
+    fingerprint_parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=DEFAULT_DATA_DIR,
+        help="carpeta de datos con interim/ y derived/ (por defecto, ../data)",
+    )
+    fingerprint_parser.add_argument(
+        "--web-data-dir",
+        type=Path,
+        default=WEB_DATA_DIR,
+        help="carpeta con los paquetes publico/ y local/ (por defecto, ../web/data)",
+    )
+    fingerprint_parser.add_argument(
+        "--out", type=Path, help="archivo JSON donde guardar las huellas de esta ejecución"
+    )
+    fingerprint_parser.add_argument(
+        "--compare", type=Path, help="huellas de otra ejecución (--out) para compararlas"
+    )
     return parser
+
+
+def _add_pipeline_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=DEFAULT_CONFIG,
+        help="archivo de configuración (por defecto, config/pipeline.toml)",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=DEFAULT_DATA_DIR,
+        help="carpeta de datos con raw/, interim/ y derived/ (por defecto, ../data)",
+    )
+
+
+def _run_download(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    for record, downloaded in download_all(config, args.data_dir, force=args.force):
+        state = "descargado" if downloaded else "ya estaba descargado"
+        print(f"{record['archivo']}: {state}, {record['bytes']} bytes, SHA-256 {record['sha256']}")
+    return 0
+
+
+def _run_ingest(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    started = time.perf_counter()
+    summary = ingest(config, args.data_dir)
+    elapsed = time.perf_counter() - started
+    read = ", ".join(f"{name}: {count}" for name, count in summary["leidos"].items())
+    print(f"Leídos ({read}) en {elapsed:.0f} s")
+    years = ", ".join(str(year) for year in summary["anios"])
+    print(f"Procesos de {summary['departamento']} ({years}): {summary['procesos']}")
+    for item in summary["exclusiones"]:
+        print(f"Excluidos por {item['motivo']}: {item['cantidad']}")
+    for item in summary["correcciones"]:
+        print(f"Corrección '{item['tipo']}': {item['cantidad']}")
+    return 0
+
+
+def _run_normalize(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    manifest = normalize(config, args.data_dir)
+    for table, count in manifest["conteos"].items():
+        print(f"{table}: {count} filas")
+    for item in manifest["correcciones"]:
+        print(f"Corrección '{item['tipo']}': {item['cantidad']}")
+    print(f"Fecha de corte: {manifest['fecha_corte']}")
+    return 0
+
+
+def _run_signals(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    settings = load_signals_config(args.signals_config)
+    manifest = compute_signals(config, settings, args.data_dir)
+    for code in manifest["senales_activas"]:
+        version = manifest["versiones"][code]
+        print(f"{code} ({version}): {manifest['conteos'][code]} señales")
+    for item in manifest["senales_desactivadas"]:
+        print(f"{item['codigo']} desactivada: {item['motivo']}")
+    for item in manifest["exclusiones"]:
+        if item["cantidad"]:
+            print(f"{item['codigo']} no evaluada por {item['motivo']}: {item['cantidad']}")
+    if manifest["metodos_sin_clasificar"]:
+        print("Métodos sin clasificar: " + ", ".join(manifest["metodos_sin_clasificar"]))
+    return 0
+
+
+def _run_cardinal(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    settings = load_signals_config(args.signals_config)
+    report = contrast(config, settings, args.data_dir, find_cardinal(args.cardinal))
+    if report.get("contraste") == "no fue posible":
+        print(f"Contraste no realizado: {report['motivo']}")
+        return 0
+    print(f"Herramienta: {report['herramienta']} · procesos: {report['entrada']['procesos']}")
+    r018 = report["R018"]
+    print(
+        f"R018 frente a S01: {r018['coincidencias']} coincidencias de {r018['senal']} "
+        f"({r018['porcentaje_coincidencia']} %); solo S01: {len(r018['solo_senal'])}; "
+        f"solo R018: {len(r018['solo_cardinal'])}"
+    )
+    r003 = report["R003"]
+    if r003.get("contraste") == "no fue posible":
+        print(f"R003 frente a S02: no fue posible. {r003['motivo']} R003 marca {r003['cardinal']}.")
+    else:
+        print(f"R003 frente a S02: {r003['coincidencias']} coincidencias de {r003['senal']}")
+    return 0
+
+
+def _run_export(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    settings = load_signals_config(args.signals_config)
+    manifest = export(config, settings, args.data_dir, args.modo, args.out)
+    counts = manifest["conteos"]
+    out = args.out or WEB_DATA_DIR / args.modo
+    print(
+        f"Paquete {args.modo} en {out}: {counts['procesos']} procesos, {counts['senales']} "
+        f"señales, {counts['proveedores']} proveedores y {counts['entidades']} entidades"
+    )
+    return 0
+
+
+def _run_fingerprint(args: argparse.Namespace) -> int:
+    values = fingerprints(args.data_dir, args.web_data_dir)
+    print(f"Huellas de {len(values)} archivos")
+    if args.out:
+        write_fingerprints(values, args.out)
+        print(f"Guardadas en {args.out}")
+    if args.compare:
+        differences = compare(values, read_fingerprints(args.compare))
+        if differences:
+            print(f"Diferencias con {args.compare}:")
+            for line in differences:
+                print(f"  {line}")
+            return 1
+        print(f"Idénticas a {args.compare}")
+    return 0
 
 
 def _run_spike(args: argparse.Namespace) -> int:
@@ -127,10 +343,33 @@ def _run_coverage(args: argparse.Namespace) -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
-    handlers = {"spike": _run_spike, "sample": _run_sample, "coverage": _run_coverage}
-    return handlers[args.command](args)
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+    handlers = {
+        "spike": _run_spike,
+        "sample": _run_sample,
+        "coverage": _run_coverage,
+        "download": _run_download,
+        "ingest": _run_ingest,
+        "normalize": _run_normalize,
+        "signals": _run_signals,
+        "cardinal": _run_cardinal,
+        "export": _run_export,
+        "fingerprint": _run_fingerprint,
+    }
+    try:
+        return handlers[args.command](args)
+    except (
+        ConfigError,
+        SourceNotAllowedError,
+        DownloadError,
+        FileNotFoundError,
+        StaleIngestError,
+        ExportError,
+    ) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":

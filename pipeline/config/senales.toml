@@ -1,0 +1,131 @@
+# Parámetros de las señales del Lote A. Las reglas están en docs/datos/catalogo-de-senales.md.
+# Cada señal tiene su versión: subirla cuando cambie su regla o sus parámetros.
+# Una señal con activa = false necesita un motivo, que se informa en el manifiesto.
+
+[comun]
+# Valla superior de Tukey: Q3 + factor_tukey × RIC.
+factor_tukey = 1.5
+# Si un grupo de comparación regional tiene menos casos, se compara con el grupo nacional.
+minimo_grupo = 30
+# Procesos que no se evalúan, según tender.items[].statusDetails (todos sus ítems en ese estado).
+estados_excluidos = ["CANCELADO"]
+
+[prioridad]
+cortes = { alta = 5, media = 3 }
+
+[prioridad.pesos]
+S01 = 3
+S02 = 2
+S03 = 3
+S04 = 3
+S06 = 2
+S07 = 3
+S08 = 3
+
+# Métodos por nombre (tender.procurementMethodDetails). tender.procurementMethod no sirve:
+# falta en los métodos de la Ley 32069. Un método que no está en ninguna lista queda sin
+# clasificar y S01 no lo evalúa (se cuenta como exclusión).
+[metodos]
+competitivos = [
+  "Licitación Pública",
+  "Licitación Pública Abreviada",
+  "Concurso Público",
+  "Concurso Público Abreviado",
+  "Concurso Público de Servicios",
+  "Concurso Público para Consultoría",
+  "Concurso Público para Evaluadores Expertos",
+  "Adjudicación Simplificada",
+  "Subasta Inversa Electrónica",
+  "Comparación de Precios",
+  "Selección de Consultores Individuales",
+  "Procedimiento Especial de Contratación",
+  "Proceso por Competencia",
+  "Adjudicación para Contrato Marco",
+]
+# Contratación Internacional, Regímen Especial y Convenio: por confirmar con el equipo.
+# Mientras tanto no se tratan como competitivos.
+no_competitivos = [
+  "Contratación Directa",
+  "Contratación Internacional",
+  "Regímen Especial",
+  "Convenio",
+]
+
+# Variantes que se comparan con su método base.
+[metodos.variantes]
+"Licitación Pública Abreviada Homologación" = "Licitación Pública Abreviada"
+"Licitación Pública Abreviada - Ley N°26859" = "Licitación Pública Abreviada"
+"Licitación Pública Abreviada - Ley N°31589" = "Licitación Pública Abreviada"
+"Licitación Pública Abreviada Séptima DCF Ley N°32069" = "Licitación Pública Abreviada"
+"Concurso Público Abreviado Homologación" = "Concurso Público Abreviado"
+"Concurso Público Abreviado - Ley N°26859" = "Concurso Público Abreviado"
+"Concurso Público Abreviado - Ley N°31589" = "Concurso Público Abreviado"
+"Concurso Público Abreviado Séptima DCF Ley N°32069" = "Concurso Público Abreviado"
+"Adjudicación Simplificada-Homologación" = "Adjudicación Simplificada"
+"Adjudicación Simplificada - Séptima Disposición Complementaria Final Reg. Ley 30225" = "Adjudicación Simplificada"
+"Procedimiento Especial de Contratación-Nueva Convocatoria por Desierto" = "Procedimiento Especial de Contratación"
+
+[S01]
+activa = true
+version = 1
+# El spec pide "postores"; el spike indica que la fuente cuenta participantes registrados.
+# Si el equipo cambia el texto, cambiar ambos valores y el spec.
+unidad = "postores"
+descripcion_umbral = "procedimiento competitivo con un solo postor"
+
+[S02]
+activa = false
+motivo = "La fuente no trae el plazo de presentación de ofertas: tender.tenderPeriod empieza y termina el día de la convocatoria."
+version = 1
+# El caso amerita revisión si su plazo, en días calendario, está bajo este percentil de su grupo.
+percentil = 10
+# Columnas de la tabla procesos con el inicio y el fin del plazo.
+plazo_inicio = "fecha_inicio_presentacion"
+plazo_fin = "fecha_fin_presentacion"
+
+[S03]
+activa = true
+version = 1
+# Ventana: los meses que terminan en la fecha de corte de los datos.
+ventana_meses = 12
+# Procesos que el proveedor debe haber ganado en la entidad, como mínimo.
+minimo_adjudicaciones = 3
+
+[S04]
+activa = false
+motivo = "Faltan los umbrales vigentes de cada método (Ley 32069 y su reglamento), verificados con la norma."
+version = 1
+ventana_dias = 60
+# Dígitos del código UNSPSC que definen "la misma clase de ítem" (6 = clase).
+digitos_clasificacion = 6
+# Umbral desde el que se exige el método superior, por método menos exigente, objeto y año.
+# Cada umbral cita su norma y la fecha en que se verificó. Ejemplo (valores ficticios):
+# { metodo = "Licitación Pública Abreviada", objeto = "bienes", anio = 2026, umbral_pen = 1000000.0, norma = "Reglamento de la Ley 32069, art. X", verificado = "2026-11-14" }
+umbrales = []
+
+[S05]
+activa = true
+version = 1
+# Métodos base de [metodos] que cuentan como contratación directa.
+metodos_directos = ["Contratación Directa"]
+# Una entidad con menos procesos no se evalúa ni entra en los grupos de comparación.
+minimo_procesos = 10
+# Con menos contrataciones directas no hay señal, aunque la proporción supere la valla.
+minimo_directas = 3
+
+[S06]
+activa = true
+version = 1
+factor = 1.15
+# Si menos contratos tienen monto final, la señal se desactiva y el manifiesto lo informa.
+cobertura_minima = 0.10
+
+[S08]
+activa = true
+version = 1
+# Expedientes internos SIMULADOS para el caso práctico (los datos abiertos no los traen).
+cantidad_expedientes = 8
+semilla = 20261113
+# ocids elegidos para el caso práctico; si la lista está vacía, se eligen con la semilla
+# entre los procesos con contrato.
+procesos = []
