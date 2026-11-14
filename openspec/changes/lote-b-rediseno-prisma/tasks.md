@@ -15,6 +15,7 @@ Lote B · Rediseño Prisma · **Joaquín (líder)** · carpetas de B en `web/` �
 - [x] 1.8 Dar la apariencia nueva a `PrioridadBadge`, `EstadoRevisionBadge` y `SinDatos` con las mismas props. Verificar con una prueba de componente que muestran ícono y texto.
 - [x] 1.9 Actualizar `docs/diseno/sistema-de-diseno.md` (color, tipografía, materiales, estructura y componentes) y "Cómo crear una pantalla" en `web/README.md` con una plantilla de página Prisma. Verificar que los tokens y componentes citados existen en el código.
 - [ ] 1.10 Abrir el PR de la parte 5 con capturas de antes y después y avisar a Sebastián y André. Verificar que el PR lista las comprobaciones en verde.
+  - Parte 5: PR #10 abierto con capturas de antes y después y las comprobaciones en verde. Falta avisar a Sebastián y André.
 
 ## 2. B6 · Parte 6: panel y bandeja (lun 16, rama `lote-b/parte-6-prisma-panel-y-bandeja`)
 
