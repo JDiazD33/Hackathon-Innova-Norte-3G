@@ -19,10 +19,10 @@ Lote B · Rediseño Prisma · **Joaquín (líder)** · carpetas de B en `web/` �
 
 ## 2. B6 · Parte 6: panel y bandeja (lun 16, rama `lote-b/parte-6-prisma-panel-y-bandeja`)
 
-- [ ] 2.1 Rediseñar el panel: título grande con la entidad, cifras como widgets, aviso de S05, gráficos con título que dice la conclusión y proveedores en lista agrupada. Verificar en claro y oscuro a 375 y 1280 px.
-- [ ] 2.2 Rediseñar la bandeja: barra de filtros fija en vidrio con control segmentado de prioridad, botones emergentes, fechas en un popover y "Limpiar filtros" plano; tabla en estilo lista en escritorio y filas con chevron en el celular. Verificar que los filtros siguen pasando `bandeja.test.ts`.
-- [ ] 2.3 Estados de carga y vacíos del panel y la bandeja con ícono, título breve y acción. Verificar en el navegador con un filtro sin resultados.
-- [ ] 2.4 Tarea 4.2 del Lote B: pruebas de componente de los filtros con Testing Library. Verificar con `npm test -- filtros`.
+- [x] 2.1 Rediseñar el panel: título grande con la entidad, cifras como widgets, aviso de S05, gráficos con título que dice la conclusión y proveedores en lista agrupada. Verificar en claro y oscuro a 375 y 1280 px.
+- [x] 2.2 Rediseñar la bandeja: barra de filtros fija en vidrio con control segmentado de prioridad, botones emergentes, fechas en un popover y "Limpiar filtros" plano; tabla en estilo lista en escritorio y filas con chevron en el celular. Verificar que los filtros siguen pasando `bandeja.test.ts`.
+- [x] 2.3 Estados de carga y vacíos del panel y la bandeja con ícono, título breve y acción. Verificar en el navegador con un filtro sin resultados.
+- [x] 2.4 Tarea 4.2 del Lote B: pruebas de componente de los filtros con Testing Library. Verificar con `npm test -- filtros`.
 
 ## 3. Verificación del lote
 
