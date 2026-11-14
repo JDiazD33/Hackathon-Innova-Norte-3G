@@ -26,6 +26,8 @@ const fechaEnLima = new Intl.DateTimeFormat("es-PE", {
   timeZone: "America/Lima",
 });
 const SOLO_FECHA = /^\d{4}-\d{2}-\d{2}$/;
+const SOLO_MES = /^\d{4}-\d{2}$/;
+const mesCorto = new Intl.DateTimeFormat("es-PE", { month: "short", year: "numeric", timeZone: "UTC" });
 
 function esNumero(valor: unknown): valor is number {
   return typeof valor === "number" && Number.isFinite(valor);
@@ -63,4 +65,12 @@ export function formatFecha(valor: string | null | undefined): string {
   const fecha = new Date(sinHora ? `${valor}T00:00:00Z` : valor);
   if (Number.isNaN(fecha.getTime())) return SIN_DATO;
   return (sinHora ? fechaSinHora : fechaEnLima).format(fecha).replace(/\./g, "");
+}
+
+/** "2025-01" → "ene 2025". */
+export function formatMes(valor: string | null | undefined): string {
+  if (!valor || !SOLO_MES.test(valor)) return SIN_DATO;
+  const fecha = new Date(`${valor}-01T00:00:00Z`);
+  if (Number.isNaN(fecha.getTime())) return SIN_DATO;
+  return mesCorto.format(fecha).replace(/\./g, "").replace(/\s+de\s+/, " ");
 }

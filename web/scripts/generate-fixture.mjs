@@ -76,15 +76,16 @@ const NIVEL = {
   S06: "proceso",
   S08: "expediente",
 };
-const OCP = "Guía de banderas rojas de OCP";
+// Igual que el pipeline (pipeline/src/pipeline/signals): solo S01 y S02 tienen equivalente en Cardinal.
+const SIN_REFERENCIA = { cardinal: null, ocp: null };
 const REFERENCIA = {
-  S01: { cardinal: "R018", ocp: OCP },
-  S02: { cardinal: "R003", ocp: OCP },
-  S03: { cardinal: null, ocp: OCP },
-  S04: { cardinal: null, ocp: OCP },
-  S05: { cardinal: null, ocp: OCP },
-  S06: { cardinal: null, ocp: OCP },
-  S08: { cardinal: null, ocp: null },
+  S01: { cardinal: "R018", ocp: "Single bid received" },
+  S02: { cardinal: "R003", ocp: "Short submission period" },
+  S03: SIN_REFERENCIA,
+  S04: SIN_REFERENCIA,
+  S05: SIN_REFERENCIA,
+  S06: SIN_REFERENCIA,
+  S08: SIN_REFERENCIA,
 };
 
 const COMPRAS = [
@@ -296,6 +297,12 @@ function senal({ id, codigo, objeto, ocids, valor, unidad, umbral, comparacion =
 
 const comparacionVacia = { n: null, q1: null, mediana: null, q3: null, valla_superior: null, percentil_del_caso: null, proporcion_referencia: null };
 
+// Proporción de contratos con monto final (S06 la informa en sus entradas, como el pipeline).
+const todosLosProcesos = [...procesosPorEntidad.values()].flat();
+const COBERTURA_MONTO_FINAL = round(
+  todosLosProcesos.filter((p) => p.monto_final !== null).length / todosLosProcesos.filter((p) => p.fechas.contrato).length,
+);
+
 // Grupo de comparación de S02: plazos de todos los procesos competitivos del fixture.
 const plazosCompetitivos = [...metaPorOcid.values()].filter((m) => !m.esDirecta).map((m) => m.plazo).sort((a, b) => a - b);
 const p10 = round(quantile(plazosCompetitivos, 0.1), 1);
@@ -348,7 +355,7 @@ for (const entidad of ENTIDADES) {
         objeto: { tipo: "proceso", id: p.ocid },
         ocids: [p.ocid],
         valor: plazo,
-        unidad: "días calendario",
+        unidad: "días",
         umbral: { operador: "menor_que", valor: p10, descripcion: "percentil 10 del plazo de presentación de procesos competitivos comparables" },
         comparacion: {
           descripcion: "Procesos competitivos de la región (2025–2026)",
@@ -361,7 +368,7 @@ for (const entidad of ENTIDADES) {
           percentil_del_caso: percentilDelCaso(plazosCompetitivos, plazo),
           proporcion_referencia: null,
         },
-        entradas: { dias_presentacion: plazo, metodo: p.metodo, percentil_configurado: 10 },
+        entradas: { dias: plazo, inicio: p.fechas.inicio_presentacion, fin: p.fechas.fin_presentacion, metodo: p.metodo },
       }),
     );
   }
@@ -374,9 +381,13 @@ for (const entidad of ENTIDADES) {
     const q1 = quantile(participaciones, 0.25);
     const q3 = quantile(participaciones, 0.75);
     const valla = q3 + 1.5 * (q3 - q1);
-    const ganados = esc.concentrado.procesos.map((i) => porIndice(i).ocid);
+    const procesosGanados = esc.concentrado.procesos.map(porIndice);
+    const ganados = procesosGanados.map((p) => p.ocid);
     const valor = ganados.length / procesos.length;
     if (!(valor > valla)) throw new Error("El escenario de S03 no supera la valla superior.");
+    const montoProveedor = procesosGanados.reduce((total, p) => total + p.monto_adjudicado, 0);
+    const montoEntidad = procesos.reduce((total, p) => total + p.monto_adjudicado, 0);
+    const convocatorias = procesos.map((p) => p.fechas.convocatoria).sort();
     senales.push(
       senal({
         id: `S03-${esc.concentrado.proveedor}-${entidad.id}`,
@@ -384,7 +395,7 @@ for (const entidad of ENTIDADES) {
         objeto: { tipo: "proveedor", id: esc.concentrado.proveedor },
         ocids: ganados,
         valor: round(valor),
-        unidad: "participación en las adjudicaciones",
+        unidad: "participación en los procesos adjudicados",
         umbral: {
           operador: "mayor_que",
           valor: round(valla),
@@ -401,7 +412,18 @@ for (const entidad of ENTIDADES) {
           percentil_del_caso: percentilDelCaso(participaciones, valor),
           proporcion_referencia: null,
         },
-        entradas: { adjudicaciones_proveedor: ganados.length, adjudicaciones_entidad: procesos.length, minimo_adjudicaciones: 3 },
+        entradas: {
+          proveedor_id: esc.concentrado.proveedor,
+          procesos_ganados: ganados.length,
+          procesos_entidad: procesos.length,
+          monto_proveedor_pen: round(montoProveedor, 2),
+          monto_entidad_pen: round(montoEntidad, 2),
+          participacion_procesos: round(valor),
+          participacion_monto: round(montoProveedor / montoEntidad),
+          medida: "procesos",
+          ventana_inicio: convocatorias[0],
+          ventana_fin: convocatorias.at(-1),
+        },
       }),
     );
   }
@@ -419,11 +441,18 @@ for (const entidad of ENTIDADES) {
         unidad: "soles",
         umbral: { operador: "mayor_que", valor: 400000, descripcion: "umbral configurado del método superior (valor ficticio del fixture)" },
         entradas: {
+          clase_item: "Mobiliario",
+          metodo: a.metodo,
+          categoria: a.objeto,
+          anio: Number(a.fechas.convocatoria.slice(0, 4)),
+          procesos: 2,
+          suma_pen: a.monto_referencial + b.monto_referencial,
+          umbral_pen: 400000,
           ventana_dias: 60,
           dias_entre_convocatorias: 20,
-          clase_item: "Mobiliario",
-          metodos: [a.metodo, b.metodo],
-          montos_referenciales: [a.monto_referencial, b.monto_referencial],
+          norma: "Umbral ficticio del fixture; no es una cifra legal",
+          fechas: [a.fechas.convocatoria, b.fechas.convocatoria],
+          montos: [a.monto_referencial, b.monto_referencial],
         },
       }),
     );
@@ -452,7 +481,20 @@ for (const entidad of ENTIDADES) {
           percentil_del_caso: 100,
           proporcion_referencia: null,
         },
-        entradas: { procesos_directos: directas.length, procesos_totales: procesos.length },
+        entradas: {
+          tipo_entidad: entidad.tipo,
+          procesos_totales: procesos.length,
+          procesos_directos: directas.length,
+          monto_pen: round(procesos.reduce((total, p) => total + p.monto_adjudicado, 0), 2),
+          monto_directo_pen: round(directas.reduce((total, p) => total + p.monto_adjudicado, 0), 2),
+          proporcion_procesos: round(directas.length / procesos.length),
+          proporcion_monto: round(
+            directas.reduce((total, p) => total + p.monto_adjudicado, 0) /
+              procesos.reduce((total, p) => total + p.monto_adjudicado, 0),
+          ),
+          medida: "procesos",
+          metodos_directos: ["Contratación directa"],
+        },
       }),
     );
   }
@@ -469,7 +511,13 @@ for (const entidad of ENTIDADES) {
         valor: round(p.monto_final / p.monto_adjudicado, 2),
         unidad: "veces el monto contratado",
         umbral: { operador: "mayor_o_igual", valor: 1.15, descripcion: "monto final igual o mayor que el contratado más 15 %" },
-        entradas: { monto_contratado: p.monto_adjudicado, monto_final: p.monto_final },
+        entradas: {
+          contrato_id: `${p.ocid}-contrato-1`,
+          monto_contratado: p.monto_adjudicado,
+          monto_final: p.monto_final,
+          moneda: p.moneda,
+          cobertura_monto_final: COBERTURA_MONTO_FINAL,
+        },
       }),
     );
   }
@@ -506,10 +554,15 @@ for (const entidad of ENTIDADES) {
         codigo: "S08",
         objeto: { tipo: "expediente", id: p.ocid },
         ocids: [p.ocid],
-        valor: 3,
-        unidad: "etapas a cargo de la misma persona",
-        umbral: { operador: "mayor_o_igual", valor: 2, descripcion: "una misma persona en dos o más etapas que deberían estar separadas" },
-        entradas: { persona: "Persona A", etapas: ["requerimiento", "evaluacion", "conformidad"], conformidad_sin_documento: true },
+        // Igual que el pipeline: valor = condiciones que se cumplen (misma persona y pago sin conformidad documentada).
+        valor: 2,
+        unidad: "condiciones",
+        umbral: {
+          operador: "mayor_o_igual",
+          valor: 1,
+          descripcion: "misma persona en requerimiento, evaluación y conformidad, o pago sin conformidad documentada",
+        },
+        entradas: { misma_persona: true, persona: "Persona A", pago_sin_conformidad_documentada: true },
         simulado: true,
       }),
     );

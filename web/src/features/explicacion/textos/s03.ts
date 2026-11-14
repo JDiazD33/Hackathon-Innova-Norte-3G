@@ -6,14 +6,15 @@ import { comparisonText, completeExplanation, inputNumber, isNumber, sentences }
 
 export function explainS03(signal: Senal, context?: ExplanationContext) {
   const share = signal.valor;
-  const count = inputNumber(signal, "adjudicaciones_proveedor");
-  const total = inputNumber(signal, "adjudicaciones_entidad");
+  // Claves de `entradas` según docs/datos/catalogo-de-senales.md#entradas-de-cada-señal.
+  const count = inputNumber(signal, "procesos_ganados");
+  const total = inputNumber(signal, "procesos_entidad");
   const fence = signal.comparacion?.valla_superior;
   return completeExplanation(signal, {
     finding: sentences(
       isNumber(share) ? `El proveedor registra una participación de ${formatPorcentaje(share, 1)} en la entidad (${signal.unidad}).` : null,
       count !== null && total !== null
-        ? `Obtuvo ${formatEntero(count)} de ${formatEntero(total)} adjudicaciones de la entidad en el periodo analizado.` : null,
+        ? `Obtuvo ${formatEntero(count)} de los ${formatEntero(total)} procesos adjudicados por la entidad en el periodo analizado.` : null,
     ) || "Falta la participación del proveedor en las adjudicaciones de la entidad.",
     comparison: comparisonText(signal,
       isNumber(fence) ? `El límite superior de comparación de la participación es ${formatPorcentaje(fence, 1)}.` : null),
@@ -22,8 +23,8 @@ export function explainS03(signal: Senal, context?: ExplanationContext) {
     limitation: "La recurrencia no demuestra favoritismo. Puede responder a especialización, disponibilidad local, un contrato marco o un desempeño comprobado.",
     dataUsed: [
       isNumber(share) ? `Participación del proveedor: ${formatPorcentaje(share, 1)} (${signal.unidad}).` : null,
-      count !== null ? `Adjudicaciones del proveedor: ${formatEntero(count)}.` : null,
-      total !== null ? `Adjudicaciones de la entidad: ${formatEntero(total)}.` : null,
+      count !== null ? `Procesos ganados por el proveedor: ${formatEntero(count)}.` : null,
+      total !== null ? `Procesos adjudicados por la entidad: ${formatEntero(total)}.` : null,
     ],
   }, context);
 }

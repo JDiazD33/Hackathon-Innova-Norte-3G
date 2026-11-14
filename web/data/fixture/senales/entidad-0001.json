@@ -31,7 +31,7 @@
     },
     "referencia": {
       "cardinal": "R018",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Single bid received"
     },
     "version_regla": "S01@1",
     "entradas": {
@@ -73,7 +73,7 @@
     },
     "referencia": {
       "cardinal": "R018",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Single bid received"
     },
     "version_regla": "S01@1",
     "entradas": {
@@ -117,7 +117,7 @@
     },
     "referencia": {
       "cardinal": "R018",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Single bid received"
     },
     "version_regla": "S01@1",
     "entradas": {
@@ -140,7 +140,7 @@
       "ocds-fixture-e1-003"
     ],
     "valor": 2,
-    "unidad": "días calendario",
+    "unidad": "días",
     "umbral": {
       "operador": "menor_que",
       "valor": 8,
@@ -159,13 +159,14 @@
     },
     "referencia": {
       "cardinal": "R003",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Short submission period"
     },
     "version_regla": "S02@1",
     "entradas": {
-      "dias_presentacion": 2,
-      "metodo": "Adjudicación simplificada",
-      "percentil_configurado": 10
+      "dias": 2,
+      "inicio": "2025-03-02",
+      "fin": "2025-03-04",
+      "metodo": "Adjudicación simplificada"
     },
     "calidad": [],
     "simulado": false
@@ -183,7 +184,7 @@
       "ocds-fixture-e1-017"
     ],
     "valor": 2,
-    "unidad": "días calendario",
+    "unidad": "días",
     "umbral": {
       "operador": "menor_que",
       "valor": 8,
@@ -202,13 +203,14 @@
     },
     "referencia": {
       "cardinal": "R003",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Short submission period"
     },
     "version_regla": "S02@1",
     "entradas": {
-      "dias_presentacion": 2,
-      "metodo": "Adjudicación simplificada",
-      "percentil_configurado": 10
+      "dias": 2,
+      "inicio": "2026-03-16",
+      "fin": "2026-03-18",
+      "metodo": "Adjudicación simplificada"
     },
     "calidad": [],
     "simulado": false
@@ -234,7 +236,7 @@
       "ocds-fixture-e1-020"
     ],
     "valor": 0.4091,
-    "unidad": "participación en las adjudicaciones",
+    "unidad": "participación en los procesos adjudicados",
     "umbral": {
       "operador": "mayor_que",
       "valor": 0.1591,
@@ -253,13 +255,20 @@
     },
     "referencia": {
       "cardinal": null,
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": null
     },
     "version_regla": "S03@1",
     "entradas": {
-      "adjudicaciones_proveedor": 9,
-      "adjudicaciones_entidad": 22,
-      "minimo_adjudicaciones": 3
+      "proveedor_id": "P0003",
+      "procesos_ganados": 9,
+      "procesos_entidad": 22,
+      "monto_proveedor_pen": 1922857.83,
+      "monto_entidad_pen": 7843215.79,
+      "participacion_procesos": 0.4091,
+      "participacion_monto": 0.2452,
+      "medida": "procesos",
+      "ventana_inicio": "2025-01-07",
+      "ventana_fin": "2026-07-29"
     },
     "calidad": [],
     "simulado": false
@@ -287,18 +296,25 @@
     "comparacion": null,
     "referencia": {
       "cardinal": null,
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": null
     },
     "version_regla": "S04@1",
     "entradas": {
+      "clase_item": "Mobiliario",
+      "metodo": "Comparación de precios",
+      "categoria": "bienes",
+      "anio": 2025,
+      "procesos": 2,
+      "suma_pen": 440000,
+      "umbral_pen": 400000,
       "ventana_dias": 60,
       "dias_entre_convocatorias": 20,
-      "clase_item": "Mobiliario",
-      "metodos": [
-        "Comparación de precios",
-        "Comparación de precios"
+      "norma": "Umbral ficticio del fixture; no es una cifra legal",
+      "fechas": [
+        "2025-09-08",
+        "2025-09-28"
       ],
-      "montos_referenciales": [
+      "montos": [
         230000,
         210000
       ]
@@ -328,12 +344,15 @@
     "comparacion": null,
     "referencia": {
       "cardinal": null,
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": null
     },
     "version_regla": "S06@1",
     "entradas": {
+      "contrato_id": "ocds-fixture-e1-015-contrato-1",
       "monto_contratado": 214797.31,
-      "monto_final": 262052.72
+      "monto_final": 262052.72,
+      "moneda": "PEN",
+      "cobertura_monto_final": 0.1
     },
     "calidad": [],
     "simulado": false
@@ -350,12 +369,12 @@
     "ocids": [
       "ocds-fixture-e1-007"
     ],
-    "valor": 3,
-    "unidad": "etapas a cargo de la misma persona",
+    "valor": 2,
+    "unidad": "condiciones",
     "umbral": {
       "operador": "mayor_o_igual",
-      "valor": 2,
-      "descripcion": "una misma persona en dos o más etapas que deberían estar separadas"
+      "valor": 1,
+      "descripcion": "misma persona en requerimiento, evaluación y conformidad, o pago sin conformidad documentada"
     },
     "comparacion": null,
     "referencia": {
@@ -364,13 +383,9 @@
     },
     "version_regla": "S08@1",
     "entradas": {
+      "misma_persona": true,
       "persona": "Persona A",
-      "etapas": [
-        "requerimiento",
-        "evaluacion",
-        "conformidad"
-      ],
-      "conformidad_sin_documento": true
+      "pago_sin_conformidad_documentada": true
     },
     "calidad": [],
     "simulado": true

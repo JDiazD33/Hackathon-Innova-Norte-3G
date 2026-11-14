@@ -91,9 +91,9 @@ describe("Explicaciones sobre el paquete de prueba", () => {
     expect(explainSignal(signal)!.comparison).not.toContain("límite superior");
   });
 
-  it("S03 explica la participación y el número de adjudicaciones sin asumir montos", () => {
+  it("S03 explica la participación y el número de procesos ganados sin asumir montos", () => {
     const explanation = explainSignal(sample("S03"))!;
-    expect(explanation.finding).toContain("9 de 22 adjudicaciones");
+    expect(explanation.finding).toContain("9 de los 22 procesos adjudicados");
     expect(explanation.finding).toContain(formatPorcentaje(0.4091, 1));
     expect(explanation.finding).not.toContain("monto");
   });
@@ -128,16 +128,18 @@ describe("Explicaciones sobre el paquete de prueba", () => {
     expect(JSON.stringify(explainSignal(signal))).not.toMatch(/NaN|Infinity/);
   });
 
-  it("S08 distingue condiciones demostradas y no afirma que hubo un pago sin conformidad", () => {
+  it("S08 describe solo las condiciones que trae el expediente simulado", () => {
     const signal = sample("S08");
     const explanation = explainSignal(signal)!;
-    expect(explanation.finding).toContain("3 etapas");
-    expect(explanation.finding).toContain("no tiene un documento");
-    expect(explanation.finding).not.toContain("pago sin conformidad");
+    expect(explanation.finding).toContain("la misma persona (Persona A) solicitó, evaluó y dio la conformidad");
+    expect(explanation.finding).toContain("conformidad no tiene un documento de sustento");
     expect(explanation.limitation).toContain("dato simulado");
-    signal.entradas = { pago_sin_conformidad: true };
-    expect(explainSignal(signal)!.finding).toContain("pago sin conformidad registrada");
+    signal.entradas = { pago_sin_conformidad_documentada: true };
+    expect(explainSignal(signal)!.finding).toContain("conformidad no tiene un documento de sustento");
     expect(explainSignal(signal)!.finding).not.toContain("misma persona");
+    signal.entradas = { misma_persona: true, persona: null, pago_sin_conformidad_documentada: false };
+    expect(explainSignal(signal)!.finding).toContain("la misma persona solicitó");
+    expect(explainSignal(signal)!.finding).not.toContain("sustento");
   });
 
   it("los ceros se conservan y las entradas no numéricas se omiten", () => {
