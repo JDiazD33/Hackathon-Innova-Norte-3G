@@ -4,11 +4,11 @@ Lote A · Datos y señales · **Stefano** · ★★★★ · carpeta `pipeline/`
 
 ## 1. A1 · Spike de datos (Fase 0, sáb 14)
 
-- [ ] 1.1 Crear `pipeline/` con uv (Python 3.12 o 3.13), DuckDB, pytest y ruff, y anotar los comandos en `CONTRIBUTING.md`. Verificar que `uv run pytest` y `uv run ruff check` terminan sin errores.
-- [ ] 1.2 Descargar `2026.jsonl.gz` del OCP Data Registry en `data/raw/` y registrar la URL, la fecha y el tamaño. Verificar que el tamaño coincide con el publicado (unos 155 MB) y que `git status` no muestra el archivo.
-- [ ] 1.3 Responder Q1–Q4 (departamento, plazo de presentación, postores y clasificación de ítems) con consultas DuckDB. Verificar anotando los campos exactos y las cifras en `docs/datos/fuente-de-datos.md`.
-- [ ] 1.4 Responder Q5–Q7 (método, culminación y tamaño de La Libertad en 2025–2026). Verificar con las cifras anotadas en el mismo documento.
-- [ ] 1.5 Instalar `ocdscardinal` y ejecutar `coverage` y `prepare` sobre una muestra (Q8). Verificar anotando qué indicadores de Cardinal se pueden calcular con estos datos.
+- [x] 1.1 Crear `pipeline/` con uv (Python 3.12 o 3.13), DuckDB, pytest y ruff, y anotar los comandos en `CONTRIBUTING.md`. Verificar que `uv run pytest` y `uv run ruff check` terminan sin errores.
+- [x] 1.2 Descargar `2026.jsonl.gz` del OCP Data Registry en `data/raw/` y registrar la URL, la fecha y el tamaño. Verificar que el tamaño coincide con el publicado (unos 155 MB) y que `git status` no muestra el archivo.
+- [x] 1.3 Responder Q1–Q4 (departamento, plazo de presentación, postores y clasificación de ítems) con consultas DuckDB. Verificar anotando los campos exactos y las cifras en `docs/datos/fuente-de-datos.md`.
+- [x] 1.4 Responder Q5–Q7 (método, culminación y tamaño de La Libertad en 2025–2026). Verificar con las cifras anotadas en el mismo documento.
+- [x] 1.5 Instalar `ocdscardinal` y ejecutar `coverage` y `prepare` sobre una muestra (Q8). Verificar anotando qué indicadores de Cardinal se pueden calcular con estos datos.
 - [ ] 1.6 Revisar con el Lote B el contrato v1 (`docs/arquitectura/contrato-paquete-de-datos.md`) y ajustarlo a lo que mostró el spike. Verificar con la aprobación de los cuatro integrantes en el PR.
 
 ## 2. A2 · Ingesta y normalización
