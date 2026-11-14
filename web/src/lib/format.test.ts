@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatEntero, formatFecha, formatPorcentaje, formatSoles, SIN_DATO } from "./format";
+import { formatEntero, formatFecha, formatMes, formatPorcentaje, formatSoles, SIN_DATO } from "./format";
 
 /** Intl puede usar espacios no separables; las pruebas comparan con espacios normales. */
 const normalizar = (texto: string) => texto.replace(/[  ]/g, " ");
@@ -30,6 +30,18 @@ describe("formatFecha", () => {
   it("devuelve Sin dato ante valores vacíos o inválidos", () => {
     expect(formatFecha(null)).toBe(SIN_DATO);
     expect(formatFecha("no es una fecha")).toBe(SIN_DATO);
+  });
+});
+
+describe("formatMes", () => {
+  it("muestra el mes abreviado y el año", () => {
+    expect(normalizar(formatMes("2025-01"))).toBe("ene 2025");
+    expect(normalizar(formatMes("2026-10"))).toBe("oct 2026");
+  });
+
+  it("devuelve Sin dato ante valores vacíos o inválidos", () => {
+    expect(formatMes(null)).toBe(SIN_DATO);
+    expect(formatMes("2025-1")).toBe(SIN_DATO);
   });
 });
 

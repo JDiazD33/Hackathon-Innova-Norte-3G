@@ -31,7 +31,7 @@
     },
     "referencia": {
       "cardinal": "R018",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Single bid received"
     },
     "version_regla": "S01@1",
     "entradas": {
@@ -73,7 +73,7 @@
     },
     "referencia": {
       "cardinal": "R018",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Single bid received"
     },
     "version_regla": "S01@1",
     "entradas": {
@@ -96,7 +96,7 @@
       "ocds-fixture-e2-008"
     ],
     "valor": 2,
-    "unidad": "días calendario",
+    "unidad": "días",
     "umbral": {
       "operador": "menor_que",
       "valor": 8,
@@ -115,13 +115,14 @@
     },
     "referencia": {
       "cardinal": "R003",
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": "Short submission period"
     },
     "version_regla": "S02@1",
     "entradas": {
-      "dias_presentacion": 2,
-      "metodo": "Adjudicación simplificada",
-      "percentil_configurado": 10
+      "dias": 2,
+      "inicio": "2025-08-02",
+      "fin": "2025-08-04",
+      "metodo": "Adjudicación simplificada"
     },
     "calidad": [],
     "simulado": false
@@ -164,12 +165,21 @@
     },
     "referencia": {
       "cardinal": null,
-      "ocp": "Guía de banderas rojas de OCP"
+      "ocp": null
     },
     "version_regla": "S05@1",
     "entradas": {
+      "tipo_entidad": "municipalidad",
+      "procesos_totales": 18,
       "procesos_directos": 7,
-      "procesos_totales": 18
+      "monto_pen": 5464229.84,
+      "monto_directo_pen": 3104302.03,
+      "proporcion_procesos": 0.3889,
+      "proporcion_monto": 0.5681,
+      "medida": "procesos",
+      "metodos_directos": [
+        "Contratación directa"
+      ]
     },
     "calidad": [],
     "simulado": false

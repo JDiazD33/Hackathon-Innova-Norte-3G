@@ -1,26 +1,187 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Tokens del sistema de diseño (docs/diseno/sistema-de-diseno.md). Dueño: Lote B.
+ * - Prioridad: la asigna el sistema; usa ámbar y neutros, nunca rojo.
+ * - Estado de revisión: lo decide una persona; el rojo solo existe en "requiere atención" (ADR 0007).
+ * src/app/theme-contrast.test.ts comprueba que cada par de texto y fondo llegue a 4,5:1.
+ */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-prioridad-alta: var(--prioridad-alta);
+  --color-prioridad-alta-foreground: var(--prioridad-alta-foreground);
+  --color-prioridad-media: var(--prioridad-media);
+  --color-prioridad-media-foreground: var(--prioridad-media-foreground);
+  --color-prioridad-baja: var(--prioridad-baja);
+  --color-prioridad-baja-foreground: var(--prioridad-baja-foreground);
+  --color-estado-sin-revisar: var(--estado-sin-revisar);
+  --color-estado-sin-revisar-foreground: var(--estado-sin-revisar-foreground);
+  --color-estado-en-revision: var(--estado-en-revision);
+  --color-estado-en-revision-foreground: var(--estado-en-revision-foreground);
+  --color-estado-justificada: var(--estado-justificada);
+  --color-estado-justificada-foreground: var(--estado-justificada-foreground);
+  --color-estado-requiere-atencion: var(--estado-requiere-atencion);
+  --color-estado-requiere-atencion-foreground: var(--estado-requiere-atencion-foreground);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.75rem;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #1e3a8a;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #eff6ff;
+  --accent-foreground: #1e3a8a;
+  --destructive: #b91c1c;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #1d4ed8;
+  --chart-1: #1e3a8a;
+  --chart-2: #0e7490;
+  --chart-3: #b45309;
+  --chart-4: #64748b;
+  --chart-5: #6d28d9;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #1e3a8a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eff6ff;
+  --sidebar-accent-foreground: #1e3a8a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #1d4ed8;
+  --prioridad-alta: #fef3c7;
+  --prioridad-alta-foreground: #92400e;
+  --prioridad-media: #fefce8;
+  --prioridad-media-foreground: #854d0e;
+  --prioridad-baja: #f1f5f9;
+  --prioridad-baja-foreground: #475569;
+  --estado-sin-revisar: #f1f5f9;
+  --estado-sin-revisar-foreground: #475569;
+  --estado-en-revision: #eff6ff;
+  --estado-en-revision-foreground: #1d4ed8;
+  --estado-justificada: #f0fdf4;
+  --estado-justificada-foreground: #15803d;
+  --estado-requiere-atencion: #fef2f2;
+  --estado-requiere-atencion-foreground: #b91c1c;
+}
+
+.dark {
+  --background: #0b1220;
+  --foreground: #e2e8f0;
+  --card: #111a2e;
+  --card-foreground: #e2e8f0;
+  --popover: #111a2e;
+  --popover-foreground: #e2e8f0;
+  --primary: #93c5fd;
+  --primary-foreground: #0b1220;
+  --secondary: #1e293b;
+  --secondary-foreground: #e2e8f0;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #e2e8f0;
+  --destructive: #f87171;
+  --border: #1e293b;
+  --input: #334155;
+  --ring: #60a5fa;
+  --chart-1: #93c5fd;
+  --chart-2: #67e8f9;
+  --chart-3: #fcd34d;
+  --chart-4: #94a3b8;
+  --chart-5: #c4b5fd;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #93c5fd;
+  --sidebar-primary-foreground: #0b1220;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #60a5fa;
+  --prioridad-alta: #451a03;
+  --prioridad-alta-foreground: #fcd34d;
+  --prioridad-media: #422006;
+  --prioridad-media-foreground: #fde68a;
+  --prioridad-baja: #1e293b;
+  --prioridad-baja-foreground: #cbd5e1;
+  --estado-sin-revisar: #1e293b;
+  --estado-sin-revisar-foreground: #cbd5e1;
+  --estado-en-revision: #172554;
+  --estado-en-revision-foreground: #93c5fd;
+  --estado-justificada: #052e16;
+  --estado-justificada-foreground: #86efac;
+  --estado-requiere-atencion: #450a0a;
+  --estado-requiere-atencion-foreground: #fca5a5;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
