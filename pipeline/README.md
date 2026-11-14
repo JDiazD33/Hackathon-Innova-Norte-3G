@@ -1,24 +1,38 @@
 # Pipeline del Lote A
 
-Convierte los datos abiertos de contrataciones del Perú (OCDS del OECE, vía el OCP Data Registry) en señales de revisión. Por ahora contiene el **spike de datos** (tareas 1.1 a 1.5 del change [`lote-a-datos-y-senales`](../openspec/changes/lote-a-datos-y-senales/tasks.md)). La ingesta, las señales, la prioridad y la exportación del paquete llegan en las partes siguientes.
+Convierte los datos abiertos de contrataciones del Perú (OCDS del OECE, vía el OCP Data Registry) en señales de revisión. Avance según el change [`lote-a-datos-y-senales`](../openspec/changes/lote-a-datos-y-senales/tasks.md).
 
-Los comandos están en [`CONTRIBUTING.md`](../CONTRIBUTING.md#comandos-disponibles-hoy) y los resultados del spike, en [`docs/datos/fuente-de-datos.md`](../docs/datos/fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a).
+Los comandos están en [`CONTRIBUTING.md`](../CONTRIBUTING.md#comandos-disponibles-hoy). Los resultados del spike, en [`docs/datos/fuente-de-datos.md`](../docs/datos/fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a), y las tablas, en [`docs/datos/tablas-normalizadas.md`](../docs/datos/tablas-normalizadas.md).
+
+## Pasos
+
+Cada paso tiene su comando y lee lo que dejó el anterior, así que se puede repetir uno sin rehacer los demás.
+
+| Paso | Comando | Lee | Escribe |
+|---|---|---|---|
+| Descarga | `uv run pipeline download` | `config/pipeline.toml` | `data/raw/<archivo>` y `<archivo>.meta.json` (URL, fecha, tamaño y SHA-256) |
+| Ingesta | `uv run pipeline ingest` | `data/raw/` | `data/interim/releases.parquet` (procesos de la región y los años) e `ingesta.json` |
+| Normalización | `uv run pipeline normalize` | `data/interim/` | `data/derived/tablas/*.parquet` y `manifiesto.json` |
 
 ## Estructura
 
 | Ruta | Contenido |
 |---|---|
-| `src/pipeline/spike.py` | Consultas DuckDB del spike (Q1–Q7 y calidad de los datos), muestra por región y años, y cobertura de Cardinal |
-| `src/pipeline/cli.py` | Comando `uv run pipeline` con `spike`, `sample` y `coverage` |
-| `tests/` | Pruebas con releases sintéticos, sin nombres ni RUC reales |
+| `config/pipeline.toml` | Fuente, fuentes permitidas, archivos, región, años y prefijos de RUC |
+| `src/pipeline/config.py` | Lectura y validación de la configuración |
+| `src/pipeline/download.py` | Descarga con lista de fuentes permitidas, también para las redirecciones |
+| `src/pipeline/ocds.py` | Campos OCDS que se leen, con sus tipos de DuckDB |
+| `src/pipeline/ingest.py` | Filtro por departamento y años, exclusiones y procesos repetidos |
+| `src/pipeline/normalize.py` | Tablas normalizadas, correcciones de calidad y manifiesto |
+| `src/pipeline/spike.py` | Consultas del spike (Q1–Q7 y calidad), muestra por región y cobertura de Cardinal |
+| `src/pipeline/cli.py` | Comando `uv run pipeline` |
+| `tests/` | Pruebas con releases sintéticos (`tests/factories.py`), sin nombres ni RUC reales |
 | `.tools/` | Herramientas locales, como la línea de comandos de Cardinal. No se sube |
 
-## Salidas
-
-Todas van a `data/`, que no se sube.
+## Salidas del spike
 
 | Archivo | Contenido |
 |---|---|
-| `data/interim/spike-<años>.duckdb` | Base DuckDB con los releases cargados (por ejemplo, `spike-2025-2026.duckdb` con los dos archivos). Se reutiliza; `--reload` la vuelve a crear |
+| `data/interim/spike-<años>.duckdb` | Base DuckDB con los releases cargados. Se reutiliza; `--reload` la vuelve a crear |
 | `data/derived/spike-<años>.json` | Informe del spike: cada consulta con su pregunta, su SQL, sus columnas y sus filas |
 | `data/interim/muestra-*.jsonl` | Procesos de una región y unos años, copiados sin cambios, para Cardinal |
