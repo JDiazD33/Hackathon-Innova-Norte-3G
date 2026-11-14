@@ -43,6 +43,7 @@ Reglas para todas las personas y agentes que trabajan en este repositorio. Los m
 - Fases, lotes y responsables: [`docs/plan/cronograma-y-lotes.md`](docs/plan/cronograma-y-lotes.md). Cada persona trabaja su change de OpenSpec (`/opsx:apply <change>` en Claude Code o `$openspec-apply-change` en Codex).
 - Una rama por parte de lote: `lote-a/parte-1-spike-datos`, `lote-b/parte-2-contrato`, etc.
 - PR pequeños, revisados por otra persona del equipo.
+- **Archivo de ramas:** cuando una parte ya está en `main`, su rama se guarda como tag `archivo/<rama>` y se borra del remoto, como en la hackathon anterior. Para retomarla: `git switch -c <rama> archivo/<rama>`.
 - Antes de pedir revisión, ejecuta las comprobaciones del proyecto que tocaste y anota el resultado en el PR.
 
 ## Comandos disponibles hoy

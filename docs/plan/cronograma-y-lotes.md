@@ -74,7 +74,7 @@ Acordado el 13 de noviembre. Cada lote termina primero su **lógica con pruebas*
 | 8 | Entrevistas de problema (lun 16 a mié 18) | Joaquín coordina; cada uno hace una | Criterios 1 y 4 (30 puntos) |
 | 9 | Verificar en el SEACE los casos de S01 y S03 (A 3.4 y 4.5) | Stefano | Respaldo de las señales ante el jurado |
 
-**Actualización (14 de noviembre, tarde):** los puntos 2, 4 y 5 están hechos en las ramas `lote-b/parte-3-logica-y-fixture` y `lote-b/parte-4-interfaz`, con sus PR. También se ajustaron a las claves del catálogo los textos de S03 y S08 del Lote C. Con la base visual, Sebastián y André ya pueden construir sus pantallas (ver "Cómo crear una pantalla" en `web/README.md`).
+**Actualización (14 de noviembre, tarde):** los puntos 2, 4 y 5 están hechos y fusionados en `main` (PR #8 y #9). Las ramas ya fusionadas de todos los lotes quedaron archivadas como tags `archivo/<rama>`. También se ajustaron a las claves del catálogo los textos de S03 y S08 del Lote C. Con la base visual, Sebastián y André ya pueden construir sus pantallas (ver "Cómo crear una pantalla" en `web/README.md`).
 
 ## Fase 0 · Cimientos (vie 13 – sáb 14)
 
