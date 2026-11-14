@@ -43,7 +43,7 @@ function Pestanas({ entidad }: { entidad: string | null }) {
                 aria-current={activa ? "page" : undefined}
                 className={cn(
                   "flex h-14 flex-col items-center justify-center gap-0.5 rounded-full text-leyenda font-medium outline-none transition-colors duration-150 ease-prisma focus-visible:ring-2 focus-visible:ring-ring",
-                  activa ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                  activa ? "bg-[color-mix(in_srgb,var(--foreground)_7%,transparent)] text-primary" : "text-muted-foreground",
                 )}
               >
                 <Icono aria-hidden="true" className="size-[1.375rem]" strokeWidth={activa ? 2.25 : 1.75} />
