@@ -11,7 +11,7 @@ Next.js 16 (App Router con Cache Components) + React 19 + TypeScript + Tailwind 
 | `npm ci` | Instala las dependencias exactas |
 | `npm run dev` | Servidor de desarrollo en http://localhost:3000 con el fixture |
 | `npm test` | Pruebas (Vitest) |
-| `npm run typecheck` | Revisión de tipos |
+| `npm run typecheck` | Genera los tipos de rutas de Next (`next typegen`) y revisa los tipos; funciona en una copia recién clonada |
 | `npm run lint` | ESLint |
 | `npm run build` y `npm run start` | Build de producción y demo local (ya construida, funciona sin internet) |
 | `npm run fixture` | Regenera `data/fixture/` (datos ficticios, siempre iguales) |

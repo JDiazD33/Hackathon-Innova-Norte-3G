@@ -56,6 +56,24 @@ Acordado el 13 de noviembre. Cada lote termina primero su **lógica con pruebas*
 
 **La interfaz empieza** cuando B tenga el tema y la estructura (1.3 a 1.5), porque C y D construyen sus pantallas encima.
 
+## Estado al 14 de noviembre
+
+**Integrado en `main`:** la parte de código de los lotes A, C y D. Del Lote A entraron los PR #1 a #7; de C y D, las ramas `lote-c/parte-1-textos-y-logica` y `lote-d/parte-1-revision-logica`. Con todo unido pasan 158 pruebas de la web y 145 del pipeline, y el lint, los tipos y el build están en verde. La parte 1 del Lote D la hizo Sebastián, en reemplazo de André.
+
+**Siguiente, en orden:**
+
+| # | Qué | Quién | Por qué ahora |
+|---|---|---|---|
+| 1 | Decidir el ajuste del contrato y de las señales (tarea 1.6 del Lote A): `numero_postores` como participantes registrados, S02 y S06 desactivadas, umbrales de S04, mínimos de S03 y S05, y métodos dudosos | Los cuatro; propone Stefano | Cambia los textos y el fixture |
+| 2 | Alinear las claves de `entradas` del fixture con el [catálogo](../datos/catalogo-de-senales.md#entradas-de-cada-señal) | Joaquín | Hoy el fixture usa claves que el pipeline no produce (S02, S03, S04 y S08) |
+| 3 | Ajustar los textos de S01 ("participantes registrados"), S03 (`procesos_ganados` y `procesos_entidad`) y S08 (`misma_persona` y `pago_sin_conformidad_documentada`) | Sebastián | Con datos reales, esas frases no aparecen o son inexactas |
+| 4 | Lógica del panel y la bandeja (B 3.2 y 4.x) | Joaquín | Es lo único del código que falta |
+| 5 | Base visual: shadcn/ui, tema y estructura (B 1.3 a 1.6) | Joaquín | C y D construyen sus pantallas encima |
+| 6 | Revisar el paquete público, subir `web/data/publico/` y probar la web con `PAQUETE_DATOS=publico` (A 5.4) | Stefano y Joaquín | La demo usa datos reales |
+| 7 | Pantallas de C (fichas y tarjeta de señal) y de D (revisión, reporte, metodología y pie) | Sebastián y André | Después del punto 5 |
+| 8 | Entrevistas de problema (lun 16 a mié 18) | Joaquín coordina; cada uno hace una | Criterios 1 y 4 (30 puntos) |
+| 9 | Verificar en el SEACE los casos de S01 y S03 (A 3.4 y 4.5) | Stefano | Respaldo de las señales ante el jurado |
+
 ## Fase 0 · Cimientos (vie 13 – sáb 14)
 
 **Objetivo:** que los cuatro puedan trabajar en paralelo desde el domingo sin bloquearse.

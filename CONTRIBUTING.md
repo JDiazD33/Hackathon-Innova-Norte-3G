@@ -56,7 +56,7 @@ openspec validate --all --strict
 npm ci                      # instala las dependencias exactas
 npm run dev                 # http://localhost:3000 con el fixture
 npm test                    # pruebas (Vitest)
-npm run typecheck           # tipos
+npm run typecheck           # genera los tipos de rutas de Next (next typegen) y revisa los tipos
 npm run lint                # ESLint
 npm run build && npm run start   # demo local; ya construida, funciona sin internet
 npm run fixture             # regenera web/data/fixture (datos ficticios)
