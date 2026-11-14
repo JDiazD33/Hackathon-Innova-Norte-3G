@@ -12,7 +12,7 @@ El Lote A (datos y señales) se divide en partes. Cada parte tiene su ficha, su 
 | [4 · S03, S04, S08 y Cardinal](parte-4-s03-s04-s08-cardinal.md) | 4.1–4.5 | `lote-a/parte-4-s03-s04-s08-cardinal` | 4.1–4.4 hechas, en PR. Falta 4.5 (verificación en el SEACE); S04 espera sus umbrales | Parte 3 |
 | [5 · Prioridad y paquete](parte-5-prioridad-y-paquete.md) | 5.1–5.4 | `lote-a/parte-5-prioridad-y-paquete` | 5.1–5.3 hechas, en PR. Falta 5.4 (Joaquín confirma que la web carga el paquete público; el equipo lo revisa antes de subirlo) | Partes 3 y 4; tarea 1.6 |
 | [6 · S05, S06 e integración](parte-6-opcionales-e-integracion.md) | 6.1–6.2 | `lote-a/parte-6-opcionales-e-integracion` | 6.1 hecha, en PR. 6.2: integración de prueba hecha (sin conflictos); falta que B, C y D abran y aprueben sus PR y que existan las pantallas | Parte 3 (6.1); PR de B, C y D (6.2) |
-| [7 · Verificación final](parte-7-verificacion-final.md) | 7.1 | `lote-a/parte-7-verificacion` | Pendiente | Todas |
+| [7 · Verificación final](parte-7-verificacion-final.md) | 7.1 | `lote-a/parte-7-verificacion` | 7.1 hecha, en PR (sobre la rama de la parte 6, porque `main` aún no tiene el Lote A). Repetir las huellas en `main` después de fusionar | Todas |
 
 ## Cómo empezar una parte
 

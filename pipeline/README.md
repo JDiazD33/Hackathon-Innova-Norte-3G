@@ -16,6 +16,7 @@ Cada paso tiene su comando y lee lo que dejó el anterior, así que se puede rep
 | Señales | `uv run pipeline signals` | `data/derived/tablas/` y `config/senales.toml` | `data/derived/senales/senales.parquet`, `expedientes-simulados.json` y `manifiesto.json` (activas, desactivadas, conteos y exclusiones) |
 | Contraste con Cardinal | `uv run pipeline cardinal` | Tablas, señales y la herramienta de Cardinal (`.tools/` o el PATH) | `data/derived/senales/contraste-cardinal.json` |
 | Paquete de datos | `uv run pipeline export --modo publico` o `--modo local` | Tablas, señales, `config/senales.toml` y `PSEUDONYM_SECRET` | `web/data/publico/` o `web/data/local/`: manifiesto, entidades, procesos y señales por entidad, proveedores, expedientes simulados e índice, validados contra `contracts/paquete-de-datos.schema.json` |
+| Huellas | `uv run pipeline fingerprint --out <archivo>` o `--compare <archivo>` | Las salidas de `ingest`, `normalize`, `signals`, `cardinal` y `export` | El SHA-256 de cada salida (en los JSON, sin `generado`), o las diferencias con otra ejecución |
 
 ## Estructura
 
@@ -32,6 +33,7 @@ Cada paso tiene su comando y lee lo que dejó el anterior, así que se puede rep
 | `src/pipeline/entities.py` | Tipo de entidad según el nombre (universidad, municipalidad, gobierno regional u otro), para S05 y el paquete |
 | `src/pipeline/cardinal.py` | Contraste con los indicadores R018 y R003 de Cardinal, que se ejecuta como herramienta externa |
 | `src/pipeline/export.py` | Prioridad de revisión, seudónimos, ocultamiento de nombres y RUC en los textos, y exportación del paquete validado |
+| `src/pipeline/fingerprint.py` | Huellas de las salidas, para comprobar que dos ejecuciones dan lo mismo |
 | `.env.example` | Variables de entorno sin sus valores (`PSEUDONYM_SECRET`). El `.env` con los valores no se sube |
 | `src/pipeline/spike.py` | Consultas del spike (Q1–Q7 y calidad), muestra por región y cobertura de Cardinal |
 | `src/pipeline/cli.py` | Comando `uv run pipeline` |

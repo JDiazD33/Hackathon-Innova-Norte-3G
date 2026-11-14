@@ -50,7 +50,7 @@ Cada parte tiene su ficha (contexto, diseño propuesto, verificación) y su rama
 
 ## 7. Verificación del lote
 
-- [ ] 7.1 Ejecutar `uv run pytest` y `uv run ruff check` en verde, recalcular dos veces con los mismos insumos y comparar que los resultados son idénticos, y revisar el manifiesto final. Anotar los resultados en el PR de cierre del lote.
+- [x] 7.1 Ejecutar `uv run pytest` y `uv run ruff check` en verde, recalcular dos veces con los mismos insumos y comparar que los resultados son idénticos, y revisar el manifiesto final. Anotar los resultados en el PR de cierre del lote.
 
 ## Workflow follow-up
 

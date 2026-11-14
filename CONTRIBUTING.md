@@ -75,6 +75,8 @@ uv run pipeline signals       # señales activas (config/senales.toml): data/der
 uv run pipeline cardinal      # contraste de S01 y S02 con R018 y R003 (necesita la herramienta de Cardinal)
 uv run pipeline export --modo publico   # paquete seudonimizado en web/data/publico/ (necesita PSEUDONYM_SECRET)
 uv run pipeline export --modo local     # paquete con nombres de empresas en web/data/local/ (nunca se sube)
+uv run pipeline fingerprint --out ../data/derived/verificacion/huellas-1.json   # huellas SHA-256 de las salidas de la cadena
+uv run pipeline fingerprint --compare ../data/derived/verificacion/huellas-1.json   # compara con otra ejecución; falla si algo cambió
 uv run pipeline spike ../data/raw/2026.jsonl.gz    # spike Q1–Q7: data/derived/spike-2026.json
 uv run pipeline spike ../data/raw/2025.jsonl.gz ../data/raw/2026.jsonl.gz   # los dos años juntos: spike-2025-2026.json
 uv run pipeline sample ../data/raw/2026.jsonl.gz ../data/interim/muestra-la-libertad-2026.jsonl

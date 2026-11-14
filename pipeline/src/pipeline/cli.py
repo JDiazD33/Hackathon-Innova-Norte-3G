@@ -13,6 +13,7 @@ from pipeline.cardinal import contrast, find_cardinal
 from pipeline.config import DEFAULT_CONFIG, DEFAULT_DATA_DIR, ConfigError, load_config
 from pipeline.download import DownloadError, SourceNotAllowedError, download_all
 from pipeline.export import MODES, WEB_DATA_DIR, ExportError, export
+from pipeline.fingerprint import compare, fingerprints, read_fingerprints, write_fingerprints
 from pipeline.ingest import ingest
 from pipeline.normalize import StaleIngestError, normalize
 from pipeline.signals.compute import compute_signals
@@ -148,6 +149,29 @@ def _build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument(
         "--out", type=Path, help="carpeta del paquete (por defecto, web/data/<modo>)"
     )
+
+    fingerprint_parser = commands.add_parser(
+        "fingerprint",
+        help="huellas SHA-256 de las salidas de la cadena, para comparar dos ejecuciones",
+    )
+    fingerprint_parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=DEFAULT_DATA_DIR,
+        help="carpeta de datos con interim/ y derived/ (por defecto, ../data)",
+    )
+    fingerprint_parser.add_argument(
+        "--web-data-dir",
+        type=Path,
+        default=WEB_DATA_DIR,
+        help="carpeta con los paquetes publico/ y local/ (por defecto, ../web/data)",
+    )
+    fingerprint_parser.add_argument(
+        "--out", type=Path, help="archivo JSON donde guardar las huellas de esta ejecución"
+    )
+    fingerprint_parser.add_argument(
+        "--compare", type=Path, help="huellas de otra ejecución (--out) para compararlas"
+    )
     return parser
 
 
@@ -253,6 +277,23 @@ def _run_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_fingerprint(args: argparse.Namespace) -> int:
+    values = fingerprints(args.data_dir, args.web_data_dir)
+    print(f"Huellas de {len(values)} archivos")
+    if args.out:
+        write_fingerprints(values, args.out)
+        print(f"Guardadas en {args.out}")
+    if args.compare:
+        differences = compare(values, read_fingerprints(args.compare))
+        if differences:
+            print(f"Diferencias con {args.compare}:")
+            for line in differences:
+                print(f"  {line}")
+            return 1
+        print(f"Idénticas a {args.compare}")
+    return 0
+
+
 def _run_spike(args: argparse.Namespace) -> int:
     sources: list[Path] = args.sources
     stem = _file_stem(sources)
@@ -315,6 +356,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "signals": _run_signals,
         "cardinal": _run_cardinal,
         "export": _run_export,
+        "fingerprint": _run_fingerprint,
     }
     try:
         return handlers[args.command](args)
