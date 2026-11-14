@@ -5,8 +5,8 @@
 ## En resumen
 
 - **Qué validamos:** que el problema existe (entrevistas), que las señales son correctas (verificación en el SEACE), que la plataforma ayuda a priorizar y se entiende (pruebas con usuarios) y que aguanta el uso y no expone datos (carga y seguridad).
-- **Ya hecho:** la validación técnica de los datos, las señales, el contrato, la accesibilidad y la demo sin internet (sección 1).
-- **Por hacer, del 16 al 24 de noviembre:** entrevistas, verificación en el SEACE, dos rondas con usuarios y pruebas de carga y seguridad (secciones 2 y 3).
+- **Ya hecho:** la validación técnica de los datos, las señales, el contrato, la accesibilidad, la demo sin internet, la carga y la seguridad (sección 1).
+- **Por hacer, del 16 al 24 de noviembre:** entrevistas, verificación en el SEACE y dos rondas con usuarios (secciones 2 y 3).
 
 ## 1. Pruebas realizadas (al 14 de noviembre)
 
@@ -20,6 +20,8 @@
 | Accesibilidad | Prueba automática de contraste (WCAG 2.2 AA) en claro y oscuro; recorrido con teclado; vistas a 375, 768 y 1280 px; zoom al 200 % | Todos los pares de texto llegan a 4,5:1; se usa solo con el teclado; sin desplazamiento horizontal |
 | Privacidad | La prueba de contrato revisa los seudónimos del modo público | Ningún proveedor aparece con nombre ni RUC en el paquete público |
 | Demo sin internet | Build de producción y revisión de la pestaña de red | Todas las peticiones van a la misma laptop. Falta repetirlo con el Wi-Fi apagado |
+| Carga | 50 usuarios simultáneos durante 20 s contra la demo local, con autocannon ([informe](../arquitectura/pruebas-de-carga-y-seguridad.md)) | p97,5 entre 22 y 305 ms y sin errores. Con 200 o más conexiones, la bandeja se pone lenta, pero el servidor no se cae |
+| Seguridad | Entradas maliciosas en la URL y la API, métodos HTTP, archivos internos, cabeceras, dependencias y secretos | Tres problemas encontrados y corregidos: error 500 con un id enorme, caché que se podía llenar con ids inventados y falta de cabeceras de seguridad. Sin vulnerabilidades altas ni críticas |
 
 ## 2. Pruebas previstas
 
@@ -64,7 +66,9 @@
 4. Explicación de una tarjeta con sus palabras (3 min).
 5. SUS y preguntas abiertas (8 min).
 
-### 2.4 Pruebas de carga y seguridad (jueves 19 a martes 24)
+### 2.4 Pruebas de carga y seguridad (hechas el 14 de noviembre)
+
+> **Hechas antes de lo previsto.** Resultados y correcciones en el [informe](../arquitectura/pruebas-de-carga-y-seguridad.md) y en la sección 1. Falta repetirlas con el paquete real.
 
 - **Qué valida:** que la demo responde con varias personas a la vez, que resiste entradas maliciosas y que no expone datos.
 - **Dónde:** contra la demo local (`npm run start`) y una vista previa propia. Nunca contra servicios de terceros como el SEACE, ni con volúmenes que violen las condiciones de uso de Vercel.
@@ -85,7 +89,7 @@
 | lun 16 – mié 18 | Entrevistas de problema | Los cuatro; coordina Joaquín |
 | mar 17 | H1 interno: bandeja → ficha → explicación → decisión → reporte, con el fixture | Los cuatro |
 | mié 18 – vie 20 | Verificación de señales en el SEACE | Joaquín, con la lista de casos de Stefano |
-| jue 19 – mar 24 | Pruebas de carga y seguridad | Joaquín |
+| jue 19 – mar 24 | Repetir carga y seguridad con el paquete real | Joaquín |
 | vie 20 | Primera ronda con usuarios | Los cuatro |
 | lun 23 | Segunda ronda con usuarios, con las mejoras de la primera | Los cuatro |
 | mar 24 | Resultados, mejoras y "qué falta" en este documento | Sebastián |
