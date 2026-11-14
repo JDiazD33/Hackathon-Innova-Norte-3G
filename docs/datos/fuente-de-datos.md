@@ -104,7 +104,7 @@ Los consorcios reciben prácticamente un código nuevo en cada adjudicación (26
 
 ## Cómo obtener los datos
 
-- **Descarga:** desde el OCP Data Registry, sin credenciales. Primero un solo año (2026 o 2025) para el spike.
+- **Descarga:** desde el OCP Data Registry, sin credenciales, con `uv run pipeline download` (desde `pipeline/`). Solo descarga desde las direcciones de `descarga.fuentes_permitidas` en `pipeline/config/pipeline.toml`, y solo sigue redirecciones hacia ellas. Cualquier otra se rechaza antes de descargar y el error la nombra. Cada archivo queda con un `<archivo>.meta.json` que registra la URL, la fecha, el tamaño, el SHA-256 y la última modificación.
 - **Lo que no hacemos:** usar la API del portal del OECE sin credenciales oficiales ni hacer scraping del SEACE. FUNES sufrió bloqueos por obtener datos así.
 - **Dónde se guardan:** los archivos van a `data/raw/` y nunca se suben al repositorio.
 
