@@ -105,6 +105,40 @@ En `pipeline/`, `--department` y `--years` cambian la región y los años del sp
 - **Volver atrás:** botón *Rollback* en la página del proyecto en Vercel.
 - Vercel construye desde GitHub, así que `web/data/local/`, que no se sube, nunca llega al enlace público.
 
+## Demo sin internet
+
+Es el respaldo para la presentación si falla la conexión. La web se construye una vez **con internet** y después funciona sin él en la laptop de la demo.
+
+**Antes del día (con internet, una vez):**
+
+```bash
+cd web
+npm ci
+npm run build
+```
+
+- `npm run build` necesita internet: `next/font` descarga Inter y la deja dentro del build.
+- Si el paquete con datos reales ya está en `main`, construye con él: `PAQUETE_DATOS=publico npm run build`.
+
+**Durante la demo (sin internet):**
+
+```bash
+cd web
+npm run start
+```
+
+Abre <http://localhost:3000>. Para usar otro puerto: `npm run start -- -p 3001`.
+
+**Qué funciona sin internet:** el panel, la bandeja con sus filtros, el buscador (`/api/busqueda` responde desde la misma laptop), el cambio de entidad y el modo claro y oscuro. Las fuentes, los íconos y los datos del paquete van dentro del build.
+
+**Qué necesita internet:** los enlaces que salen de Prisma, como los documentos oficiales, el SEACE y la Ficha Única del Proveedor.
+
+**Cómo comprobarlo:**
+
+1. Con el build hecho, apaga el Wi-Fi y ejecuta `npm run start`.
+2. En el navegador, abre las herramientas de desarrollo, pestaña *Red*, y recarga.
+3. Recorre panel → bandeja → buscador → otra entidad. Todas las peticiones deben ir a `localhost`; ninguna debe salir a otro dominio.
+
 ## Datos y seguridad
 
 - Fuente y atribución obligatoria: [`docs/datos/fuente-de-datos.md`](docs/datos/fuente-de-datos.md).

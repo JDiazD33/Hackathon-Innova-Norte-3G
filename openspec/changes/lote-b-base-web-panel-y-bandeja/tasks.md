@@ -38,6 +38,7 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 - [ ] 5.1 Desplegar en Vercel con `PAQUETE_DATOS=publico`. Verificar desde otro dispositivo que el enlace abre el panel, la bandeja y una ficha.
   - 14 de noviembre: publicado en <https://hackathon-innova-norte-3g.vercel.app> (proyecto `hackathon-innova-norte-3g`, carpeta raíz `web`, conectado a `main`), todavía con el fixture. Contra el enlace público, no contra localhost, se comprobó que el panel, la bandeja y `/api/busqueda` responden con datos (400 ante un id no válido), así que el despliegue incluye los JSON. Las vistas previas piden iniciar sesión en Vercel; el dominio de producción es público. Falta definir `PAQUETE_DATOS=publico` cuando el paquete esté en `main`, abrir una ficha cuando exista la pantalla del Lote C y repetir la revisión desde un celular.
 - [ ] 5.2 Documentar en `CONTRIBUTING.md` la ejecución local para la demo (`npm run build` y `npm run start`). Verificar con el Wi-Fi apagado.
+  - 14 de noviembre: documentada en `CONTRIBUTING.md` (sección "Demo sin internet"). Con el build de producción del diseño Prisma (`npm run start`), panel, bandeja, buscador y cambio de entidad hacen solo peticiones a `localhost` (revisado en la pestaña de red), y el build no carga fuentes ni scripts externos. Falta repetir el recorrido con el Wi-Fi apagado en la laptop de la demo.
 
 ## 6. Verificación del lote
 
