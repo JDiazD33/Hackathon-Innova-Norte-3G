@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from pipeline import spike
+from pipeline.cardinal import contrast, find_cardinal
 from pipeline.config import DEFAULT_CONFIG, DEFAULT_DATA_DIR, ConfigError, load_config
 from pipeline.download import DownloadError, SourceNotAllowedError, download_all
 from pipeline.ingest import ingest
@@ -110,6 +111,22 @@ def _build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_SIGNALS_CONFIG,
         help="parámetros de las señales (por defecto, config/senales.toml)",
     )
+
+    cardinal_parser = commands.add_parser(
+        "cardinal", help="contrasta S01 y S02 con los indicadores R018 y R003 de Cardinal"
+    )
+    _add_pipeline_arguments(cardinal_parser)
+    cardinal_parser.add_argument(
+        "--signals-config",
+        type=Path,
+        default=DEFAULT_SIGNALS_CONFIG,
+        help="parámetros de las señales (por defecto, config/senales.toml)",
+    )
+    cardinal_parser.add_argument(
+        "--cardinal",
+        type=Path,
+        help="ejecutable de Cardinal (por defecto, el del PATH o el de .tools/)",
+    )
     return parser
 
 
@@ -180,6 +197,28 @@ def _run_signals(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_cardinal(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    settings = load_signals_config(args.signals_config)
+    report = contrast(config, settings, args.data_dir, find_cardinal(args.cardinal))
+    if report.get("contraste") == "no fue posible":
+        print(f"Contraste no realizado: {report['motivo']}")
+        return 0
+    print(f"Herramienta: {report['herramienta']} · procesos: {report['entrada']['procesos']}")
+    r018 = report["R018"]
+    print(
+        f"R018 frente a S01: {r018['coincidencias']} coincidencias de {r018['senal']} "
+        f"({r018['porcentaje_coincidencia']} %); solo S01: {len(r018['solo_senal'])}; "
+        f"solo R018: {len(r018['solo_cardinal'])}"
+    )
+    r003 = report["R003"]
+    if r003.get("contraste") == "no fue posible":
+        print(f"R003 frente a S02: no fue posible. {r003['motivo']} R003 marca {r003['cardinal']}.")
+    else:
+        print(f"R003 frente a S02: {r003['coincidencias']} coincidencias de {r003['senal']}")
+    return 0
+
+
 def _run_spike(args: argparse.Namespace) -> int:
     sources: list[Path] = args.sources
     stem = _file_stem(sources)
@@ -240,6 +279,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "ingest": _run_ingest,
         "normalize": _run_normalize,
         "signals": _run_signals,
+        "cardinal": _run_cardinal,
     }
     try:
         return handlers[args.command](args)

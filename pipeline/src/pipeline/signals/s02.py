@@ -12,6 +12,7 @@ from typing import Any
 
 import duckdb
 
+from pipeline.signals.context import RuleContext
 from pipeline.signals.groups import build_comparison
 from pipeline.signals.settings import PERIOD_COLUMNS, SignalsConfig
 
@@ -20,7 +21,7 @@ ELIGIBLE_SQL = "NOT excluido AND entidad_id IS NOT NULL"
 
 
 def compute(
-    con: duckdb.DuckDBPyConnection, settings: SignalsConfig, region_label: str
+    con: duckdb.DuckDBPyConnection, settings: SignalsConfig, context: RuleContext
 ) -> list[dict[str, Any]]:
     """Insert the S02 results into ``senales`` and return the counted exclusions."""
     start, end = settings.s02.start_column, settings.s02.end_column
@@ -44,7 +45,7 @@ def compute(
         measure_sql=f"date_diff('day', {start}, {end})",
         population_sql=f"NOT excluido AND {has_period} AND {end} >= {start}",
         minimum_group=settings.minimum_group,
-        region_label=region_label,
+        region_label=context.region_label,
         percentile=percentile / 100,
     )
     con.execute(

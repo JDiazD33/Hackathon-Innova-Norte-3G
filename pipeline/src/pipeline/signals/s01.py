@@ -11,6 +11,7 @@ from typing import Any
 
 import duckdb
 
+from pipeline.signals.context import RuleContext
 from pipeline.signals.groups import build_comparison
 from pipeline.signals.settings import SignalsConfig
 
@@ -19,7 +20,7 @@ ELIGIBLE_SQL = "NOT excluido AND entidad_id IS NOT NULL"
 
 
 def compute(
-    con: duckdb.DuckDBPyConnection, settings: SignalsConfig, region_label: str
+    con: duckdb.DuckDBPyConnection, settings: SignalsConfig, context: RuleContext
 ) -> list[dict[str, Any]]:
     """Insert the S01 results into ``senales`` and return the counted exclusions."""
     excluded, no_buyer, unclassified, no_data = con.execute(
@@ -38,7 +39,7 @@ def compute(
         measure_sql="numero_postores",
         population_sql="NOT excluido AND competitivo AND numero_postores IS NOT NULL",
         minimum_group=settings.minimum_group,
-        region_label=region_label,
+        region_label=context.region_label,
         share_of_two_or_more=True,
     )
     con.execute(

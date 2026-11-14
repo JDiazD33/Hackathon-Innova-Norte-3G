@@ -86,15 +86,22 @@ plazo_fin = "fecha_fin_presentacion"
 [S03]
 activa = true
 version = 1
+# Ventana: los meses que terminan en la fecha de corte de los datos.
 ventana_meses = 12
+# Procesos que el proveedor debe haber ganado en la entidad, como mínimo.
 minimo_adjudicaciones = 3
 
 [S04]
-activa = true
+activa = false
+motivo = "Faltan los umbrales vigentes de cada método (Ley 32069 y su reglamento), verificados con la norma."
 version = 1
 ventana_dias = 60
 # Dígitos del código UNSPSC que definen "la misma clase de ítem" (6 = clase).
 digitos_clasificacion = 6
+# Umbral desde el que se exige el método superior, por método menos exigente, objeto y año.
+# Cada umbral cita su norma y la fecha en que se verificó. Ejemplo (valores ficticios):
+# { metodo = "Licitación Pública Abreviada", objeto = "bienes", anio = 2026, umbral_pen = 1000000.0, norma = "Reglamento de la Ley 32069, art. X", verificado = "2026-11-14" }
+umbrales = []
 
 [S05]
 activa = true
@@ -110,3 +117,9 @@ cobertura_minima = 0.10
 [S08]
 activa = true
 version = 1
+# Expedientes internos SIMULADOS para el caso práctico (los datos abiertos no los traen).
+cantidad_expedientes = 8
+semilla = 20261113
+# ocids elegidos para el caso práctico; si la lista está vacía, se eligen con la semilla
+# entre los procesos con contrato.
+procesos = []

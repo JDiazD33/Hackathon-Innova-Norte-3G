@@ -26,7 +26,7 @@ Medida sobre los 5 036 procesos de La Libertad convocados en 2025–2026 (`2025.
 | S01 | Sí, como "un solo participante registrado" | No hay `bids`. `tender.numberOfTenderers` está en el 92,1 % de los procesos de los dos archivos y, según la evidencia, cuenta participantes registrados, no ofertas | Confirmar en el SEACE (tarea 3.4). Cambiar el texto a "1 participante registrado" en lugar de "1 oferta". Definir la tabla de métodos competitivos |
 | S02 | **No**, como está definida | `tender.tenderPeriod` no tiene duración en el 99,99 % de los procesos: inicio y fin son el día de la convocatoria | Desactivarla y subir S05 al núcleo (recomendado), o redefinirla con `tender.enquiryPeriod` (plazo de consultas, 79,5 %) |
 | S03 | Sí | `buyer.id`, `awards[].suppliers`, `awards[].value` y `awards[].date` (108 427 de 108 430 adjudicaciones de 2025–2026 tienen fecha) | Los consorcios reciben un código nuevo en cada adjudicación (23,3 % de los proveedores adjudicados), así que no acumulan adjudicaciones |
-| S04 | Sí | Ítems clasificados (CUBSO y UNSPSC) en 4 417 procesos (87,7 %); valor referencial en 4 671 | Agrupar por clase (6 dígitos) o familia (4) UNSPSC, no por segmento. Cargar los umbrales de los métodos de la Ley 32069 |
+| S04 | Sí, cuando estén los umbrales | Ítems clasificados (CUBSO y UNSPSC) en 4 417 procesos (87,7 %); valor referencial en 4 671 | Cargar en `S04.umbrales` los umbrales de los métodos de la Ley 32069, verificados con la norma. Hoy está desactivada |
 | S05 | Sí | `tender.procurementMethodDetails` en el 100 %; 377 contrataciones directas | Tabla de métodos y grupo de entidades comparables |
 | S06 | **No**, con el mínimo actual | Monto final en 290 de 3 177 contratos (9,1 %), por debajo del 10 % mínimo. La razón final/contratado tiene mediana 1,11 y p75 1,25 | Desactivarla con su motivo, o bajar el mínimo y calibrar el factor 1,15, que marcaría entre el 25 % y el 50 % de los contratos con monto final |
 | S07 | No | Falta la fuente | Sin cambios |
@@ -68,6 +68,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Comparación:** `proporcion_referencia` es la parte del grupo con 2 o más postores, y `percentil_del_caso`, la parte con 1.
   - **La Libertad 2025–2026:** 69 señales (35 licitaciones públicas abreviadas, 24 subastas inversas, 7 concursos abreviados y 3 de otros métodos). Además, 504 procesos no se evaluaron por falta de dato de postores y 46 por estar cancelados.
 - **Decisión pendiente:** 33 de esas 69 señales son de procesos que terminaron desiertos. Hay que decidir si S01 se limita a procesos con adjudicación, lo que dejaría 36.
+- **Contraste con Cardinal (`uv run pipeline cardinal`):** R018 se ejecutó sobre los 5 036 procesos, con `tender.procurementMethod` completado desde la tabla de métodos. Marca los mismos 69 procesos que S01 (100 % de coincidencia) y 2 más, que son procesos cancelados que S01 no evalúa. El informe queda en `data/derived/senales/contraste-cardinal.json`.
 
 ### S02 · Plazo corto para presentar ofertas
 
@@ -91,6 +92,13 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Qué revisar:** cómo se definieron los requerimientos, si se repiten los mismos evaluadores y si hay relación entre el proveedor y quienes deciden.
 - **Qué no significa:** puede ser el único proveedor del rubro en la zona, tener un contrato marco o un buen desempeño comprobado.
 - **Spike:** los consorcios tienen un código que no es RUC y que cambia en cada adjudicación, así que la señal solo puede seguir a proveedores con RUC.
+- **Implementación (S03@1):**
+  - **Ventana:** los 12 meses (`ventana_meses`) que terminan en la fecha de corte. Hoy va del 5 de octubre de 2025 al 4 de octubre de 2026.
+  - **Medidas:** se calculan dos participaciones por proveedor en cada entidad, la de los procesos adjudicados y la del monto adjudicado en soles. Los montos en otra moneda se convierten con la tasa del proceso.
+  - **Cuándo hay señal:** si una de las dos supera la valla de Tukey de los proveedores de esa entidad y el proveedor ganó al menos 3 procesos. `valor` es la participación que superó la valla y `ocids` lista los procesos ganados, que heredan la señal.
+  - **No se evalúan, y se cuentan:** las adjudicaciones sin proveedor, sin fecha o fuera de la ventana, y las de procesos cancelados.
+- **La Libertad 2025–2026:** 46 señales; 15 por monto y 31 por número de procesos.
+- **Calibración pendiente:** cuando casi todos los proveedores de una entidad ganan un solo proceso, el rango intercuartílico es cero y la valla queda muy baja. Por eso hay señales con participaciones de 1 % a 3 %. Con una participación mínima quedarían 29 señales (5 %), 20 (10 %) u 8 (20 %). Se propone agregar `participacion_minima` a `senales.toml` si el equipo lo aprueba.
 
 ### S04 · Compras similares cercanas en el tiempo (posible fraccionamiento)
 
@@ -102,6 +110,11 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Qué revisar:** el Plan Anual de Contrataciones, si la necesidad era previsible y si los requerimientos los hizo la misma área.
 - **Qué no significa:** pudo haber necesidades nuevas que no eran previsibles, o compras programadas por etapas.
 - **Spike:** los ítems traen CUBSO (16 dígitos) y UNSPSC (8 dígitos). El segmento UNSPSC (2 dígitos) es demasiado amplio; conviene la clase (6) o la familia (4), con el nivel como parámetro.
+- **Implementación (S04@1):**
+  - **Agrupación:** procesos de la misma entidad, la misma clase UNSPSC (`digitos_clasificacion` = 6), el mismo método y el mismo objeto, convocados dentro de `ventana_dias` (60) desde el primero del grupo.
+  - **Cuándo hay señal:** con 2 o más procesos cuya suma supera el umbral del método superior. Se conservan solo los grupos que no están contenidos en otro mayor. `valor` es la suma en soles y `ocids` lista los procesos, que heredan la señal.
+  - **Umbrales:** cada umbral se carga en `S04.umbrales` con su método, objeto, año, monto, norma y fecha de verificación. Un método sin umbral para ese objeto y año no se evalúa.
+- **Estado:** desactivada hasta que se carguen los umbrales vigentes de la Ley 32069 y su reglamento, verificados con la norma. La regla está probada con umbrales de prueba (dentro y fuera de la ventana, y cambio de ventana con nueva versión).
 
 ### S05 · Uso atípico de contratación directa (opcional)
 
@@ -130,6 +143,11 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Pregunta:** ¿la misma persona solicitó, evaluó y dio conformidad, o hubo un pago sin conformidad registrada?
 - **Datos:** un expediente interno **sintético**. Los datos abiertos no traen responsables internos ni pagos.
 - **Uso:** demostrar en el caso práctico la parte de trazabilidad interna del desafío 2. La interfaz debe marcarlo claramente como "dato simulado".
+- **Implementación (S08@1):**
+  - **Expedientes:** `uv run pipeline signals` genera `expedientes-simulados.json` con una semilla fija (`semilla`). Son 8 expedientes (`cantidad_expedientes`) para procesos con contrato, o para los ocids de `S08.procesos`. Con la misma configuración salen siempre iguales.
+  - **Variedad:** uno de cada tres repite a la misma persona en requerimiento, evaluación y conformidad; otro tiene un pago sin conformidad documentada.
+  - **Cuándo hay señal:** si se cumple alguna de las dos condiciones. Todo lleva `simulado: true` y un proceso sin expediente no se evalúa.
+  - **Resultado actual:** 6 señales simuladas.
 
 ## Plantilla de explicación
 

@@ -27,6 +27,8 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+# The multiplication sign is correct in Spanish texts such as "Q3 + 1,5 × RIC".
+allowed-confusables = ["×"]
 
 [dependency-groups]
 dev = [

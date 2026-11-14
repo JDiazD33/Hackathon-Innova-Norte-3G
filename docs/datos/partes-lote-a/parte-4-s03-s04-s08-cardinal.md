@@ -19,10 +19,10 @@ Agregar estas piezas sobre el marco de la parte 3:
 
 ## Tareas
 
-- [ ] 4.1 Implementar S03 (ventana de 12 meses, valla de Tukey, mínimo 3 adjudicaciones y herencia a los procesos). Verificar con pruebas de participación atípica y de pocas adjudicaciones.
-- [ ] 4.2 Implementar S04 (misma clase de ítem, ventana configurable y suma sobre el umbral). Verificar con pruebas de compras dentro y fuera de la ventana.
-- [ ] 4.3 Generar `expedientes-simulados.json` con semilla fija e implementar S08. Verificar que todos los resultados llevan `simulado: true` y que dos ejecuciones dan el mismo archivo.
-- [ ] 4.4 Ejecutar Cardinal (R018 y R003) y generar el informe de contraste. Verificar que el informe lista las coincidencias y las diferencias, o el motivo si no fue posible.
+- [x] 4.1 Implementar S03 (ventana de 12 meses, valla de Tukey, mínimo 3 adjudicaciones y herencia a los procesos). Verificar con pruebas de participación atípica y de pocas adjudicaciones.
+- [x] 4.2 Implementar S04 (misma clase de ítem, ventana configurable y suma sobre el umbral). Verificar con pruebas de compras dentro y fuera de la ventana.
+- [x] 4.3 Generar `expedientes-simulados.json` con semilla fija e implementar S08. Verificar que todos los resultados llevan `simulado: true` y que dos ejecuciones dan el mismo archivo.
+- [x] 4.4 Ejecutar Cardinal (R018 y R003) y generar el informe de contraste. Verificar que el informe lista las coincidencias y las diferencias, o el motivo si no fue posible.
 - [ ] 4.5 Verificar a mano 5 resultados de S03 y 5 de S04 y actualizar `docs/datos/catalogo-de-senales.md` con las reglas finales.
 
 ## Diseño propuesto

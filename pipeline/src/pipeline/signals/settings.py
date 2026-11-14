@@ -54,6 +54,39 @@ class S02Settings:
 
 
 @dataclass(frozen=True)
+class S03Settings:
+    switch: SignalSwitch
+    window_months: int
+    minimum_awards: int
+
+
+@dataclass(frozen=True)
+class S04Threshold:
+    method: str
+    category: str  # OCDS mainProcurementCategory: goods, services or works
+    year: int
+    amount_pen: float
+    norm: str
+    verified: str
+
+
+@dataclass(frozen=True)
+class S04Settings:
+    switch: SignalSwitch
+    window_days: int
+    classification_digits: int
+    thresholds: tuple[S04Threshold, ...]
+
+
+@dataclass(frozen=True)
+class S08Settings:
+    switch: SignalSwitch
+    count: int
+    seed: int
+    processes: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class SignalsConfig:
     path: Path
     tukey_factor: float
@@ -65,6 +98,9 @@ class SignalsConfig:
     switches: dict[str, SignalSwitch]
     s01: S01Settings
     s02: S02Settings
+    s03: S03Settings
+    s04: S04Settings
+    s08: S08Settings
 
 
 def get_number(data: dict[str, Any], key: str, path: Path) -> float:
@@ -134,11 +170,82 @@ def _methods(data: dict[str, Any], path: Path) -> MethodTable:
     return MethodTable(competitive, non_competitive, dict(variants))
 
 
+CATEGORIES = {"bienes": "goods", "servicios": "services", "obras": "works"}
+
+
+def _s04_thresholds(
+    data: dict[str, Any], path: Path, competitive: tuple[str, ...]
+) -> tuple[S04Threshold, ...]:
+    entries = get_value(data, "S04.umbrales", path)
+    if not isinstance(entries, list):
+        raise ConfigError(f"'S04.umbrales' de {path} debe ser una lista de umbrales")
+    thresholds = []
+    for index, entry in enumerate(entries, start=1):
+        key = f"umbrales[{index}]"  # S04.umbrales, without dots so the key can be nested
+        if not isinstance(entry, dict):
+            raise ConfigError(f"'S04.{key}' de {path} debe ser una tabla")
+        wrapped = {key: entry}
+        method = get_text(wrapped, f"{key}.metodo", path)
+        if method not in competitive:
+            raise ConfigError(
+                f"'S04.{key}.metodo' de {path} debe ser un método competitivo: {method}"
+            )
+        category = get_text(wrapped, f"{key}.objeto", path)
+        if category not in CATEGORIES:
+            raise ConfigError(f"'S04.{key}.objeto' de {path} debe ser bienes, servicios u obras")
+        amount = get_number(wrapped, f"{key}.umbral_pen", path)
+        if amount <= 0:
+            raise ConfigError(f"'S04.{key}.umbral_pen' de {path} debe ser mayor que cero")
+        thresholds.append(
+            S04Threshold(
+                method=method,
+                category=CATEGORIES[category],
+                year=get_positive_int(wrapped, f"{key}.anio", path),
+                amount_pen=amount,
+                norm=get_text(wrapped, f"{key}.norma", path),
+                verified=get_text(wrapped, f"{key}.verificado", path),
+            )
+        )
+    return tuple(thresholds)
+
+
+def _s04(
+    data: dict[str, Any], path: Path, switch: SignalSwitch, methods: MethodTable
+) -> S04Settings:
+    digits = get_positive_int(data, "S04.digitos_clasificacion", path)
+    if not 2 <= digits <= 8:
+        raise ConfigError(f"'S04.digitos_clasificacion' de {path} debe estar entre 2 y 8")
+    thresholds = _s04_thresholds(data, path, methods.competitive)
+    if switch.active and not thresholds:
+        raise ConfigError(f"S04 está activa pero 'S04.umbrales' de {path} no tiene umbrales")
+    return S04Settings(
+        switch=switch,
+        window_days=get_positive_int(data, "S04.ventana_dias", path),
+        classification_digits=digits,
+        thresholds=thresholds,
+    )
+
+
+def _s08(data: dict[str, Any], path: Path, switch: SignalSwitch) -> S08Settings:
+    count = get_positive_int(data, "S08.cantidad_expedientes", path)
+    if count > 50:
+        raise ConfigError(f"'S08.cantidad_expedientes' de {path} debe ser 50 o menos")
+    seed = get_value(data, "S08.semilla", path)
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ConfigError(f"'S08.semilla' de {path} debe ser un entero")
+    return S08Settings(
+        switch=switch,
+        count=count,
+        seed=seed,
+        processes=get_text_list(data, "S08.procesos", path),
+    )
+
+
 def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
     """Load and validate ``config/senales.toml``; a missing parameter stops with its name."""
     data = read_toml(path)
     switches = {code: _switch(data, code, path) for code in SIGNAL_CODES if code in data}
-    for code in ("S01", "S02"):
+    for code in ("S01", "S02", "S03", "S04", "S08"):
         if code not in switches:
             raise ConfigError(f"Falta la sección [{code}] en {path}")
 
@@ -163,6 +270,7 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
     tukey = get_number(data, "comun.factor_tukey", path)
     if tukey <= 0:
         raise ConfigError(f"'comun.factor_tukey' de {path} debe ser mayor que cero")
+    methods = _methods(data, path)
 
     return SignalsConfig(
         path=path,
@@ -171,7 +279,7 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
         excluded_statuses=get_text_list(data, "comun.estados_excluidos", path),
         weights=_weights(data, path),
         cuts=cuts,
-        methods=_methods(data, path),
+        methods=methods,
         switches=switches,
         s01=S01Settings(
             switch=switches["S01"],
@@ -184,4 +292,11 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
             start_column=start_column,
             end_column=end_column,
         ),
+        s03=S03Settings(
+            switch=switches["S03"],
+            window_months=get_positive_int(data, "S03.ventana_meses", path),
+            minimum_awards=get_positive_int(data, "S03.minimo_adjudicaciones", path),
+        ),
+        s04=_s04(data, path, switches["S04"], methods),
+        s08=_s08(data, path, switches["S08"]),
     )
