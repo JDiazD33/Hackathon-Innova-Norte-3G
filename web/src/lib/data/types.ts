@@ -90,6 +90,8 @@ export interface Proceso {
   ocid: string;
   entidad_id: string;
   descripcion: string;
+  /** Nomenclatura en el SEACE (`tender.title`). Desde el contrato 1.1; falta en paquetes 1.0. */
+  nomenclatura?: string | null;
   metodo: string;
   objeto: ObjetoProceso;
   moneda: string;
@@ -97,6 +99,7 @@ export interface Proceso {
   monto_adjudicado: number | null;
   monto_final: number | null;
   fechas: FechasProceso;
+  /** Participantes registrados, no ofertas (la fuente no publica `bids`). */
   numero_postores: number | null;
   estado: string | null;
   ganadores: string[];

@@ -113,6 +113,7 @@ const ENTIDADES = [
   {
     id: "entidad-0001",
     clave: "e1",
+    sigla: "UPFN",
     nombre: "Universidad Pública Ficticia del Norte",
     tipo: "universidad",
     total: 22,
@@ -137,6 +138,7 @@ const ENTIDADES = [
   {
     id: "entidad-0002",
     clave: "e2",
+    sigla: "MPF",
     nombre: "Municipalidad Provincial Ficticia",
     tipo: "municipalidad",
     total: 18,
@@ -183,6 +185,23 @@ function metodoPara(compra, esDirecta, esFraccion) {
     default:
       return pick(["Subasta inversa electrónica", "Licitación pública", "Adjudicación simplificada", "Comparación de precios"]);
   }
+}
+
+/**
+ * Nomenclatura ficticia con la forma de la del SEACE (contrato 1.1): sigla del método, número, año y
+ * sigla de la entidad. No consume números aleatorios, así que el resto del fixture no cambia.
+ */
+const SIGLAS_METODO = {
+  "Adjudicación simplificada": "AS",
+  "Licitación pública": "LP",
+  "Concurso público": "CP",
+  "Subasta inversa electrónica": "SIE",
+  "Comparación de precios": "COMPRE",
+  "Contratación directa": "CD",
+};
+
+function nomenclaturaPara(metodo, numero, convocatoria, siglaEntidad) {
+  return `${SIGLAS_METODO[metodo]}-SM-${numero}-${convocatoria.slice(0, 4)}-${siglaEntidad}-1`;
 }
 
 // --- Procesos -------------------------------------------------------------------
@@ -240,6 +259,7 @@ for (const entidad of ENTIDADES) {
       ocid,
       entidad_id: entidad.id,
       descripcion: compra.descripcion,
+      nomenclatura: nomenclaturaPara(metodo, i, convocatoria, entidad.sigla),
       metodo,
       objeto: compra.objeto,
       moneda: "PEN",
@@ -638,7 +658,7 @@ for (const [entidadId, procesos] of procesosPorEntidad) {
 
 const todasLasSenales = [...senalesPorEntidad.values()].flat();
 const manifest = {
-  version_contrato: "1.0",
+  version_contrato: "1.1",
   version_reglas: "fixture-1",
   generado: "2026-11-13T12:00:00-05:00",
   fecha_corte: FECHA_CORTE,

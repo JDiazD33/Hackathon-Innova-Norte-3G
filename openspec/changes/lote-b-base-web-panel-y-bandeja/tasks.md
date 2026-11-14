@@ -14,6 +14,7 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 ## 2. B2 · Contrato y acceso a datos (Fase 0, sáb 14)
 
 - [x] 2.1 Escribir `contracts/paquete-de-datos.schema.json` a partir del contrato v1, junto con el Lote A. Verificar con `npm test -- paquete` que el fixture valida y que un paquete roto falla.
+  - 14 de noviembre: contrato 1.1 con las decisiones 1 y 10 del Lote A (PR #11): `nomenclatura` opcional en cada proceso y `numero_postores` aclarado como participantes registrados. El fixture y la búsqueda la usan; `npm test -- paquete` y las pruebas del pipeline siguen en verde.
 - [x] 2.2 Crear el fixture sintético en `web/data/fixture/`: 2 entidades, unos 40 procesos, todas las señales y un expediente simulado. Verificar que valida contra el schema.
 - [x] 2.3 Definir la interfaz `DataSource` y los tipos del contrato, e implementar `StaticDataSource` con `PAQUETE_DATOS`. Verificar con pruebas unitarias sobre el fixture.
 
