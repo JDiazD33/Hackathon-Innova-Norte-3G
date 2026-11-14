@@ -8,7 +8,8 @@
  * Tema Prisma (docs/diseno/sistema-de-diseno.md · ADR 0008). Dueño: Lote B.
  * Inspirado en las guías públicas de Apple (HIG), sin usar sus fuentes, símbolos ni recursos.
  *
- * - Color: un solo acento (--primary). Los demás colores tienen significado fijo.
+ * - Color: un solo acento (--primary; azul en claro, blanco en oscuro). Los demás colores tienen significado fijo.
+ * - Modo oscuro: negro total (#000000) en todas las superficies, sin azules.
  * - Prioridad: la asigna el sistema; ámbar y neutros, nunca rojo.
  * - Estado de revisión: lo decide una persona; el rojo solo existe en "requiere atención" (ADR 0007).
  * - src/app/theme-contrast.test.ts lee los hexadecimales de :root y .dark y exige 4,5:1 en texto,
@@ -209,57 +210,59 @@
 }
 
 .dark {
+  /* Modo oscuro negro total: todas las superficies son #000000 y se separan con bordes finos. Sin azules:
+     el acento es blanco y la selección, un gris neutro. */
   --background: #000000;
   --foreground: #f5f5f7;
-  --card: #1c1c1e;
+  --card: #000000;
   --card-foreground: #f5f5f7;
-  --popover: #2c2c2e;
+  --popover: #000000;
   --popover-foreground: #f5f5f7;
-  --primary: #409cff;
+  --primary: #ffffff;
   --primary-foreground: #000000;
-  --secondary: #2c2c2e;
+  --secondary: #1c1c1c;
   --secondary-foreground: #f5f5f7;
-  --muted: #2c2c2e;
+  --muted: #141414;
   --muted-foreground: #a1a1a6;
-  --accent: #0f2a4a;
-  --accent-foreground: #8cc2ff;
+  --accent: #1f1f1f;
+  --accent-foreground: #ffffff;
   --destructive: #ff6961;
-  --border: #38383a;
-  --separador: #2e2e30;
+  --border: #2c2c2c;
+  --separador: #1f1f1f;
   --borde-contraste: #8e8e93;
-  --input: #48484a;
-  --segmento: #636366;
-  --ring: #409cff;
-  --chart-1: #409cff;
-  --chart-2: #7d7aff;
+  --input: #3a3a3a;
+  --segmento: #3a3a3c;
+  --ring: #ffffff;
+  --chart-1: #f5f5f7;
+  --chart-2: #a1a1a6;
   --chart-3: #ff9f0a;
-  --chart-4: #98989d;
-  --chart-5: #40c8e0;
-  --sidebar: #161618;
+  --chart-4: #636366;
+  --chart-5: #d1d1d6;
+  --sidebar: #000000;
   --sidebar-foreground: #f5f5f7;
-  --sidebar-primary: #409cff;
+  --sidebar-primary: #ffffff;
   --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #0f2a4a;
-  --sidebar-accent-foreground: #8cc2ff;
-  --sidebar-border: #38383a;
-  --sidebar-ring: #409cff;
-  --prioridad-alta: #3a2508;
+  --sidebar-accent: #1f1f1f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #2c2c2c;
+  --sidebar-ring: #ffffff;
+  --prioridad-alta: #2e1d06;
   --prioridad-alta-foreground: #ffb340;
-  --prioridad-media: #33290a;
+  --prioridad-media: #2a2208;
   --prioridad-media-foreground: #ffd60a;
-  --prioridad-baja: #2c2c2e;
+  --prioridad-baja: #1c1c1c;
   --prioridad-baja-foreground: #aeaeb2;
-  --estado-sin-revisar: #2c2c2e;
+  --estado-sin-revisar: #1c1c1c;
   --estado-sin-revisar-foreground: #aeaeb2;
-  --estado-en-revision: #0f2a4a;
-  --estado-en-revision-foreground: #8cc2ff;
-  --estado-justificada: #0e2e19;
+  --estado-en-revision: #1c1c1c;
+  --estado-en-revision-foreground: #ffffff;
+  --estado-justificada: #0b2414;
   --estado-justificada-foreground: #4cd964;
-  --estado-requiere-atencion: #3b1214;
+  --estado-requiere-atencion: #2e0e10;
   --estado-requiere-atencion-foreground: #ff6961;
   --sombra-tarjeta: none;
-  --sombra-material: 0 8px 32px rgb(0 0 0 / 0.4);
-  --velo: rgb(0 0 0 / 0.5);
+  --sombra-material: 0 8px 32px rgb(0 0 0 / 0.6);
+  --velo: rgb(0 0 0 / 0.6);
 }
 
 /* Aumentar el contraste: texto secundario y bordes más marcados (HIG · Color y Accesibilidad). */
@@ -272,7 +275,7 @@
   html.dark {
     --muted-foreground: #d1d1d6;
     --border: #8e8e93;
-    --separador: #636366;
+    --separador: #48484a;
   }
 }
 

@@ -27,8 +27,9 @@ Queremos una interfaz **bonita, sobria y confiable**: que se vea como una herram
 
 Los tokens se definen en `web/src/app/globals.css` (`:root` y `.dark`) y se usan con sus clases de Tailwind (`bg-card`, `text-muted-foreground`, `bg-prioridad-alta`…). **Nunca se escriben colores sueltos en un componente.** La prueba `web/src/app/theme-contrast.test.ts` manda: exige 4,5:1 en cada par de texto y fondo, 3:1 en el anillo de foco y en las series de los gráficos, y que solo "requiere atención" sea rojo. Si cambias o agregas un token con texto, agrega su par a la prueba.
 
-- **Un solo acento** (`--primary`) para acciones principales, enlaces y selección. Los demás colores tienen significado: prioridad, estado o una serie de un gráfico.
-- **Profundidad:** en claro, la separación viene del fondo gris con tarjetas blancas y sombras mínimas; en oscuro, de grises cada vez más claros y sin sombra.
+- **Modo oscuro negro total:** el fondo, las tarjetas, las barras y los menús son `#000000` y se separan con bordes finos. No hay fondos azules ni acento azul: en oscuro el acento es blanco y la selección es un gris neutro.
+- **Un solo acento** (`--primary`: azul en claro, blanco en oscuro) para acciones principales, enlaces y selección. Los demás colores tienen significado: prioridad, estado o una serie de un gráfico.
+- **Profundidad:** en claro, la separación viene del fondo gris con tarjetas blancas y sombras mínimas; en oscuro, de bordes finos sobre negro, sin sombra.
 - **Aumentar contraste** (`prefers-contrast: more`): el texto secundario y los bordes se oscurecen (o aclaran, en oscuro) y las tarjetas y barras ganan un borde visible.
 
 ### Base
@@ -36,35 +37,35 @@ Los tokens se definen en `web/src/app/globals.css` (`:root` y `.dark`) y se usan
 | Token | Claro | Oscuro | Uso |
 |---|---|---|---|
 | `--background` | `#F2F2F7` | `#000000` | Fondo de la página (fondo agrupado) |
-| `--card` / `--card-foreground` | `#FFFFFF` / `#1D1D1F` | `#1C1C1E` / `#F5F5F7` | Superficies del contenido |
-| `--popover` | `#FFFFFF` | `#2C2C2E` | Base sólida de menús, hojas y diálogos |
+| `--card` / `--card-foreground` | `#FFFFFF` / `#1D1D1F` | `#000000` / `#F5F5F7` | Superficies del contenido |
+| `--popover` | `#FFFFFF` | `#000000` | Base sólida de menús, hojas y diálogos |
 | `--foreground` | `#1D1D1F` | `#F5F5F7` | Texto principal |
 | `--muted-foreground` | `#636366` | `#A1A1A6` | Texto secundario |
-| `--primary` / `--primary-foreground` | `#0066CC` / `#FFFFFF` | `#409CFF` / `#000000` | Acento: botón prominente, enlaces, selección |
-| `--secondary` | `#E5E5EA` | `#2C2C2E` | Relleno de controles (campos, botones neutros, control segmentado) |
-| `--accent` / `--accent-foreground` | `#E5EFFA` / `#0058B0` | `#0F2A4A` / `#8CC2FF` | Tinte de acento: ítem activo, botón `tinted`, insignias |
-| `--sidebar` | `#F7F7FA` | `#161618` | Base sólida del vidrio de las barras |
-| `--segmento` | `#FFFFFF` | `#636366` | Segmento activo del control segmentado |
-| `--border` / `--separador` | `#D8D8DC` / `#E3E3E8` | `#38383A` / `#2E2E30` | Bordes finos y separadores de listas |
-| `--ring` | `#0071E3` | `#409CFF` | Anillo de foco |
-| `--chart-1` … `--chart-5` | azul, índigo, naranja oscuro, gris y verde azulado | sus variantes claras | Series de los gráficos (sin rojo ni el naranja `#FF9500`) |
+| `--primary` / `--primary-foreground` | `#0066CC` / `#FFFFFF` | `#FFFFFF` / `#000000` | Acento: botón prominente, enlaces, selección |
+| `--secondary` | `#E5E5EA` | `#1C1C1C` | Relleno de controles (campos, botones neutros, control segmentado) |
+| `--accent` / `--accent-foreground` | `#E5EFFA` / `#0058B0` | `#1F1F1F` / `#FFFFFF` | Tinte de acento: ítem activo, botón `tinted`, insignias |
+| `--sidebar` | `#F7F7FA` | `#000000` | Base sólida del vidrio de las barras |
+| `--segmento` | `#FFFFFF` | `#3A3A3C` | Segmento activo del control segmentado |
+| `--border` / `--separador` | `#D8D8DC` / `#E3E3E8` | `#2C2C2C` / `#1F1F1F` | Bordes finos y separadores de listas |
+| `--ring` | `#0071E3` | `#FFFFFF` | Anillo de foco |
+| `--chart-1` … `--chart-5` | azul, índigo, naranja oscuro, gris y verde azulado | blanco, grises y naranja | Series de los gráficos (sin rojo ni el naranja `#FF9500`) |
 
 ### Prioridad de las señales (las asigna el sistema)
 
 | Nivel | Texto | Fondo | Indicador | Uso |
 |---|---|---|---|---|
-| Alta | `#9A4500` / `#FFB340` | `#FFF0D9` / `#3A2508` | ●●● | 5 puntos o más |
-| Media | `#765300` / `#FFD60A` | `#FFF8DB` / `#33290A` | ●●○ | 3 o 4 puntos |
-| Baja | `#55555A` / `#AEAEB2` | `#EEEEF2` / `#2C2C2E` | ●○○ | 1 o 2 puntos |
+| Alta | `#9A4500` / `#FFB340` | `#FFF0D9` / `#2E1D06` | ●●● | 5 puntos o más |
+| Media | `#765300` / `#FFD60A` | `#FFF8DB` / `#2A2208` | ●●○ | 3 o 4 puntos |
+| Baja | `#55555A` / `#AEAEB2` | `#EEEEF2` / `#1C1C1C` | ●○○ | 1 o 2 puntos |
 
 ### Estado de la revisión (lo decide una persona)
 
 | Estado | Texto (claro / oscuro) | Fondo (claro / oscuro) | Ícono |
 |---|---|---|---|
-| Sin revisar | `#55555A` / `#AEAEB2` | `#EEEEF2` / `#2C2C2E` | Círculo vacío |
-| En revisión | `#0058B0` / `#8CC2FF` | `#E5EFFA` / `#0F2A4A` | Reloj |
-| Justificada | `#1A7333` / `#4CD964` | `#E4F5E9` / `#0E2E19` | Check |
-| Requiere atención | `#C1121C` / `#FF6961` | `#FDECEC` / `#3B1214` | Bandera |
+| Sin revisar | `#55555A` / `#AEAEB2` | `#EEEEF2` / `#1C1C1C` | Círculo vacío |
+| En revisión | `#0058B0` / `#FFFFFF` | `#E5EFFA` / `#1C1C1C` | Reloj |
+| Justificada | `#1A7333` / `#4CD964` | `#E4F5E9` / `#0B2414` | Check |
+| Requiere atención | `#C1121C` / `#FF6961` | `#FDECEC` / `#2E0E10` | Bandera |
 
 ## Tipografía
 
@@ -149,7 +150,7 @@ shadcn/ui sigue siendo la base ([ADR 0005](../adr/0005-web-nextjs-shadcn.md)); c
 | Componente | Cómo se ve |
 |---|---|
 | `Button` | Cápsula. `default` = **prominente** (fondo de acento; uno por vista), `tinted` = tinte de acento, `secondary` = neutro con relleno gris, `outline` = neutro con borde fino, `plain` = solo texto de acento ("Limpiar filtros"), `ghost` = íconos de barra, `destructive` = solo para "requiere atención" |
-| `Card` | Superficie sólida, radio de 20 px, sin borde y con sombra mínima. `CardTitle` usa Título 3. Para pares etiqueta–valor, lista con separadores finos (`border-separador`) |
+| `Card` | Superficie sólida, radio de 20 px, sin borde y con sombra mínima en claro; en oscuro, negra con un borde fino. `CardTitle` usa Título 3. Para pares etiqueta–valor, lista con separadores finos (`border-separador`) |
 | `Badge` | Cápsula pequeña con tinte (por defecto, el de acento) |
 | `Input`, `Textarea` | Relleno gris del sistema; el campo es una cápsula |
 | `Select` | Botón emergente en cápsula con el valor y un chevron; el menú en vidrio |
