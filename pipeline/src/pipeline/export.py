@@ -24,6 +24,7 @@ import duckdb
 from jsonschema import Draft202012Validator
 
 from pipeline.config import PROJECT_DIR, PipelineConfig, now_in_lima
+from pipeline.entities import entity_type
 from pipeline.ocds import connect, sql_string
 from pipeline.signals.compute import (
     check_tables,
@@ -183,17 +184,6 @@ def redact(text: str, *indexes: NameIndex) -> str:
 
 
 # --- Helpers ---------------------------------------------------------------------------------
-
-
-def entity_type(name: str) -> str:
-    upper = name.upper()
-    if "UNIVERSIDAD" in upper:
-        return "universidad"
-    if upper.startswith("MUNICIPALIDAD"):
-        return "municipalidad"
-    if "GOBIERNO REGIONAL" in upper:
-        return "gobierno regional"
-    return "otro"
 
 
 def is_web_url(url: str | None) -> bool:

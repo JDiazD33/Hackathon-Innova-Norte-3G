@@ -227,15 +227,20 @@ def test_s02_counts_processes_without_a_period(tmp_path: Path) -> None:
     assert by_code(rows, "S02") == []
 
 
-def test_s02_and_s04_are_deactivated_by_default(tmp_path: Path) -> None:
+def test_s02_s04_and_s06_are_deactivated_by_default(tmp_path: Path) -> None:
     manifest, rows = run_signals(tmp_path, [release("ocds-caso-0001", tenderers=tenderers(1))])
     defaults = load_signals_config()
-    assert manifest["senales_activas"] == ["S01", "S03", "S08"]
+    assert manifest["senales_activas"] == ["S01", "S03", "S05", "S08"]
     assert manifest["senales_desactivadas"] == [
         {"codigo": "S02", "motivo": defaults.s02.switch.reason},
         {"codigo": "S04", "motivo": defaults.s04.switch.reason},
+        {
+            "codigo": "S06",
+            "motivo": "Solo el 0 % de los contratos de La Libertad tiene monto final "
+            "(contracts[].implementation.finalValue); el mínimo es 10 %.",
+        },
     ]
-    assert manifest["versiones"] == {"S01": "S01@1", "S03": "S03@1", "S08": "S08@1"}
+    assert manifest["versiones"] == {"S01": "S01@1", "S03": "S03@1", "S05": "S05@1", "S08": "S08@1"}
     assert manifest["conteos"]["S01"] == 1
     assert by_code(rows, "S02") == []
     assert by_code(rows, "S04") == []

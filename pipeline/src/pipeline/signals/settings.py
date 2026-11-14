@@ -79,6 +79,21 @@ class S04Settings:
 
 
 @dataclass(frozen=True)
+class S05Settings:
+    switch: SignalSwitch
+    direct_methods: tuple[str, ...]  # base methods that count as direct contracting
+    minimum_processes: int
+    minimum_direct: int
+
+
+@dataclass(frozen=True)
+class S06Settings:
+    switch: SignalSwitch
+    factor: float
+    minimum_coverage: float
+
+
+@dataclass(frozen=True)
 class S08Settings:
     switch: SignalSwitch
     count: int
@@ -100,6 +115,8 @@ class SignalsConfig:
     s02: S02Settings
     s03: S03Settings
     s04: S04Settings
+    s05: S05Settings
+    s06: S06Settings
     s08: S08Settings
 
 
@@ -226,6 +243,34 @@ def _s04(
     )
 
 
+def _s05(
+    data: dict[str, Any], path: Path, switch: SignalSwitch, methods: MethodTable
+) -> S05Settings:
+    direct = get_texts(data, "S05.metodos_directos", path)
+    for method in direct:
+        if method not in methods.non_competitive:
+            raise ConfigError(
+                f"'S05.metodos_directos' de {path} debe tener métodos de "
+                f"metodos.no_competitivos: {method}"
+            )
+    return S05Settings(
+        switch=switch,
+        direct_methods=direct,
+        minimum_processes=get_positive_int(data, "S05.minimo_procesos", path),
+        minimum_direct=get_positive_int(data, "S05.minimo_directas", path),
+    )
+
+
+def _s06(data: dict[str, Any], path: Path, switch: SignalSwitch) -> S06Settings:
+    factor = get_number(data, "S06.factor", path)
+    if factor <= 1:
+        raise ConfigError(f"'S06.factor' de {path} debe ser mayor que 1")
+    coverage = get_number(data, "S06.cobertura_minima", path)
+    if not 0 <= coverage <= 1:
+        raise ConfigError(f"'S06.cobertura_minima' de {path} debe estar entre 0 y 1")
+    return S06Settings(switch=switch, factor=factor, minimum_coverage=coverage)
+
+
 def _s08(data: dict[str, Any], path: Path, switch: SignalSwitch) -> S08Settings:
     count = get_positive_int(data, "S08.cantidad_expedientes", path)
     if count > 50:
@@ -245,7 +290,7 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
     """Load and validate ``config/senales.toml``; a missing parameter stops with its name."""
     data = read_toml(path)
     switches = {code: _switch(data, code, path) for code in SIGNAL_CODES if code in data}
-    for code in ("S01", "S02", "S03", "S04", "S08"):
+    for code in ("S01", "S02", "S03", "S04", "S05", "S06", "S08"):
         if code not in switches:
             raise ConfigError(f"Falta la sección [{code}] en {path}")
 
@@ -298,5 +343,7 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
             minimum_awards=get_positive_int(data, "S03.minimo_adjudicaciones", path),
         ),
         s04=_s04(data, path, switches["S04"], methods),
+        s05=_s05(data, path, switches["S05"], methods),
+        s06=_s06(data, path, switches["S06"]),
         s08=_s08(data, path, switches["S08"]),
     )

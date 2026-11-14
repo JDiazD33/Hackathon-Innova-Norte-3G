@@ -28,7 +28,8 @@ Cada paso tiene su comando y lee lo que dejó el anterior, así que se puede rep
 | `src/pipeline/ocds.py` | Campos OCDS que se leen, con sus tipos de DuckDB |
 | `src/pipeline/ingest.py` | Filtro por departamento y años, exclusiones y procesos repetidos |
 | `src/pipeline/normalize.py` | Tablas normalizadas, correcciones de calidad y manifiesto |
-| `src/pipeline/signals/` | Configuración de las señales (`settings.py`), grupos de comparación (`groups.py`), reglas (`s01.py`, `s02.py`, `s03.py`, `s04.py`, `s08.py`) y cálculo (`compute.py`) |
+| `src/pipeline/signals/` | Configuración de las señales (`settings.py`), grupos de comparación (`groups.py`), reglas (`s01.py` a `s06.py` y `s08.py`) y cálculo (`compute.py`). Una regla que los datos no permiten calcular, como S06 con poca cobertura, queda desactivada con su motivo |
+| `src/pipeline/entities.py` | Tipo de entidad según el nombre (universidad, municipalidad, gobierno regional u otro), para S05 y el paquete |
 | `src/pipeline/cardinal.py` | Contraste con los indicadores R018 y R003 de Cardinal, que se ejecuta como herramienta externa |
 | `src/pipeline/export.py` | Prioridad de revisión, seudónimos, ocultamiento de nombres y RUC en los textos, y exportación del paquete validado |
 | `.env.example` | Variables de entorno sin sus valores (`PSEUDONYM_SECRET`). El `.env` con los valores no se sube |

@@ -45,7 +45,7 @@ Cada parte tiene su ficha (contexto, diseño propuesto, verificación) y su rama
 
 ## 6. A6 · Señales opcionales e integración (Fase 2)
 
-- [ ] 6.1 Implementar S05 y S06 solo si los datos alcanzan la cobertura mínima. Verificar con pruebas, o con la desactivación registrada en el manifiesto.
+- [x] 6.1 Implementar S05 y S06 solo si los datos alcanzan la cobertura mínima. Verificar con pruebas, o con la desactivación registrada en el manifiesto.
 - [ ] 6.2 Integrar en `main` los PR de los lotes B, C y D que estén aprobados. Verificar recorriendo la demo completa en local: bandeja → ficha → explicación → decisión → reporte.
 
 ## 7. Verificación del lote

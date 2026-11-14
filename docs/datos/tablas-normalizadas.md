@@ -124,6 +124,7 @@ Una fila por proceso de **todo el país** convocado en los años configurados, c
 | Columna | Campo OCDS |
 |---|---|
 | `ocid`, `entidad_id`, `departamento`, `anio_convocatoria` | Como en `procesos` (`departamento` puede ser vacío) |
+| `entidad_nombre` | `buyer.name` o, si falta, el nombre de la parte compradora. S05 lo usa para saber el tipo de entidad (2 911 entidades en 2025–2026) |
 | `metodo`, `categoria`, `numero_postores`, `estado` | Como en `procesos` |
 | `fecha_convocatoria`, `fecha_inicio_presentacion`, `fecha_fin_presentacion`, `fecha_inicio_consultas`, `fecha_fin_consultas` | Como en `procesos` |
 | `monto_referencial_pen` | `tender.value.amount_PEN` |

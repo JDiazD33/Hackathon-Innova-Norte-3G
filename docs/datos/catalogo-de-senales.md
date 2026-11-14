@@ -124,6 +124,17 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Regla v1:** la proporción de contratación directa de la entidad (por monto o por cantidad) es atípica frente a entidades del mismo tipo.
 - **Qué revisar:** el supuesto legal invocado en cada caso.
 - **Qué no significa:** hay supuestos legales válidos, como emergencias o proveedor único.
+- **Implementación (S05@1):**
+  - **Medidas:** por cada entidad, la proporción de sus procesos que son contratación directa (`metodos_directos`, hoy "Contratación Directa") y la proporción de su monto referencial en soles. No cuentan los procesos cancelados.
+  - **Tipo de entidad:** sale del nombre (`pipeline/src/pipeline/entities.py`): universidad, municipalidad, gobierno regional u otro. Es el mismo `tipo` del paquete de datos.
+  - **Grupo de comparación:** las entidades del mismo tipo de la región con al menos `minimo_procesos` procesos (hoy 10). Si son menos de `minimo_grupo` (30), se usan las del mismo tipo de todo el país, con la tabla `procesos_nacionales`.
+  - **Cuándo hay señal:** si una de las dos proporciones supera la valla de Tukey de su grupo y la entidad hizo al menos `minimo_directas` contrataciones directas (hoy 3). El mínimo evita marcar a una entidad por una sola compra directa cuando la mayoría de su grupo no hace ninguna y la valla queda casi en cero.
+  - **Resultado:** `valor` es la proporción que superó la valla, y `ocids` lista las contrataciones directas de la entidad. La señal es de nivel `entidad`: se muestra en su panel (`senales_entidad`) y no suma a la prioridad de ningún proceso.
+  - **No se evalúan, y se cuentan:** los procesos cancelados, sin comprador o sin método, y las entidades con menos de `minimo_procesos` procesos.
+- **La Libertad 2025–2026:** 9 señales.
+  - **Unidades del gobierno regional** (comparadas con las 327 de todo el país; valla del monto: 25,8 %): Instituto Regional de Oftalmología (61,7 % del monto, 29 de 78 procesos), Instituto Regional de Enfermedades Neoplásicas (30,3 %, 25 de 53) y Hospital Regional Docente (28,9 %, 28 de 76).
+  - **Municipalidades** (comparadas con las 72 de La Libertad): Pacasmayo y Huaranchal por procesos (14,8 % y 13,0 %; valla 11,5 %); Quiruvilca, Sartimbamba, Marcabal y Chilia por monto (13,0 %, 12,4 %, 2,3 % y 1,3 %; valla 0,9 %).
+- **Calibración pendiente:** 56 de las 84 municipalidades de La Libertad no tienen contrataciones directas, así que la valla del monto queda en 0,9 %. Con una proporción mínima de 5 % saldrían Marcabal y Chilia y quedarían 7 señales. Se propone agregar `proporcion_minima` a `senales.toml` si el equipo lo aprueba.
 
 ### S06 · Monto final mayor que el contratado (opcional)
 
@@ -133,6 +144,11 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Qué revisar:** adicionales aprobados, su sustento y los plazos de aprobación.
 - **Qué no significa:** los adicionales pueden ser legales y estar justificados.
 - **Spike:** el monto final (`contracts[].implementation.finalValue`) está en el 9,1 % de los contratos de La Libertad 2025–2026, por debajo del 10 % mínimo, así que con la regla actual la señal se desactiva. Si se activa, hay que calibrar el factor 1,15: la razón final/contratado tiene mediana 1,11.
+- **Implementación (S06@1):**
+  - **Cobertura:** antes de calcular, mide qué parte de los contratos de procesos no cancelados tiene monto final. Si es menor que `cobertura_minima`, la señal no se calcula y queda en `senales_desactivadas` con la cobertura medida como motivo, aunque esté activa en `senales.toml`.
+  - **Cuándo hay señal:** si el monto final es mayor o igual que `factor` × el monto contratado, en la misma moneda. Es de nivel `proceso` (el contrato va en `entradas.contrato_id`) y suma su peso (2) a la prioridad del proceso.
+  - **No se evalúan, y se cuentan:** los contratos de procesos cancelados, sin monto final, sin monto contratado o con el monto final en otra moneda.
+- **La Libertad 2025–2026:** desactivada. Solo 290 de los 3 177 contratos tienen monto final (9,1 %). Si el equipo baja el mínimo, con el factor 1,15 marcaría 61 contratos, el 21 % de los que tienen monto final.
 
 ### S07 · Proveedor con sanción vigente adjudicado (fase 2)
 

@@ -106,6 +106,12 @@ umbrales = []
 [S05]
 activa = true
 version = 1
+# Métodos base de [metodos] que cuentan como contratación directa.
+metodos_directos = ["Contratación Directa"]
+# Una entidad con menos procesos no se evalúa ni entra en los grupos de comparación.
+minimo_procesos = 10
+# Con menos contrataciones directas no hay señal, aunque la proporción supere la valla.
+minimo_directas = 3
 
 [S06]
 activa = true

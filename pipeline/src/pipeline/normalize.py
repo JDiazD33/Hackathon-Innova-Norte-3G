@@ -174,8 +174,8 @@ TABLES: dict[str, str] = {
         ORDER BY ocid, seccion DESC, contrato_id, documento_id
     """,
     "procesos_nacionales": """
-        SELECT ocid, entidad_id, departamento, anio_convocatoria, metodo, categoria,
-               numero_postores, estado, fecha_convocatoria, fecha_inicio_presentacion,
+        SELECT ocid, entidad_id, entidad_nombre, departamento, anio_convocatoria, metodo,
+               categoria, numero_postores, estado, fecha_convocatoria, fecha_inicio_presentacion,
                fecha_fin_presentacion, fecha_inicio_consultas, fecha_fin_consultas,
                monto_referencial_pen, archivo
         FROM n

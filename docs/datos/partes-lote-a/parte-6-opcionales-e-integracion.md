@@ -6,8 +6,28 @@ La tarea 6.1 puede adelantarse a la parte 5 si se quiere que S05 salga en el pri
 
 ## Tareas
 
-- [ ] 6.1 Implementar S05 y S06 solo si los datos alcanzan la cobertura mínima. Verificar con pruebas, o con la desactivación registrada en el manifiesto.
-- [ ] 6.2 Integrar en `main` los PR de los lotes B, C y D que estén aprobados. Verificar recorriendo la demo completa en local: bandeja → ficha → explicación → decisión → reporte.
+- [x] 6.1 Implementar S05 y S06 solo si los datos alcanzan la cobertura mínima. Verificar con pruebas, o con la desactivación registrada en el manifiesto.
+- [ ] 6.2 Integrar en `main` los PR de los lotes B, C y D que estén aprobados. Verificar recorriendo la demo completa en local: bandeja → ficha → explicación → decisión → reporte. *Espera a que esos PR estén aprobados y a que Stefano los fusione.*
+
+## Resultado de la tarea 6.1 (14 de noviembre)
+
+- **S05 activa**, con 9 señales en La Libertad 2025–2026. Las reglas y las cifras están en el [catálogo](../catalogo-de-senales.md#s05--uso-atípico-de-contratación-directa-opcional).
+  - **Comparación:** con entidades del mismo tipo, como propone el diseño. Las municipalidades se comparan con las 72 de La Libertad; las unidades del gobierno regional, las universidades y las demás, con las de todo el país, porque en la región son menos de 30.
+  - **Tabla nacional:** para eso, `procesos_nacionales` tiene ahora la columna `entidad_nombre`. Hay que volver a ejecutar `ingest` y `normalize`.
+  - **Tipo de entidad:** la clasificación por nombre pasó a `pipeline/src/pipeline/entities.py`, y la usan S05 y el paquete.
+  - **Parámetro nuevo, `minimo_directas` (3):** sin él, 8 de las 14 entidades marcadas tenían menos de 3 contrataciones directas, porque la mayoría de las municipalidades no hace ninguna y la valla del monto queda en 0,9 %.
+  - **En el paquete:** las señales van en `senales_entidad` de cada entidad y no suman a la prioridad. Pasa de 121 a 130 señales.
+- **S06 desactivada por cobertura.** El manifiesto la lista con el motivo "Solo el 9,1 % de los contratos de La Libertad tiene monto final (contracts[].implementation.finalValue); el mínimo es 10 %".
+  - **Implementación:** la regla está completa y probada. Si el equipo baja el mínimo, marcaría 61 contratos con el factor 1,15.
+  - **Cómo se desactiva:** cuando los datos no alcanzan, una regla activa en `senales.toml` puede quedar desactivada con su motivo (`SignalUnavailable`).
+- **Verificación:**
+  - `uv run pytest`: 142 pruebas en verde, 19 de ellas en `tests/test_signals_s05_s06.py`. `uv run ruff check` y `uv run ruff format --check`: sin observaciones;
+  - `uv run pipeline ingest`, `normalize`, `signals` y `export` (público y local) sobre los datos reales;
+  - desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete` y `PAQUETE_DIR=data/local npm test -- paquete`: 10 de 10 en cada uno.
+- **Pendiente del equipo:**
+  - aprobar los grupos de comparación de S05;
+  - decidir una proporción mínima (`proporcion_minima`): con 5 % quedarían 7 señales;
+  - decidir si se baja la cobertura mínima de S06.
 
 ## Diseño propuesto
 
@@ -38,4 +58,4 @@ La tarea 6.1 puede adelantarse a la parte 5 si se quiere que S05 salga en el pri
 
 ## Archivos
 
-`pipeline/src/pipeline/signals/s05.py`, `pipeline/src/pipeline/signals/s06.py`, `pipeline/config/senales.toml`, `pipeline/tests/` y `docs/datos/catalogo-de-senales.md`.
+`pipeline/src/pipeline/signals/s05.py`, `pipeline/src/pipeline/signals/s06.py`, `pipeline/src/pipeline/signals/` (`compute.py`, `settings.py`, `context.py`), `pipeline/src/pipeline/entities.py`, `pipeline/src/pipeline/ingest.py` y `normalize.py` (`entidad_nombre`), `pipeline/src/pipeline/export.py`, `pipeline/config/senales.toml`, `pipeline/tests/`, `docs/datos/catalogo-de-senales.md` y `docs/datos/tablas-normalizadas.md`.

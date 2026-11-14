@@ -46,6 +46,7 @@ alcance AS (
 )
 SELECT ocid, date, archivo, departamento, anio_convocatoria, en_alcance,
        buyer.id AS entidad_id,
+       coalesce(buyer.name, comprador.name) AS entidad_nombre,
        tender.procurementMethodDetails AS metodo,
        tender.mainProcurementCategory AS categoria,
        tender.numberOfTenderers AS numero_postores,
@@ -67,8 +68,8 @@ FROM alcance
 # national comparison groups that the signals use when a regional group is too small.
 _NATIONAL_SQL = """
 COPY (
-    SELECT ocid, entidad_id, departamento, anio_convocatoria, metodo, categoria,
-           numero_postores, estado, fecha_convocatoria, fecha_inicio_presentacion,
+    SELECT ocid, entidad_id, entidad_nombre, departamento, anio_convocatoria, metodo,
+           categoria, numero_postores, estado, fecha_convocatoria, fecha_inicio_presentacion,
            fecha_fin_presentacion, fecha_inicio_consultas, fecha_fin_consultas,
            monto_referencial_pen, archivo
     FROM base

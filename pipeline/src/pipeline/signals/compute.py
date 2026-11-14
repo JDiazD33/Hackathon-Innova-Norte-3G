@@ -18,15 +18,15 @@ import duckdb
 from pipeline.config import PipelineConfig, now_in_lima
 from pipeline.normalize import StaleIngestError, manifest_path, tables_dir
 from pipeline.ocds import connect, sql_string
-from pipeline.signals import s01, s02, s03, s04, s08
-from pipeline.signals.context import RuleContext
+from pipeline.signals import s01, s02, s03, s04, s05, s06, s08
+from pipeline.signals.context import RuleContext, SignalUnavailable
 from pipeline.signals.groups import prepare_cases
 from pipeline.signals.settings import SignalsConfig
 
 SIGNALS_DIR = "senales"
 RESULTS_FILE = "senales.parquet"
 MANIFEST_FILE = "manifiesto.json"
-TABLES = ("procesos", "procesos_nacionales", "adjudicaciones", "contratos", "items")
+TABLES = ("procesos", "procesos_nacionales", "entidades", "adjudicaciones", "contratos", "items")
 
 Rule = Callable[[duckdb.DuckDBPyConnection, SignalsConfig, RuleContext], list[dict[str, Any]]]
 RULES: dict[str, Rule] = {
@@ -34,6 +34,8 @@ RULES: dict[str, Rule] = {
     "S02": s02.compute,
     "S03": s03.compute,
     "S04": s04.compute,
+    "S05": s05.compute,
+    "S06": s06.compute,
     "S08": s08.compute,
 }
 
@@ -143,11 +145,16 @@ def compute_signals(
         exclusions: list[dict[str, Any]] = []
         for code, rule in RULES.items():
             switch = settings.switches[code]
-            if switch.active:
-                exclusions.extend(rule(con, settings, context))
-                active.append(code)
-            else:
+            if not switch.active:
                 deactivated.append({"codigo": code, "motivo": switch.reason})
+                continue
+            try:
+                exclusions.extend(rule(con, settings, context))
+            except SignalUnavailable as reason:
+                # Active in the configuration, but the data do not allow computing it.
+                deactivated.append({"codigo": code, "motivo": str(reason)})
+                continue
+            active.append(code)
         output = sql_string(str(results_path(data_dir)))
         con.execute(
             f"COPY (SELECT * FROM senales ORDER BY codigo, id) TO {output} "
@@ -212,6 +219,15 @@ def compute_signals(
                     }
                     for threshold in settings.s04.thresholds
                 ],
+            },
+            "S05": {
+                "metodos_directos": list(settings.s05.direct_methods),
+                "minimo_procesos": settings.s05.minimum_processes,
+                "minimo_directas": settings.s05.minimum_direct,
+            },
+            "S06": {
+                "factor": settings.s06.factor,
+                "cobertura_minima": settings.s06.minimum_coverage,
             },
             "S08": {
                 "cantidad_expedientes": settings.s08.count,
