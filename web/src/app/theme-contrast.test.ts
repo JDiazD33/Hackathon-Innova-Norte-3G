@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 
 /**
  * Comprueba el contraste WCAG 2.2 AA de los tokens de globals.css en modo claro y oscuro:
- * 4,5:1 para texto y 3:1 para el anillo de foco (docs/diseno/sistema-de-diseno.md).
+ * 4,5:1 para texto y 3:1 para el anillo de foco y las series de los gráficos (docs/diseno/sistema-de-diseno.md).
+ * El texto sobre vidrio (barras, menús y hojas) se comprueba contra la base sólida de cada material
+ * (--sidebar, --background y --popover), que es el peor caso: el vidrio mezcla al menos 72 % de esa base.
  */
 const css = readFileSync(fileURLToPath(new URL("./globals.css", import.meta.url)), "utf8");
 
@@ -39,8 +41,14 @@ const PARES_DE_TEXTO: [texto: string, fondo: string][] = [
   ["muted-foreground", "background"],
   ["muted-foreground", "card"],
   ["muted-foreground", "muted"],
+  ["muted-foreground", "secondary"],
+  ["muted-foreground", "popover"],
+  ["foreground", "segmento"],
+  ["primary", "popover"],
   ["accent-foreground", "accent"],
   ["sidebar-foreground", "sidebar"],
+  ["muted-foreground", "sidebar"],
+  ["sidebar-primary", "sidebar"],
   ["sidebar-primary-foreground", "sidebar-primary"],
   ["sidebar-accent-foreground", "sidebar-accent"],
   ["prioridad-alta-foreground", "prioridad-alta"],
@@ -65,6 +73,14 @@ describe.each([":root", ".dark"] as const)("contraste de los tokens en %s", (sel
     expect(contraste(t.ring, t.background)).toBeGreaterThanOrEqual(3);
     expect(contraste(t.ring, t.card)).toBeGreaterThanOrEqual(3);
   });
+
+  it.each(["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"])(
+    "la serie %s se distingue de las tarjetas (3:1)",
+    (serie) => {
+      expect(t[serie], `falta --${serie}`).toBeDefined();
+      expect(contraste(t[serie], t.card)).toBeGreaterThanOrEqual(3);
+    },
+  );
 
   it("solo el estado 'requiere atención' usa rojo", () => {
     const rojos = Object.entries(t)

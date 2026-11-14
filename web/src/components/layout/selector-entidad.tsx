@@ -9,7 +9,7 @@ import { conEntidad, elegirEntidad, PARAM_ENTIDAD, type EntidadResumen } from "@
 /** Rutas que muestran datos de una entidad; desde otras (una ficha, por ejemplo) se vuelve al panel. */
 const RUTAS_POR_ENTIDAD = new Set(["/", "/senales", "/revision"]);
 
-const CLASE_SELECTOR = "h-9 w-full min-w-0 sm:w-80";
+const CLASE_SELECTOR = "w-full min-w-0 md:w-60 xl:w-80";
 
 export function SelectorEntidad({ entidades }: { entidades: EntidadResumen[] }) {
   const router = useRouter();
@@ -23,11 +23,11 @@ export function SelectorEntidad({ entidades }: { entidades: EntidadResumen[] }) 
       onValueChange={(id) => router.push(conEntidad(RUTAS_POR_ENTIDAD.has(pathname) ? pathname : "/", id))}
     >
       <SelectTrigger aria-label="Entidad" className={CLASE_SELECTOR}>
-        <Building2 aria-hidden="true" className="size-4 text-muted-foreground" />
+        <Building2 aria-hidden="true" className="size-4 text-primary" />
         {/* El nombre va explícito para que se vea desde el primer render, antes de hidratar. */}
         <SelectValue>{actual.nombre}</SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent position="popper" align="start" className="max-w-[min(28rem,calc(100vw-2rem))]">
         {entidades.map((entidad) => (
           <SelectItem key={entidad.id} value={entidad.id}>
             {entidad.nombre}
@@ -41,6 +41,6 @@ export function SelectorEntidad({ entidades }: { entidades: EntidadResumen[] }) 
 /** Mientras se lee la URL. */
 export function SelectorEntidadCargando() {
   return (
-    <div aria-hidden="true" className={`${CLASE_SELECTOR} animate-pulse rounded-md border bg-muted`} />
+    <div aria-hidden="true" className={`${CLASE_SELECTOR} h-9 rounded-full bg-secondary motion-safe:animate-pulse`} />
   );
 }

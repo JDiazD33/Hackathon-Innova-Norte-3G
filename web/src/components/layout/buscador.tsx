@@ -2,7 +2,7 @@
 
 import { Building2, FileText, Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,9 @@ import {
 import { buscar, type EntradaBusqueda } from "@/features/bandeja/busqueda";
 import { elegirEntidad, PARAM_ENTIDAD, type EntidadResumen } from "@/lib/entidad";
 
-const CLASE_BOTON = "h-9 w-full justify-between gap-6 text-muted-foreground sm:w-56";
+/* Cápsula con lupa en la barra (HIG · Search fields); en el celular se abre con un ícono. */
+const CLASE_BOTON =
+  "w-9 justify-center gap-2 px-0 text-muted-foreground pointer-coarse:w-11 md:w-44 md:justify-between md:px-3.5 md:pointer-coarse:w-44 lg:w-56 xl:w-64";
 
 /**
  * Buscador global (Ctrl o Cmd + K). Busca en la entidad seleccionada: procesos por descripción
@@ -87,12 +89,12 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
 
   return (
     <>
-      <Button variant="outline" className={CLASE_BOTON} onClick={() => setAbierto(true)}>
+      <Button variant="secondary" className={CLASE_BOTON} onClick={() => setAbierto(true)} aria-label="Buscar">
         <span className="flex items-center gap-2">
           <Search aria-hidden="true" className="size-4" />
-          Buscar
+          <span className="hidden md:inline">Buscar</span>
         </span>
-        <kbd className="hidden rounded border bg-muted px-1.5 font-sans text-[0.7rem] sm:inline">Ctrl K</kbd>
+        <Atajo />
       </Button>
       <CommandDialog
         open={abierto}
@@ -108,7 +110,7 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
               <CommandGroup heading="Procesos">
                 {procesos.map((r) => (
                   <CommandItem key={r.id} value={`proceso-${r.id}`} onSelect={() => ir(r.href)}>
-                    <FileText aria-hidden="true" className="size-4" />
+                    <FileText aria-hidden="true" className="size-4 text-primary" />
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate">{r.titulo}</span>
                       <span className="truncate text-xs text-muted-foreground">
@@ -123,7 +125,7 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
               <CommandGroup heading="Proveedores">
                 {proveedores.map((r) => (
                   <CommandItem key={r.id} value={`proveedor-${r.id}`} onSelect={() => ir(r.href)}>
-                    <Building2 aria-hidden="true" className="size-4" />
+                    <Building2 aria-hidden="true" className="size-4 text-primary" />
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate">{r.titulo}</span>
                       <span className="truncate text-xs text-muted-foreground">{r.detalle}</span>
@@ -141,11 +143,25 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
 
 export function BuscadorCargando() {
   return (
-    <Button variant="outline" className={CLASE_BOTON} disabled>
+    <Button variant="secondary" className={CLASE_BOTON} disabled aria-label="Buscar">
       <span className="flex items-center gap-2">
         <Search aria-hidden="true" className="size-4" />
-        Buscar
+        <span className="hidden md:inline">Buscar</span>
       </span>
     </Button>
+  );
+}
+
+/** "⌘K" en Mac y "Ctrl K" en los demás. Se decide al montar para no desajustar la hidratación. */
+function Atajo() {
+  const esMac = useSyncExternalStore(
+    () => () => {},
+    () => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent),
+    () => false,
+  );
+  return (
+    <kbd className="hidden rounded-md bg-card px-1.5 font-sans text-leyenda font-medium text-muted-foreground md:inline">
+      {esMac ? "⌘K" : "Ctrl K"}
+    </kbd>
   );
 }
