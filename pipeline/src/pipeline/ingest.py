@@ -13,9 +13,10 @@ from pathlib import Path
 from typing import Any
 
 from pipeline.config import PipelineConfig, now_in_lima
-from pipeline.ocds import MAX_OBJECT_SIZE, columns_literal, connect, sql_string
+from pipeline.ocds import ITEM_STATUS_SQL, MAX_OBJECT_SIZE, columns_literal, connect, sql_string
 
 INTERIM_FILE = "releases.parquet"
+NATIONAL_FILE = "procesos-nacionales.parquet"
 SUMMARY_FILE = "ingesta.json"
 
 REGION_UNKNOWN = "región indeterminada"
@@ -44,11 +45,37 @@ alcance AS (
     FROM marcados
 )
 SELECT ocid, date, archivo, departamento, anio_convocatoria, en_alcance,
+       buyer.id AS entidad_id,
+       tender.procurementMethodDetails AS metodo,
+       tender.mainProcurementCategory AS categoria,
+       tender.numberOfTenderers AS numero_postores,
+       __STATUS__ AS estado,
+       CAST(tender.datePublished AS DATE) AS fecha_convocatoria,
+       CAST(tender.tenderPeriod.startDate AS DATE) AS fecha_inicio_presentacion,
+       CAST(tender.tenderPeriod.endDate AS DATE) AS fecha_fin_presentacion,
+       CAST(tender.enquiryPeriod.startDate AS DATE) AS fecha_inicio_consultas,
+       CAST(tender.enquiryPeriod.endDate AS DATE) AS fecha_fin_consultas,
+       tender.value.amount_PEN AS monto_referencial_pen,
        CASE WHEN en_alcance THEN {'id': id, 'buyer': buyer, 'comprador': comprador,
                                   'parties': parties, 'tender': tender, 'awards': awards,
                                   'contracts': contracts}
        END AS datos
 FROM alcance
+"""
+
+# Light table of every process of the country in the configured years: it gives the
+# national comparison groups that the signals use when a regional group is too small.
+_NATIONAL_SQL = """
+COPY (
+    SELECT ocid, entidad_id, departamento, anio_convocatoria, metodo, categoria,
+           numero_postores, estado, fecha_convocatoria, fecha_inicio_presentacion,
+           fecha_fin_presentacion, fecha_inicio_consultas, fecha_fin_consultas,
+           monto_referencial_pen, archivo
+    FROM base
+    WHERE list_contains($years, anio_convocatoria)
+    QUALIFY row_number() OVER (PARTITION BY ocid ORDER BY date DESC NULLS LAST, archivo DESC) = 1
+    ORDER BY ocid
+) TO __PATH__ (FORMAT parquet, COMPRESSION zstd)
 """
 
 _COUNTS_SQL = """
@@ -91,6 +118,10 @@ def interim_path(data_dir: Path) -> Path:
     return data_dir / "interim" / INTERIM_FILE
 
 
+def national_path(data_dir: Path) -> Path:
+    return data_dir / "interim" / NATIONAL_FILE
+
+
 def summary_path(data_dir: Path) -> Path:
     return data_dir / "interim" / SUMMARY_FILE
 
@@ -104,8 +135,10 @@ def ingest(config: PipelineConfig, data_dir: Path) -> dict[str, Any]:
 
     con = connect()
     try:
-        base_sql = _BASE_SQL.replace("__COLUMNS__", columns_literal()).replace(
-            "__MAX_SIZE__", str(MAX_OBJECT_SIZE)
+        base_sql = (
+            _BASE_SQL.replace("__COLUMNS__", columns_literal())
+            .replace("__MAX_SIZE__", str(MAX_OBJECT_SIZE))
+            .replace("__STATUS__", ITEM_STATUS_SQL)
         )
         con.execute(base_sql, {"files": [str(path) for path in sources], **scope})
         read = dict(
@@ -117,6 +150,14 @@ def ingest(config: PipelineConfig, data_dir: Path) -> dict[str, Any]:
             _COUNTS_SQL, scope
         ).fetchone()
         con.execute(_OUTPUT_SQL.replace("__PATH__", sql_string(str(output))))
+        national = national_path(data_dir)
+        con.execute(
+            _NATIONAL_SQL.replace("__PATH__", sql_string(str(national))),
+            {"years": scope["years"]},
+        )
+        national_processes = con.execute(
+            f"SELECT count(*) FROM read_parquet({sql_string(str(national))})"
+        ).fetchone()[0]
     finally:
         con.close()
 
@@ -127,6 +168,7 @@ def ingest(config: PipelineConfig, data_dir: Path) -> dict[str, Any]:
         "archivos": [path.name for path in sources],
         "leidos": {path.name: read.get(path.name, 0) for path in sources},
         "procesos": processes,
+        "procesos_nacionales": national_processes,
         "exclusiones": [
             {"motivo": REGION_UNKNOWN, "cantidad": region_unknown},
             {"motivo": YEAR_UNKNOWN, "cantidad": year_unknown},

@@ -94,6 +94,12 @@ RELEASE_COLUMNS: dict[str, str] = {
 }
 
 
+# Process status: there is no ``tender.status``, so it is the sorted distinct item statuses.
+ITEM_STATUS_SQL = """nullif(array_to_string(list_sort(list_distinct(list_filter(
+    list_transform(tender.items, lambda i: i.statusDetails),
+    lambda s: s IS NOT NULL))), ', '), '')"""
+
+
 def sql_string(value: str) -> str:
     """A single-quoted SQL string literal."""
     return "'" + value.replace("'", "''") + "'"

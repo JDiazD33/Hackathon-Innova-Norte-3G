@@ -117,6 +117,18 @@ Una fila por documento de la convocatoria o de un contrato.
 | `tipo` | `documents[].documentType`, o "sin tipo" si falta |
 | `titulo`, `url`, `fecha_publicacion`, `formato` | `title`, `url`, `datePublished`, `format` |
 
+## `procesos_nacionales`
+
+Una fila por proceso de **todo el país** convocado en los años configurados, con pocas columnas. Las señales la usan como grupo de comparación nacional cuando el grupo regional tiene menos de `minimo_grupo` casos.
+
+| Columna | Campo OCDS |
+|---|---|
+| `ocid`, `entidad_id`, `departamento`, `anio_convocatoria` | Como en `procesos` (`departamento` puede ser vacío) |
+| `metodo`, `categoria`, `numero_postores`, `estado` | Como en `procesos` |
+| `fecha_convocatoria`, `fecha_inicio_presentacion`, `fecha_fin_presentacion`, `fecha_inicio_consultas`, `fecha_fin_consultas` | Como en `procesos` |
+| `monto_referencial_pen` | `tender.value.amount_PEN` |
+| `archivo` | Archivo anual de donde salió el proceso |
+
 ## Exclusiones y correcciones
 
 Ningún problema de calidad descarta un proceso completo. El manifiesto cuenta cada caso.
@@ -157,3 +169,4 @@ Ejecución del 13 de noviembre de 2026 con `2025.jsonl.gz` y `2026.jsonl.gz`:
 | `proveedores` | 11 945 |
 | `items` | 5 537 |
 | `documentos` | 31 055 |
+| `procesos_nacionales` | 136 961 |

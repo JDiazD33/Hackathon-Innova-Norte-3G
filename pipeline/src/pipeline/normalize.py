@@ -15,8 +15,8 @@ from typing import Any
 from pipeline import __version__
 from pipeline.config import PipelineConfig, now_in_lima
 from pipeline.download import metadata_path
-from pipeline.ingest import interim_path, summary_path
-from pipeline.ocds import connect, sql_string
+from pipeline.ingest import interim_path, national_path, summary_path
+from pipeline.ocds import ITEM_STATUS_SQL, connect, sql_string
 
 TABLES_DIR = "tablas"
 MANIFEST_FILE = "manifiesto.json"
@@ -40,9 +40,7 @@ TABLES: dict[str, str] = {
                CAST(tender.enquiryPeriod.startDate AS DATE) AS fecha_inicio_consultas,
                CAST(tender.enquiryPeriod.endDate AS DATE) AS fecha_fin_consultas,
                tender.numberOfTenderers AS numero_postores,
-               nullif(array_to_string(list_sort(list_distinct(list_filter(
-                   list_transform(tender.items, lambda i: i.statusDetails),
-                   lambda s: s IS NOT NULL))), ', '), '') AS estado,
+               __STATUS__ AS estado,
                departamento,
                provincia,
                distrito,
@@ -175,6 +173,14 @@ TABLES: dict[str, str] = {
         FROM (SELECT * FROM licitacion UNION ALL SELECT * FROM contrato)
         ORDER BY ocid, seccion DESC, contrato_id, documento_id
     """,
+    "procesos_nacionales": """
+        SELECT ocid, entidad_id, departamento, anio_convocatoria, metodo, categoria,
+               numero_postores, estado, fecha_convocatoria, fecha_inicio_presentacion,
+               fecha_fin_presentacion, fecha_inicio_consultas, fecha_fin_consultas,
+               monto_referencial_pen, archivo
+        FROM n
+        ORDER BY ocid
+    """,
 }
 
 # Quality corrections, measured on the source (``r``) so they do not depend on the tables.
@@ -229,7 +235,8 @@ def manifest_path(data_dir: Path) -> Path:
 def read_summary(config: PipelineConfig, data_dir: Path) -> dict[str, Any]:
     """The ingest summary, checked against the current scope."""
     path = summary_path(data_dir)
-    if not path.exists() or not interim_path(data_dir).exists():
+    interim_files = (interim_path(data_dir), national_path(data_dir))
+    if not path.exists() or not all(file.exists() for file in interim_files):
         raise FileNotFoundError(f"Falta {path}. Ejecuta antes `uv run pipeline ingest`.")
     summary = json.loads(path.read_text(encoding="utf-8"))
     current = (config.scope.department, list(config.scope.years), list(config.download.files))
@@ -278,9 +285,15 @@ def normalize(config: PipelineConfig, data_dir: Path) -> dict[str, Any]:
             + sql_string(str(interim_path(data_dir)))
             + ")"
         )
+        con.execute(
+            "CREATE TEMP VIEW n AS SELECT * FROM read_parquet("
+            + sql_string(str(national_path(data_dir)))
+            + ")"
+        )
         counts: dict[str, int] = {}
         for name, sql in TABLES.items():
             used = {key: value for key, value in params.items() if f"${key}" in sql}
+            sql = sql.replace("__STATUS__", ITEM_STATUS_SQL)
             con.execute(f"CREATE OR REPLACE TEMP TABLE {name} AS {sql}", used)
             path = output_dir / f"{name}.parquet"
             con.execute(

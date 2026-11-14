@@ -13,6 +13,8 @@ from pipeline.config import DEFAULT_CONFIG, DEFAULT_DATA_DIR, ConfigError, load_
 from pipeline.download import DownloadError, SourceNotAllowedError, download_all
 from pipeline.ingest import ingest
 from pipeline.normalize import StaleIngestError, normalize
+from pipeline.signals.compute import compute_signals
+from pipeline.signals.settings import DEFAULT_SIGNALS_CONFIG, load_signals_config
 
 DEFAULT_DEPARTMENT = "LA LIBERTAD"
 DEFAULT_YEARS = (2025, 2026)
@@ -97,6 +99,17 @@ def _build_parser() -> argparse.ArgumentParser:
         "normalize", help="escribe las tablas normalizadas en Parquet y el manifiesto"
     )
     _add_pipeline_arguments(normalize_parser)
+
+    signals_parser = commands.add_parser(
+        "signals", help="calcula las señales activas sobre las tablas normalizadas"
+    )
+    _add_pipeline_arguments(signals_parser)
+    signals_parser.add_argument(
+        "--signals-config",
+        type=Path,
+        default=DEFAULT_SIGNALS_CONFIG,
+        help="parámetros de las señales (por defecto, config/senales.toml)",
+    )
     return parser
 
 
@@ -147,6 +160,23 @@ def _run_normalize(args: argparse.Namespace) -> int:
     for item in manifest["correcciones"]:
         print(f"Corrección '{item['tipo']}': {item['cantidad']}")
     print(f"Fecha de corte: {manifest['fecha_corte']}")
+    return 0
+
+
+def _run_signals(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    settings = load_signals_config(args.signals_config)
+    manifest = compute_signals(config, settings, args.data_dir)
+    for code in manifest["senales_activas"]:
+        version = manifest["versiones"][code]
+        print(f"{code} ({version}): {manifest['conteos'][code]} señales")
+    for item in manifest["senales_desactivadas"]:
+        print(f"{item['codigo']} desactivada: {item['motivo']}")
+    for item in manifest["exclusiones"]:
+        if item["cantidad"]:
+            print(f"{item['codigo']} no evaluada por {item['motivo']}: {item['cantidad']}")
+    if manifest["metodos_sin_clasificar"]:
+        print("Métodos sin clasificar: " + ", ".join(manifest["metodos_sin_clasificar"]))
     return 0
 
 
@@ -209,6 +239,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "download": _run_download,
         "ingest": _run_ingest,
         "normalize": _run_normalize,
+        "signals": _run_signals,
     }
     try:
         return handlers[args.command](args)

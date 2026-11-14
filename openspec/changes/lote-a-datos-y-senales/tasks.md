@@ -23,9 +23,9 @@ Cada parte tiene su ficha (contexto, diseño propuesto, verificación) y su rama
 
 ## 3. A3 · Señales S01 y S02
 
-- [ ] 3.1 Crear `config/senales.toml` con los parámetros y pesos iniciales del catálogo. Verificar que el cálculo se detiene con un mensaje claro si falta un parámetro.
-- [ ] 3.2 Implementar S01 con la estructura de resultado común. Verificar con pruebas positiva, negativa (contratación directa) y sin dato de postores.
-- [ ] 3.3 Implementar S02 con el percentil por grupo y el respaldo nacional. Verificar con pruebas de un caso bajo el percentil y de un grupo pequeño.
+- [x] 3.1 Crear `config/senales.toml` con los parámetros y pesos iniciales del catálogo. Verificar que el cálculo se detiene con un mensaje claro si falta un parámetro.
+- [x] 3.2 Implementar S01 con la estructura de resultado común. Verificar con pruebas positiva, negativa (contratación directa) y sin dato de postores.
+- [x] 3.3 Implementar S02 con el percentil por grupo y el respaldo nacional. Verificar con pruebas de un caso bajo el percentil y de un grupo pequeño.
 - [ ] 3.4 Verificar a mano 5 resultados reales de S01 y 5 de S02 contra el SEACE y anotar la verificación en el PR.
 
 ## 4. A4 · S03, S04, S08 y contraste con Cardinal

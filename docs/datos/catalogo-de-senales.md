@@ -36,6 +36,9 @@ Medida sobre los 5 036 procesos de La Libertad convocados en 2025–2026 (`2025.
 
 - **"Atípico"** significa que el valor supera la valla superior de Tukey (Q3 + 1,5 × RIC) de su grupo de comparación. Es el mismo enfoque de cuartiles y vallas que reporta Cardinal. El factor 1,5 es configurable.
 - **Grupo de comparación:** procesos del mismo método de contratación, del mismo año y, cuando haya suficientes casos, del mismo tipo de objeto (bienes, servicios u obras). Si un grupo tiene menos de 30 casos, se amplía al nivel nacional y la explicación lo dice.
+  - El método es el método base de `pipeline/config/senales.toml`: las variantes por ley u homologación se comparan con su método.
+  - Se prueba en este orden: región con tipo de objeto, región y país. El mínimo (`minimo_grupo`) es configurable.
+  - Cada resultado guarda el grupo usado (`comparacion.descripcion` y `comparacion.ambito`), su tamaño, sus cuartiles y el percentil del caso.
 - **Exclusiones:** procesos cancelados, sin identificador del comprador o del proveedor, o con montos en otra moneda sin tipo de cambio. Cada exclusión se cuenta y se informa.
 - **Trazabilidad del cálculo:** cada resultado guarda la versión de la regla, los valores de entrada, el grupo de comparación y sus estadísticas. Así, cualquiera puede reproducirlo.
 
@@ -45,7 +48,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 
 - **Fórmula:** puntaje del proceso = suma de los pesos de sus señales. Pesos iniciales: S01 = 3, S02 = 2, S03 = 3, S04 = 3, S06 = 2, S07 = 3, S08 = 3. S05 se muestra en el panel de la entidad y no suma al proceso.
 - **Niveles:** alta (5 o más), media (3 o 4) y baja (1 o 2).
-- **Configuración:** los pesos y los cortes están en un archivo versionado.
+- **Configuración:** los pesos y los cortes están en `pipeline/config/senales.toml`, junto con los parámetros y la versión de cada señal.
 - **Transparencia:** la interfaz siempre muestra el desglose ("alta: S01 + S03 = 6").
 
 ## Fichas de las señales
@@ -59,6 +62,12 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Qué revisar:** requisitos de calificación restrictivos, plazos, difusión de la convocatoria y especificaciones técnicas que favorezcan a un proveedor.
 - **Qué no significa:** en mercados pequeños o con bienes muy especializados puede haber un solo proveedor capaz.
 - **Spike:** no hay `bids` y `tender.numberOfTenderers` cuenta participantes registrados. Un solo participante implica a lo sumo una oferta, así que la señal no da falsos positivos de oferta única, pero no ve los procesos con varios registrados y una sola oferta. En la muestra de La Libertad de `2026.jsonl.gz`, Cardinal R018 marca los mismos 57 procesos que nuestra consulta con su regla, pero no ve las licitaciones y concursos abreviados porque no traen `tender.procurementMethod`.
+- **Implementación (S01@1):** `uv run pipeline signals`.
+  - **Métodos competitivos:** salen de la tabla de métodos de `senales.toml`, por nombre de `procurementMethodDetails`. La Contratación Internacional, el Régimen Especial y los convenios se tratan como no competitivos hasta que el equipo decida.
+  - **Procesos que no se evalúan, y se cuentan:** los de métodos sin clasificar, los de estados excluidos (`CANCELADO`), los que no tienen comprador y los que no tienen dato de postores.
+  - **Comparación:** `proporcion_referencia` es la parte del grupo con 2 o más postores, y `percentil_del_caso`, la parte con 1.
+  - **La Libertad 2025–2026:** 69 señales (35 licitaciones públicas abreviadas, 24 subastas inversas, 7 concursos abreviados y 3 de otros métodos). Además, 504 procesos no se evaluaron por falta de dato de postores y 46 por estar cancelados.
+- **Decisión pendiente:** 33 de esas 69 señales son de procesos que terminaron desiertos. Hay que decidir si S01 se limita a procesos con adjudicación, lo que dejaría 36.
 
 ### S02 · Plazo corto para presentar ofertas
 
@@ -68,6 +77,10 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Qué revisar:** si hubo prórrogas, si el plazo cumple la norma y cuántos postores participaron.
 - **Qué no significa:** procesos simples o situaciones de urgencia pueden justificar plazos cortos.
 - **Spike:** con esta fuente la regla no se puede calcular. `tender.tenderPeriod` trae como inicio y fin la fecha de la convocatoria en el 99,99 % de los procesos, y Cardinal R003 marca por eso a casi todos. Decisión pendiente: desactivar S02 o redefinirla con el plazo de consultas (`tender.enquiryPeriod`).
+- **Implementación (S02@1):** la regla está programada y probada con datos sintéticos.
+  - **Parámetros:** el percentil (`percentil`, 10) y las columnas del plazo (`plazo_inicio` y `plazo_fin`) se configuran en `senales.toml`. El grupo es por método y año, con respaldo nacional.
+  - **Estado actual:** sale con `activa = false` y su motivo en el manifiesto, porque la fuente no trae el plazo de presentación.
+  - **Para usar el plazo de consultas:** cambiar las columnas a `fecha_inicio_consultas` y `fecha_fin_consultas`, activarla, subir su versión y actualizar esta ficha.
 
 ### S03 · Proveedor recurrente atípico en una entidad
 

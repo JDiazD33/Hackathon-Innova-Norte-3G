@@ -8,7 +8,7 @@ El Lote A (datos y señales) se divide en partes. Cada parte tiene su ficha, su 
 |---|---|---|---|---|
 | 1 · Spike de datos | 1.1–1.6 | `lote-a/parte-1-spike-datos` | PR #1. Falta 1.6 (contrato, con el equipo) | — |
 | 2 · Ingesta y normalización | 2.1–2.5 | `lote-a/parte-2-ingesta` | PR #2 | Parte 1 |
-| [3 · Señales S01 y S02](parte-3-senales-s01-s02.md) | 3.1–3.4 | `lote-a/parte-3-senales-s01-s02` | Pendiente | Parte 2 |
+| [3 · Señales S01 y S02](parte-3-senales-s01-s02.md) | 3.1–3.4 | `lote-a/parte-3-senales-s01-s02` | 3.1–3.3 hechas, en PR. Falta 3.4 (verificación en el SEACE) | Parte 2 |
 | [4 · S03, S04, S08 y Cardinal](parte-4-s03-s04-s08-cardinal.md) | 4.1–4.5 | `lote-a/parte-4-s03-s04-s08-cardinal` | Pendiente | Parte 3 |
 | [5 · Prioridad y paquete](parte-5-prioridad-y-paquete.md) | 5.1–5.4 | `lote-a/parte-5-prioridad-y-paquete` | Pendiente | Partes 3 y 4; tarea 1.6 |
 | [6 · S05, S06 e integración](parte-6-opcionales-e-integracion.md) | 6.1–6.2 | `lote-a/parte-6-opcionales-e-integracion` | Pendiente | Parte 3 (6.1); PR de B, C y D (6.2) |

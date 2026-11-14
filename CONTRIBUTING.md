@@ -71,6 +71,7 @@ uv run ruff format --check    # formato
 uv run pipeline download      # descarga 2025 y 2026 a data/raw/, solo desde fuentes permitidas
 uv run pipeline ingest        # La Libertad 2025–2026: data/interim/releases.parquet
 uv run pipeline normalize     # tablas en data/derived/tablas/*.parquet y manifiesto.json
+uv run pipeline signals       # señales activas (config/senales.toml): data/derived/senales/
 uv run pipeline spike ../data/raw/2026.jsonl.gz    # spike Q1–Q7: data/derived/spike-2026.json
 uv run pipeline spike ../data/raw/2025.jsonl.gz ../data/raw/2026.jsonl.gz   # los dos años juntos: spike-2025-2026.json
 uv run pipeline sample ../data/raw/2026.jsonl.gz ../data/interim/muestra-la-libertad-2026.jsonl

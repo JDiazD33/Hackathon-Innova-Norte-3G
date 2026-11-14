@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import gzip
 import json
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -164,8 +165,13 @@ def release(
     awards: list[dict[str, Any]] | None = None,
     contracts: list[dict[str, Any]] | None = None,
     documents: list[dict[str, Any]] | None = None,
+    submission_days: int | None = 0,
 ) -> dict[str, Any]:
-    """A compiled release with sensible defaults; every argument can be overridden."""
+    """A compiled release with sensible defaults; every argument can be overridden.
+
+    ``submission_days`` is the length of ``tender.tenderPeriod`` (0, as in the real source);
+    None leaves the process without ``tenderPeriod``.
+    """
     tender: dict[str, Any] = {
         "id": ocid.rsplit("-", 1)[-1],
         "title": f"PRUEBA-{ocid.rsplit('-', 1)[-1]}-2026-EP-1",
@@ -180,11 +186,13 @@ def release(
     if method_ocds is not None:
         tender["procurementMethod"] = method_ocds
     if published is not None:
-        day = published[:10]
         tender["datePublished"] = published
+    if published is not None and submission_days is not None:
+        day = published[:10]
+        end_day = (date.fromisoformat(day) + timedelta(days=submission_days)).isoformat()
         tender["tenderPeriod"] = {
             "startDate": f"{day}T00:00:00-05:00",
-            "endDate": f"{day}T00:00:00-05:00",
+            "endDate": f"{end_day}T00:00:00-05:00",
         }
     if tenderers is not None:
         tender["tenderers"] = [{"id": t, "name": f"PROVEEDOR {t[-4:]}"} for t in tenderers]
