@@ -48,13 +48,39 @@ Cuando la parte anterior ya esté en `main`, la rama sale de `origin/main`. Con 
   - los consorcios cambian de código en cada adjudicación;
   - el monto final cubre el 9,1 % de los contratos.
 
-## Pendientes que no son de una parte
+## Qué falta, por qué y quién (14 de noviembre)
 
-| Pendiente | Quién |
-|---|---|
-| Tarea 1.6: revisar el contrato con el Lote B (tabla "Impacto en el contrato" de la fuente de datos) y los textos de S01 con el Lote C | Stefano con Joaquín y Sebastián |
-| Decidir S02 (desactivar o redefinir) y S06 (desactivar o bajar el mínimo) | Equipo |
-| Decidir las proporciones mínimas de S03 (`participacion_minima`) y S05 (`proporcion_minima`) | Equipo |
-| Verificar a mano en el SEACE que `numero_postores` son participantes registrados | Stefano |
-| Ajustar en `design.md` las decisiones 3 (departamento) y 5 (Cardinal) | Stefano |
-| Citar DuckDB (MIT) y jsonschema (MIT) en `docs/producto/referentes-internacionales.md` | Stefano |
+Lo que queda del Lote A no depende de más código del lote: depende de la integración con los otros lotes, de decisiones del equipo o de revisiones manuales. El detalle está en cada ficha.
+
+### Bloqueado por la integración
+
+| Qué falta | Por qué no se hizo | Qué hace falta | Quién |
+|---|---|---|---|
+| Fusionar en `main` los PR del Lote A (#1 a #7) | Cada PR necesita la revisión de otra persona del equipo, y se decidió no fusionar nada por ahora | Revisarlos y fusionarlos en orden, del #1 al #7 | Equipo; fusiona Stefano |
+| 6.2 · Integrar B, C y D y recorrer la demo | No hay PR de B, C ni D, y la web solo tiene la página provisional de la Fase 0. La integración de prueba (`main` + A + las ramas de C y D) pasó sin conflictos ([parte 6](parte-6-opcionales-e-integracion.md#integración-de-prueba-tarea-62-14-de-noviembre)) | Que B, C y D abran sus PR y otra persona los apruebe, que existan las pantallas (bandeja, ficha, explicación, decisión y reporte) y que se fusionen en `main`. Después, regenerar el paquete y recorrer la demo con el paquete público y con el fixture | B, C y D; fusiona Stefano |
+| 5.4 · Confirmar que la web carga el paquete público | Lo confirma el Lote B | Que Joaquín pruebe la web con `PAQUETE_DATOS=publico`. El build ya funciona y muestra los datos reales | Joaquín |
+| Subir `web/data/publico/` | Se sube solo después de revisarlo | Revisión del equipo y un commit aparte | Equipo |
+| Repetir la comparación de huellas desde `main` | La 7.1 se verificó sobre la rama de la parte 6, porque `main` aún no tiene el Lote A | Después de fusionar, correr la cadena dos veces y comparar con `uv run pipeline fingerprint --compare` | Stefano |
+| Ajustar dos textos del Lote C | El contrato no fijaba las claves de `entradas`; ahora están en el [catálogo](../catalogo-de-senales.md#entradas-de-cada-señal) | Que S03 lea `procesos_ganados` y `procesos_entidad` (hoy falta la frase "Obtuvo X de Y" en las 46 señales) y que S01 diga "participantes registrados" en lugar de "ofertas" | Sebastián |
+| `npm run typecheck` en una copia nueva | Falla con `LayoutProps` hasta que Next.js genera sus tipos, también en `main` | Generar los tipos (`npm run build`) antes del chequeo, o incluirlo en el script | Joaquín |
+
+### Decisiones del equipo
+
+| Qué falta | Por qué no se hizo | Qué hace falta | Quién |
+|---|---|---|---|
+| 1.6 · Ajustar el contrato | Necesita el acuerdo de los lotes B y C, y la aprobación de los cuatro integrantes | Revisar la tabla "Impacto en el contrato" de la [fuente de datos](../fuente-de-datos.md): significado de `numero_postores`, fechas de presentación nulas, `url_seace` y `nomenclatura`, tipo `consorcio` | Stefano con Joaquín y Sebastián |
+| S02 | La fuente no trae el plazo de presentación | Dejarla desactivada o redefinirla con el plazo de consultas | Equipo |
+| S04 | Faltan los umbrales de la Ley 32069 y su reglamento | Cargarlos en `S04.umbrales`, con la norma verificada | Equipo |
+| S06 | Solo el 9.1% de los contratos tiene monto final y el mínimo es 10% | Dejarla desactivada, o bajar la cobertura mínima y calibrar el factor | Equipo |
+| Proporciones mínimas de S03 y S05 | Las vallas quedan muy bajas cuando casi todos los casos valen cero | Aprobar `participacion_minima` y `proporcion_minima` en `senales.toml` | Equipo |
+| Métodos dudosos | Contratación Internacional, Régimen Especial y Convenio están como no competitivos, sin confirmar | Confirmar su clasificación en `senales.toml` | Equipo |
+
+### Revisiones manuales y documentación
+
+| Qué falta | Por qué no se hizo | Qué hace falta | Quién |
+|---|---|---|---|
+| 3.4 · Verificar en el SEACE 5 casos de S01 y 5 de S02 | Es una revisión manual en el portal, que el pipeline no puede automatizar sin hacer scraping. S02 está desactivada | Revisar los casos de S01 y confirmar que `numero_postores` son participantes registrados | Stefano |
+| 4.5 · Verificar en el SEACE 5 casos de S03 y 5 de S04 | Revisión manual. S04 está desactivada hasta tener sus umbrales | Revisar los casos de S03 listados en el PR #4 | Stefano |
+| Decisiones 3 (departamento) y 5 (Cardinal) de `design.md` | El spike las cambió, y `design.md` no estaba entre los archivos de este trabajo | Ajustarlas: el departamento sale de la parte compradora, y `prepare` e `indicators` de Cardinal se compilan desde su código fuente | Stefano |
+| Citar DuckDB y jsonschema (MIT) | `docs/producto/` no estaba entre los archivos de este trabajo | Agregarlas en `docs/producto/referentes-internacionales.md` | Stefano |
+| Archivar el change de OpenSpec | Siguen abiertas 1.6, 3.4, 4.5, 5.4 y 6.2, y falta confirmar la entrega del Stage-Gate 1 | `/opsx:archive` cuando todo esté cerrado | Stefano |
