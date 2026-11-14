@@ -10,6 +10,9 @@ import {
   describirCategorias,
   describirTendencia,
   describirTopProveedores,
+  titularCategorias,
+  titularProveedores,
+  titularTendencia,
   resumirPanel,
 } from "./panel";
 
@@ -91,5 +94,20 @@ describe("resúmenes en texto de los gráficos", () => {
     expect(describirCategorias([])).toContain("no tiene señales");
     expect(describirTendencia([])).toContain("No hay procesos");
     expect(describirTopProveedores([])).toContain("No hay adjudicaciones");
+  });
+});
+
+describe("títulos que dicen la conclusión de cada gráfico", () => {
+  it("nombran el dato principal del fixture", async () => {
+    const panel = await panelDe("entidad-0001");
+    expect(titularCategorias(panel.porCategoria)).toBe("Competencia reúne más señales: 3 señales");
+    expect(titularTendencia(panel.tendencia)).toBe("12 de 22 procesos convocados tienen señales");
+    expect(titularProveedores(panel.topProveedores)).toMatch(/^Proveedor 0003 tiene la mayor participación: 40[.,]9\s?%$/);
+  });
+
+  it("explican cuando no hay datos", () => {
+    expect(titularCategorias([])).toBe("Sin señales en el periodo");
+    expect(titularTendencia([])).toBe("Sin procesos convocados en el periodo");
+    expect(titularProveedores([])).toBe("Sin adjudicaciones en el periodo");
   });
 });

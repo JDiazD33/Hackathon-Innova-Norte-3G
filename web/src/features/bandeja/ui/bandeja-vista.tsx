@@ -1,20 +1,20 @@
 "use client";
 
+import { ChevronRight, Inbox, SearchX } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { EstadoRevisionBadge } from "@/components/estado/estado-revision-badge";
-import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
 import { PrioridadBadge } from "@/components/estado/prioridad-badge";
 import { SinDatos } from "@/components/estado/sin-datos";
-import { Badge } from "@/components/ui/badge";
+import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SIGNAL_METHODOLOGY } from "@/features/etica/metodologia";
 import type { ReviewState } from "@/features/revision";
 import { formatEntero, formatFecha, formatSoles } from "@/lib/format";
 import { useRevisiones } from "@/lib/revisiones";
+import { cn } from "@/lib/utils";
 
 import { FILTROS_VACIOS, filtrarFilas, hayFiltrosActivos, type FilaBandeja, type FiltrosBandeja } from "../bandeja";
 import type { DatosBandeja } from "../cargar";
@@ -22,6 +22,13 @@ import { FiltrosDeBandeja } from "./filtros";
 
 const hrefProceso = (ocid: string) => `/procesos/${encodeURIComponent(ocid)}`;
 
+/** Superficie sólida de la lista y la tabla (el contenido nunca va en vidrio). */
+const CLASE_SUPERFICIE = "rounded-tarjeta bg-card text-card-foreground shadow-tarjeta dark:ring-1 dark:ring-border contrast-more:ring-1 contrast-more:ring-borde-contraste";
+
+/**
+ * Bandeja de señales (Lote B · parte 6): barra de filtros fija en vidrio y, debajo, los procesos en estilo
+ * lista: tabla en escritorio ancho y filas con chevron en tablet y celular.
+ */
 export function BandejaVista({ entidad, datos }: { entidad: { id: string; nombre: string }; datos: DatosBandeja }) {
   const { estadoDe } = useRevisiones();
   const [filtros, setFiltros] = useState<FiltrosBandeja>(FILTROS_VACIOS);
@@ -37,18 +44,28 @@ export function BandejaVista({ entidad, datos }: { entidad: { id: string; nombre
 
       {total > 0 && <FiltrosDeBandeja opciones={datos.opciones} filtros={filtros} onChange={setFiltros} />}
 
-      <p aria-live="polite" className="text-sm text-muted-foreground">
+      <p aria-live="polite" className="px-1 text-sm text-muted-foreground">
         {hayFiltrosActivos(filtros)
           ? `Mostrando ${formatEntero(visibles.length)} de ${formatEntero(total)} procesos con señales.`
           : `${formatEntero(total)} ${total === 1 ? "proceso con señales" : "procesos con señales"}.`}
       </p>
 
       {total === 0 ? (
-        <SinDatos mensaje="Esta entidad no tiene procesos con señales en el periodo." />
+        <SinDatos
+          icono={Inbox}
+          titulo="Sin señales en el periodo"
+          mensaje="Esta entidad no tiene procesos con señales en el periodo del paquete de datos."
+        />
       ) : visibles.length === 0 ? (
         <SinDatos
-          mensaje="Ningún proceso coincide con los filtros."
-          accion={<Button onClick={() => setFiltros(FILTROS_VACIOS)}>Limpiar filtros</Button>}
+          icono={SearchX}
+          titulo="Sin resultados"
+          mensaje="Ningún proceso coincide con los filtros. Prueba con otra combinación."
+          accion={
+            <Button variant="secondary" onClick={() => setFiltros(FILTROS_VACIOS)}>
+              Limpiar filtros
+            </Button>
+          }
         />
       ) : (
         <>
@@ -60,6 +77,7 @@ export function BandejaVista({ entidad, datos }: { entidad: { id: string; nombre
   );
 }
 
+/** Escritorio ancho: tabla en estilo lista, con la cabecera fija bajo la barra de filtros. */
 function TablaBandeja({
   filas,
   estadoDe,
@@ -69,42 +87,47 @@ function TablaBandeja({
   estadoDe: (ocid: string) => ReviewState;
   entidad: string;
 }) {
+  // overflow-clip (no hidden) para que la cabecera pueda quedar fija al desplazarse.
   return (
-    <div className="hidden overflow-x-auto rounded-xl border bg-card lg:block">
-      <Table>
+    <div className={cn(CLASE_SUPERFICIE, "hidden overflow-clip xl:block [&_[data-slot=table-container]]:overflow-visible")}>
+      <Table className="table-fixed">
         <TableCaption className="sr-only">
           Procesos con señales de {entidad}, ordenados por prioridad de revisión
         </TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-28 ps-4">Prioridad</TableHead>
-            <TableHead className="min-w-56">Proceso</TableHead>
-            <TableHead className="min-w-64">Señales</TableHead>
-            <TableHead className="w-32">Convocatoria</TableHead>
-            <TableHead className="w-36 text-right">Monto referencial</TableHead>
-            <TableHead className="w-44 pe-4">Revisión</TableHead>
+        <TableHeader className="[&_th]:sticky [&_th]:top-[7.5rem] [&_th]:z-10 [&_th]:bg-card">
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-28 ps-5">Prioridad</TableHead>
+            <TableHead>Proceso</TableHead>
+            <TableHead className="w-[32%]">Señales</TableHead>
+            <TableHead className="w-36 text-right">Fecha y monto</TableHead>
+            <TableHead className="w-40 pe-5">Revisión</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filas.map((fila) => (
             <TableRow key={fila.ocid}>
-              <TableCell className="ps-4 align-top">
+              <TableCell className="ps-5 align-top">
                 <PrioridadBadge prioridad={fila.prioridad} />
               </TableCell>
-              <TableCell className="max-w-md whitespace-normal align-top">
-                <Link href={hrefProceso(fila.ocid)} className="font-medium underline-offset-2 hover:underline">
+              <TableCell className="align-top whitespace-normal">
+                <Link
+                  href={hrefProceso(fila.ocid)}
+                  className="rounded-md font-medium outline-none underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   {fila.descripcion}
                 </Link>
-                <div className="text-xs text-muted-foreground">
+                <div className="mt-0.5 truncate text-xs text-muted-foreground" title={`${fila.metodo} · ${fila.ocid}`}>
                   {fila.metodo} · {fila.ocid}
                 </div>
               </TableCell>
-              <TableCell className="whitespace-normal align-top">
+              <TableCell className="align-top whitespace-normal">
                 <ChipsDeSenales senales={fila.senales} />
               </TableCell>
-              <TableCell className="align-top tabular-nums">{formatFecha(fila.fechaConvocatoria)}</TableCell>
-              <TableCell className="text-right align-top tabular-nums">{formatSoles(fila.montoReferencial)}</TableCell>
-              <TableCell className="pe-4 align-top">
+              <TableCell className="text-right align-top">
+                <div>{formatFecha(fila.fechaConvocatoria)}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{formatSoles(fila.montoReferencial)}</div>
+              </TableCell>
+              <TableCell className="pe-5 align-top">
                 <EstadoRevisionBadge estado={estadoDe(fila.ocid)} />
               </TableCell>
             </TableRow>
@@ -115,40 +138,51 @@ function TablaBandeja({
   );
 }
 
+/**
+ * Tablet y celular: filas de lista con chevron. Toda la fila abre la ficha (el enlace del título se
+ * extiende sobre ella); la insignia de prioridad queda por encima para que su desglose siga accesible.
+ */
 function ListaBandeja({ filas, estadoDe }: { filas: FilaBandeja[]; estadoDe: (ocid: string) => ReviewState }) {
   return (
-    <ul className="flex flex-col gap-3 lg:hidden">
+    <ul className={cn(CLASE_SUPERFICIE, "flex flex-col overflow-hidden xl:hidden")}>
       {filas.map((fila) => (
-        <li key={fila.ocid}>
-          <Card className="gap-3 py-4">
-            <CardContent className="flex flex-col gap-3 px-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <PrioridadBadge prioridad={fila.prioridad} />
-                <EstadoRevisionBadge estado={estadoDe(fila.ocid)} />
-              </div>
-              <Link href={hrefProceso(fila.ocid)} className="font-medium underline-offset-2 hover:underline">
-                {fila.descripcion}
-              </Link>
-              <p className="text-xs text-muted-foreground">
-                {fila.metodo} · {formatFecha(fila.fechaConvocatoria)} · {formatSoles(fila.montoReferencial)}
-              </p>
-              <ChipsDeSenales senales={fila.senales} />
-            </CardContent>
-          </Card>
+        <li
+          key={fila.ocid}
+          className="relative flex items-center gap-3 border-t border-separador px-4 py-3.5 transition-colors duration-150 ease-prisma first:border-t-0 hover:bg-[color-mix(in_srgb,var(--foreground)_4%,transparent)] has-[a:focus-visible]:bg-[color-mix(in_srgb,var(--foreground)_6%,transparent)] md:px-5"
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="relative z-10 flex flex-wrap items-center gap-2">
+              <PrioridadBadge prioridad={fila.prioridad} />
+              <EstadoRevisionBadge estado={estadoDe(fila.ocid)} />
+            </div>
+            <Link
+              href={hrefProceso(fila.ocid)}
+              className="text-encabezado outline-none after:absolute after:inset-0 after:content-[''] focus-visible:underline"
+            >
+              {fila.descripcion}
+            </Link>
+            <p className="text-xs text-muted-foreground tabular-nums">
+              {fila.metodo} · {formatFecha(fila.fechaConvocatoria)} · {formatSoles(fila.montoReferencial)}
+            </p>
+            <ChipsDeSenales senales={fila.senales} />
+          </div>
+          <ChevronRight aria-hidden="true" className="size-5 shrink-0 text-muted-foreground" />
         </li>
       ))}
     </ul>
   );
 }
 
+/** Chips de las señales del proceso: código y nombre, en cápsulas neutras. */
 function ChipsDeSenales({ senales }: { senales: FilaBandeja["senales"] }) {
   return (
-    <ul className="flex flex-col gap-1 text-sm" aria-label="Señales del proceso">
+    <ul className="flex flex-wrap gap-1.5" aria-label="Señales del proceso">
       {senales.map((senal) => (
-        <li key={senal.id} className="flex items-baseline gap-2">
-          <Badge variant="outline" className="shrink-0 px-1.5 font-mono text-[0.7rem]">
-            {senal.codigo}
-          </Badge>
+        <li
+          key={senal.id}
+          className="inline-flex min-h-6 items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground"
+        >
+          <span className="font-mono font-semibold">{senal.codigo}</span>
           <span>
             {SIGNAL_METHODOLOGY[senal.codigo].name}
             {senal.simulado && <span className="text-muted-foreground"> · dato simulado</span>}

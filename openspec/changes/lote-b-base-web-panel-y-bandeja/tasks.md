@@ -26,8 +26,9 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 ## 4. B4 · Bandeja y búsqueda
 
 - [x] 4.1 Implementar la bandeja ordenada por puntaje y fecha, con la prioridad (ícono y texto) y los chips de señales. Verificar el orden con una prueba sobre el fixture.
-- [ ] 4.2 Agregar los filtros (prioridad, categoría, método, fechas y estado de revisión) y el estado vacío con "Limpiar filtros". Verificar cada filtro con pruebas de componente.
-  - Parte 4: filtros y estado vacío listos. Cada filtro se verificó con pruebas de la lógica (`bandeja.test.ts`) y a mano en el navegador; faltan las pruebas de componente.
+- [x] 4.2 Agregar los filtros (prioridad, categoría, método, fechas y estado de revisión) y el estado vacío con "Limpiar filtros". Verificar cada filtro con pruebas de componente.
+  - Parte 4: filtros y estado vacío listos. Cada filtro se verificó con pruebas de la lógica (`bandeja.test.ts`) y a mano en el navegador.
+  - Parte 6 del rediseño Prisma: pruebas de componente con Testing Library en `src/features/bandeja/ui/filtros.test.tsx` (prioridad, categoría, método, revisión, fechas y "Limpiar filtros").
 - [ ] 4.3 Mostrar el estado de revisión leyendo el `ReviewStore` del Lote D. Verificar que se ve "Sin revisar" por defecto y el estado nuevo después de registrar una decisión.
   - Parte 4: la bandeja muestra "Sin revisar" por defecto con `useRevisiones` (`src/lib/revisiones.ts`). Falta verificar el cambio de estado cuando exista el diálogo de decisión del Lote D.
 - [ ] 4.4 Implementar el buscador global (Ctrl o Cmd + K) por descripción, ocid y seudónimo. Verificar que elegir un resultado abre la ficha correcta.

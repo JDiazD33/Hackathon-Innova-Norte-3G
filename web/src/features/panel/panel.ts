@@ -131,3 +131,30 @@ export function describirTopProveedores(proveedores: readonly ProveedorPanel[]):
     .map((p) => `${p.nombre}: ${formatPorcentaje(p.participacion, 1)} (${plural(p.adjudicaciones, "proceso", "procesos")})`)
     .join("; ")}.`;
 }
+
+/*
+ * Títulos que dicen la conclusión de cada gráfico (HIG · Charting data). El resumen en texto completo
+ * sigue en `describir*`, para el lector de pantalla y para quien quiera el detalle.
+ */
+
+/** Título del gráfico de señales por categoría: la categoría con más señales. */
+export function titularCategorias(categorias: readonly CategoriaPanel[]): string {
+  if (categorias.length === 0) return "Sin señales en el periodo";
+  const mayor = categorias.reduce((a, b) => (b.cantidad > a.cantidad ? b : a));
+  return `${mayor.etiqueta} reúne más señales: ${plural(mayor.cantidad, "señal", "señales")}`;
+}
+
+/** Título de la tendencia mensual: cuántos procesos convocados tienen señales. */
+export function titularTendencia(tendencia: readonly MesPanel[]): string {
+  const total = tendencia.reduce((suma, m) => suma + m.procesos, 0);
+  if (total === 0) return "Sin procesos convocados en el periodo";
+  const conSenales = tendencia.reduce((suma, m) => suma + m.conSenales, 0);
+  return `${formatEntero(conSenales)} de ${plural(total, "proceso convocado", "procesos convocados")} ${conSenales === 1 ? "tiene" : "tienen"} señales`;
+}
+
+/** Título de los proveedores con mayor participación: el que más concentra. */
+export function titularProveedores(proveedores: readonly ProveedorPanel[]): string {
+  if (proveedores.length === 0) return "Sin adjudicaciones en el periodo";
+  const mayor = proveedores.reduce((a, b) => (b.participacion > a.participacion ? b : a));
+  return `${mayor.nombre} tiene la mayor participación: ${formatPorcentaje(mayor.participacion, 1)}`;
+}
