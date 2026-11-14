@@ -4,7 +4,7 @@ Reglas para todas las personas y agentes que trabajan en este repositorio. Los m
 
 ## Stack elegido
 
-**Versiones de `web/`** (creado el 13 de noviembre): Node 24, Next.js 16.4.6 (App Router con Cache Components), React 19.3, TypeScript 5, Tailwind CSS 4.3 y Vitest 5.1. shadcn/ui se agrega en la fase de interfaz.
+**Versiones de `web/`** (creado el 13 de noviembre): Node 24, Next.js 16.4.6 (App Router con Cache Components), React 19.3, TypeScript 5, Tailwind CSS 4.3 y Vitest 5.1. Desde el 14 de noviembre, también shadcn/ui (estilo radix-nova, sobre Radix), Recharts, lucide-react y next-themes.
 
 **Versiones de `pipeline/`** (creado el 13 de noviembre): Python 3.13 (también funciona con 3.12), uv 0.11, DuckDB 2.0.0, `ocdscardinal` 0.0.9, pytest 9.2 y ruff 0.17. El paquete de Python de Cardinal solo trae `coverage`; `prepare` e `indicators` están en su herramienta de línea de comandos, que se compila desde la etiqueta 0.0.9 porque el binario de Windows publicado se cierra al arrancar.
 

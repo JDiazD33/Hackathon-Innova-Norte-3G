@@ -30,8 +30,18 @@ Next.js 16 (App Router con Cache Components) + React 19 + TypeScript + Tailwind 
 |---|---|
 | `src/lib/data/`, `src/lib/format.ts`, `src/config/`, `src/app/layout.tsx`, `data/fixture/`, `scripts/` | B · Joaquín |
 | `src/features/panel/`, `src/features/bandeja/` | B · Joaquín |
+| `src/components/ui/` (shadcn/ui), `src/components/layout/`, `src/components/estado/`, `src/lib/revisiones.ts`, `src/lib/entidad.ts`, `src/lib/etiquetas.ts`, `src/app/(app)/layout.tsx`, `src/app/api/busqueda/` | B · Joaquín |
 | `src/features/fichas/`, `src/features/explicacion/` | C · Sebastián |
 | `src/features/revision/`, `src/features/etica/` | D · André |
 | `data/publico/`, `data/local/` (los genera el pipeline) | A · Stefano |
 
 Las rutas de `src/app/` siguen el mapa del `design.md` del Lote B (`openspec/changes/lote-b-base-web-panel-y-bandeja/design.md`). Para cambiar algo de otro dueño, se le propone mediante un PR.
+
+## Cómo crear una pantalla
+
+1. La ruta va dentro de `src/app/(app)/`, así hereda la barra lateral, la cabecera y el pie.
+2. Los datos se leen en el servidor con funciones `cargar*` que usan `"use cache"` y `cacheLife("max")`. Hay ejemplos en `src/features/panel/cargar.ts` y `src/features/bandeja/cargar.ts`.
+3. La entidad seleccionada viene en `?entidad=`. Para leerla, la página envuelve su contenido en `<Suspense>` y usa `elegirEntidad` de `src/lib/entidad.ts`. Ver `src/app/(app)/page.tsx`.
+4. Lo interactivo va en componentes cliente (`"use client"`). El estado de revisión se lee con `useRevisiones()` de `src/lib/revisiones.ts`.
+5. Los componentes compartidos ya existen: `PrioridadBadge`, `EstadoRevisionBadge` y `SinDatos` (en `src/components/estado/`), y los de shadcn/ui (en `src/components/ui/`).
+6. Los colores salen de los tokens de `src/app/globals.css`: `bg-prioridad-alta`, `text-estado-requiere-atencion-foreground`, etc. El rojo es solo para "requiere atención".

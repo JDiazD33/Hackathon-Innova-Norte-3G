@@ -1,8 +1,10 @@
 # Bandeja priorizada y búsqueda · Lote B (Joaquín)
 
-- **Código (ahora):** funciones puras con pruebas para:
-  - ordenar por puntaje de prioridad (descendente) y por fecha de convocatoria (más reciente primero);
-  - filtrar por prioridad, categoría, método, rango de fechas y estado de revisión;
-  - armar un índice de búsqueda por descripción, ocid y seudónimo, sin distinguir tildes ni mayúsculas.
-- **Interfaz (después):** tabla con TanStack Table, filtros, estado vacío con "Limpiar filtros" y buscador con Ctrl o Cmd + K.
+- **Lógica:** `bandeja.ts` (filas, orden y filtros) y `busqueda.ts` (índice y búsqueda sin tildes ni mayúsculas), con pruebas.
+- **Carga:** `cargar.ts`, que se ejecuta en el servidor con `"use cache"`. El índice del buscador se sirve en `src/app/api/busqueda/route.ts`.
+- **Interfaz:**
+  - `ui/bandeja-vista.tsx`: tabla desde 1024 px y tarjetas en pantallas más pequeñas;
+  - `ui/filtros.tsx`;
+  - el buscador global, en `src/components/layout/buscador.tsx` (Ctrl o Cmd + K).
+- **Ruta:** `src/app/(app)/senales/page.tsx`.
 - **Spec:** `openspec/changes/lote-b-base-web-panel-y-bandeja/specs/app/exploracion-de-contrataciones/spec.md`
