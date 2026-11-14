@@ -9,10 +9,6 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from pipeline import spike
-from pipeline.config import DEFAULT_CONFIG, DEFAULT_DATA_DIR, ConfigError, load_config
-from pipeline.download import DownloadError, SourceNotAllowedError, download_all
-from pipeline.ingest import ingest
-from pipeline.normalize import StaleIngestError, normalize
 
 DEFAULT_DEPARTMENT = "LA LIBERTAD"
 DEFAULT_YEARS = (2025, 2026)
@@ -79,75 +75,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     coverage_parser.add_argument("source", type=Path, help="archivo OCDS .jsonl")
     coverage_parser.add_argument("--out", type=Path, help="guarda la cobertura completa en JSON")
-
-    download_parser = commands.add_parser(
-        "download", help="descarga los archivos configurados, solo desde fuentes permitidas"
-    )
-    _add_pipeline_arguments(download_parser)
-    download_parser.add_argument(
-        "--force", action="store_true", help="vuelve a descargar aunque el archivo ya exista"
-    )
-
-    ingest_parser = commands.add_parser(
-        "ingest", help="conserva los procesos del departamento y los años configurados"
-    )
-    _add_pipeline_arguments(ingest_parser)
-
-    normalize_parser = commands.add_parser(
-        "normalize", help="escribe las tablas normalizadas en Parquet y el manifiesto"
-    )
-    _add_pipeline_arguments(normalize_parser)
     return parser
-
-
-def _add_pipeline_arguments(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "--config",
-        type=Path,
-        default=DEFAULT_CONFIG,
-        help="archivo de configuración (por defecto, config/pipeline.toml)",
-    )
-    parser.add_argument(
-        "--data-dir",
-        type=Path,
-        default=DEFAULT_DATA_DIR,
-        help="carpeta de datos con raw/, interim/ y derived/ (por defecto, ../data)",
-    )
-
-
-def _run_download(args: argparse.Namespace) -> int:
-    config = load_config(args.config)
-    for record, downloaded in download_all(config, args.data_dir, force=args.force):
-        state = "descargado" if downloaded else "ya estaba descargado"
-        print(f"{record['archivo']}: {state}, {record['bytes']} bytes, SHA-256 {record['sha256']}")
-    return 0
-
-
-def _run_ingest(args: argparse.Namespace) -> int:
-    config = load_config(args.config)
-    started = time.perf_counter()
-    summary = ingest(config, args.data_dir)
-    elapsed = time.perf_counter() - started
-    read = ", ".join(f"{name}: {count}" for name, count in summary["leidos"].items())
-    print(f"Leídos ({read}) en {elapsed:.0f} s")
-    years = ", ".join(str(year) for year in summary["anios"])
-    print(f"Procesos de {summary['departamento']} ({years}): {summary['procesos']}")
-    for item in summary["exclusiones"]:
-        print(f"Excluidos por {item['motivo']}: {item['cantidad']}")
-    for item in summary["correcciones"]:
-        print(f"Corrección '{item['tipo']}': {item['cantidad']}")
-    return 0
-
-
-def _run_normalize(args: argparse.Namespace) -> int:
-    config = load_config(args.config)
-    manifest = normalize(config, args.data_dir)
-    for table, count in manifest["conteos"].items():
-        print(f"{table}: {count} filas")
-    for item in manifest["correcciones"]:
-        print(f"Corrección '{item['tipo']}': {item['cantidad']}")
-    print(f"Fecha de corte: {manifest['fecha_corte']}")
-    return 0
 
 
 def _run_spike(args: argparse.Namespace) -> int:
@@ -199,28 +127,10 @@ def _run_coverage(args: argparse.Namespace) -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8")
-    handlers = {
-        "spike": _run_spike,
-        "sample": _run_sample,
-        "coverage": _run_coverage,
-        "download": _run_download,
-        "ingest": _run_ingest,
-        "normalize": _run_normalize,
-    }
-    try:
-        return handlers[args.command](args)
-    except (
-        ConfigError,
-        SourceNotAllowedError,
-        DownloadError,
-        FileNotFoundError,
-        StaleIngestError,
-    ) as error:
-        print(f"Error: {error}", file=sys.stderr)
-        return 1
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    handlers = {"spike": _run_spike, "sample": _run_sample, "coverage": _run_coverage}
+    return handlers[args.command](args)
 
 
 if __name__ == "__main__":

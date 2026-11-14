@@ -13,11 +13,11 @@ Lote A · Datos y señales · **Stefano** · ★★★★ · carpeta `pipeline/`
 
 ## 2. A2 · Ingesta y normalización
 
-- [x] 2.1 Implementar la descarga con la lista de fuentes permitidas. Verificar con pruebas: una URL permitida pasa y una no permitida se detiene con un mensaje que la nombra.
-- [x] 2.2 Implementar el filtro por departamento y años, con las exclusiones contadas. Verificar con un fixture sintético: el proceso de otra región queda fuera y la región indeterminada se cuenta.
-- [x] 2.3 Generar las tablas normalizadas en Parquet. Verificar con una prueba en la que un proceso con dos adjudicaciones produce dos filas con el mismo `ocid`.
-- [x] 2.4 Tratar los postores duplicados, los contratos sin estado y las adjudicaciones sin contrato. Verificar con pruebas y con los conteos de correcciones del manifiesto.
-- [x] 2.5 Escribir el manifiesto de ejecución. Verificar con una prueba automática que sus conteos coinciden con las filas de cada tabla.
+- [ ] 2.1 Implementar la descarga con la lista de fuentes permitidas. Verificar con pruebas: una URL permitida pasa y una no permitida se detiene con un mensaje que la nombra.
+- [ ] 2.2 Implementar el filtro por departamento y años, con las exclusiones contadas. Verificar con un fixture sintético: el proceso de otra región queda fuera y la región indeterminada se cuenta.
+- [ ] 2.3 Generar las tablas normalizadas en Parquet. Verificar con una prueba en la que un proceso con dos adjudicaciones produce dos filas con el mismo `ocid`.
+- [ ] 2.4 Tratar los postores duplicados, los contratos sin estado y las adjudicaciones sin contrato. Verificar con pruebas y con los conteos de correcciones del manifiesto.
+- [ ] 2.5 Escribir el manifiesto de ejecución. Verificar con una prueba automática que sus conteos coinciden con las filas de cada tabla.
 
 ## 3. A3 · Señales S01 y S02
 
