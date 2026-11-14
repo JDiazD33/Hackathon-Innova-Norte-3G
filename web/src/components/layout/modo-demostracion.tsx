@@ -11,7 +11,7 @@ export function ModoDemostracion() {
       <TooltipTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-accent px-2 py-1 text-xs font-medium text-accent-foreground"
+          className="inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-full bg-accent px-2.5 text-xs font-medium text-accent-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Info aria-hidden="true" className="size-3.5" />
           Modo demostración

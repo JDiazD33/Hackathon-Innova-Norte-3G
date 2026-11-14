@@ -39,9 +39,66 @@ Las rutas de `src/app/` siguen el mapa del `design.md` del Lote B (`openspec/cha
 
 ## Cómo crear una pantalla
 
-1. La ruta va dentro de `src/app/(app)/`, así hereda la barra lateral, la cabecera y el pie.
+Prisma sigue el lenguaje visual descrito en [`docs/diseno/sistema-de-diseno.md`](../docs/diseno/sistema-de-diseno.md) ([ADR 0008](../docs/adr/0008-prisma-y-diseno-inspirado-en-apple.md)): **el contenido va en superficies sólidas y los controles flotan en vidrio**.
+
+1. La ruta va dentro de `src/app/(app)/`, así hereda la barra lateral, la barra superior, la barra de pestañas del celular y el pie.
 2. Los datos se leen en el servidor con funciones `cargar*` que usan `"use cache"` y `cacheLife("max")`. Hay ejemplos en `src/features/panel/cargar.ts` y `src/features/bandeja/cargar.ts`.
 3. La entidad seleccionada viene en `?entidad=`. Para leerla, la página envuelve su contenido en `<Suspense>` y usa `elegirEntidad` de `src/lib/entidad.ts`. Ver `src/app/(app)/page.tsx`.
 4. Lo interactivo va en componentes cliente (`"use client"`). El estado de revisión se lee con `useRevisiones()` de `src/lib/revisiones.ts`.
-5. Los componentes compartidos ya existen: `PrioridadBadge`, `EstadoRevisionBadge` y `SinDatos` (en `src/components/estado/`), y los de shadcn/ui (en `src/components/ui/`).
-6. Los colores salen de los tokens de `src/app/globals.css`: `bg-prioridad-alta`, `text-estado-requiere-atencion-foreground`, etc. El rojo es solo para "requiere atención".
+5. **Cada página abre con `TituloDePagina`** (`src/components/layout/titulo-de-pagina.tsx`): título grande, una frase que explica qué se ve y, a la derecha, las acciones (un solo botón prominente).
+6. **Componentes:** los compartidos (`PrioridadBadge`, `EstadoRevisionBadge` y `SinDatos`, en `src/components/estado/`) y los de shadcn/ui (en `src/components/ui/`), incluidos `Tabs` y `ControlSegmentado`. No los copies ni los reestilices: si necesitas otra variante, pídela al Lote B.
+7. **Solo tokens, nada de colores ni medidas sueltas:**
+   - color: `bg-card`, `text-muted-foreground`, `bg-prioridad-alta`, `text-estado-requiere-atencion-foreground`… El rojo es solo para "requiere atención";
+   - texto: `text-titulo-grande` … `text-leyenda` (o la escala de Tailwind, que está reasignada a la misma);
+   - formas: `rounded-tarjeta`, `rounded-item`, `rounded-full`, `shadow-tarjeta`;
+   - vidrio: `material-barra`, `material-menu` o `material-hoja`, **solo** en controles y navegación;
+   - movimiento: `duration-200 ease-prisma`, y `motion-safe:` para cualquier escala o desplazamiento.
+8. Une clases con `cn` de `@/lib/utils`, que conoce la escala de Prisma.
+9. Revisa la pantalla en claro y oscuro, a 375, 768 y 1280 px y solo con el teclado.
+
+### Plantilla de página Prisma
+
+```tsx
+// src/app/(app)/mi-pantalla/page.tsx
+import type { Metadata } from "next";
+import { Suspense } from "react";
+
+import { SinDatos } from "@/components/estado/sin-datos";
+import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cargarEntidades } from "@/lib/data/cached";
+import { elegirEntidad, PARAM_ENTIDAD } from "@/lib/entidad";
+
+export const metadata: Metadata = { title: "Mi pantalla" }; // la pestaña dice "Mi pantalla · Prisma"
+
+export default function PaginaMiPantalla({ searchParams }: PageProps<"/mi-pantalla">) {
+  return (
+    <Suspense fallback={<Skeleton className="h-64 rounded-tarjeta" />}>
+      <MiPantalla searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function MiPantalla({ searchParams }: Pick<PageProps<"/mi-pantalla">, "searchParams">) {
+  const [parametros, entidades] = await Promise.all([searchParams, cargarEntidades()]);
+  const entidad = elegirEntidad(entidades, parametros[PARAM_ENTIDAD]);
+  if (!entidad) return <SinDatos titulo="Sin datos" mensaje="El paquete de datos no tiene entidades para mostrar." />;
+
+  return (
+    <div className="flex flex-col gap-8">
+      <TituloDePagina titulo="Mi pantalla" descripcion={`Qué se ve aquí, para ${entidad.nombre}.`} />
+      <section aria-labelledby="seccion-1" className="flex flex-col gap-3">
+        <h2 id="seccion-1" className="text-titulo-2">Una sección</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>El título dice la conclusión</CardTitle>
+            <CardDescription>Una línea de contexto.</CardDescription>
+          </CardHeader>
+          <CardContent className="text-base">El contenido va en superficies sólidas.</CardContent>
+        </Card>
+      </section>
+    </div>
+  );
+}
+```

@@ -77,7 +77,7 @@ No copiamos código ni textos de nadie. Tomamos los referentes de cuatro formas 
 | Explicación | Arachne, Early Warning Red Flags y Serenata de Amor | Tarjeta "Por qué aparece" |
 | Decisión humana | Arachne (sin decisiones automáticas) | Bandeja de revisión |
 | Datos | OCDS y OCP Data Registry | Descarga oficial, sin scraping |
-| Diseño visual | Guías de diseño de Apple | Tema y componentes propios sobre shadcn/ui, con Inter e íconos de lucide; sin recursos de Apple |
+| Diseño visual | Guías de diseño de Apple | Tema y componentes propios sobre shadcn/ui, con Inter (SIL Open Font License 1.1, incluida en el build con `next/font`) e íconos de lucide-react (ISC); ícono de Prisma propio; sin fuentes, símbolos ni recursos de Apple |
 
 ## Cómo citarlo
 

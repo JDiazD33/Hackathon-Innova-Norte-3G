@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { EstadoRevisionBadge } from "@/components/estado/estado-revision-badge";
+import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
 import { PrioridadBadge } from "@/components/estado/prioridad-badge";
 import { SinDatos } from "@/components/estado/sin-datos";
 import { Badge } from "@/components/ui/badge";
@@ -29,13 +30,10 @@ export function BandejaVista({ entidad, datos }: { entidad: { id: string; nombre
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Señales</h1>
-        <p className="text-sm text-muted-foreground">
-          Procesos de {entidad.nombre} que ameritan revisión, ordenados por prioridad. Una señal no es una
-          acusación: la decisión siempre es de una persona.
-        </p>
-      </header>
+      <TituloDePagina
+        titulo="Señales"
+        descripcion={`Procesos de ${entidad.nombre} que ameritan revisión, ordenados por prioridad. Una señal no es una acusación: la decisión siempre es de una persona.`}
+      />
 
       {total > 0 && <FiltrosDeBandeja opciones={datos.opciones} filtros={filtros} onChange={setFiltros} />}
 

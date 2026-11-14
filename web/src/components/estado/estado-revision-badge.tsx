@@ -13,18 +13,18 @@ const ESTADOS: Record<ReviewState, { icono: LucideIcon; clase: string }> = {
   },
 };
 
-/** Estado de revisión decidido por una persona, siempre con ícono y texto. */
+/** Estado de revisión decidido por una persona: cápsula con tinte, siempre con ícono y texto. */
 export function EstadoRevisionBadge({ estado, className }: { estado: ReviewState; className?: string }) {
   const { icono: Icono, clase } = ESTADOS[estado];
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium",
+        "inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap contrast-more:ring-1 contrast-more:ring-current",
         clase,
         className,
       )}
     >
-      <Icono aria-hidden="true" className="size-3.5" />
+      <Icono aria-hidden="true" className="size-3.5" strokeWidth={2.25} />
       {STATE_LABELS[estado]}
     </span>
   );

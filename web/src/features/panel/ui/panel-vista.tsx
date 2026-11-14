@@ -4,6 +4,7 @@ import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
+import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -46,13 +47,11 @@ export function PanelVista({ datos }: { datos: DatosPanel }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <p className="text-sm capitalize text-muted-foreground">{datos.entidad.tipo}</p>
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{datos.entidad.nombre}</h1>
-        <p className="text-sm text-muted-foreground">
-          Panorama de las contrataciones de la entidad y de los procesos que ameritan revisión.
-        </p>
-      </header>
+      <TituloDePagina
+        antetitulo={datos.entidad.tipo}
+        titulo={datos.entidad.nombre}
+        descripcion="Panorama de las contrataciones de la entidad y de los procesos que ameritan revisión."
+      />
 
       <section aria-label="Cifras clave" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Cifra titulo="Procesos" valor={formatEntero(datos.procesos)} detalle="En el periodo del paquete de datos" />

@@ -5,18 +5,25 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Tokens del sistema de diseño (docs/diseno/sistema-de-diseno.md). Dueño: Lote B.
- * - Prioridad: la asigna el sistema; usa ámbar y neutros, nunca rojo.
+ * Tema Prisma (docs/diseno/sistema-de-diseno.md · ADR 0008). Dueño: Lote B.
+ * Inspirado en las guías públicas de Apple (HIG), sin usar sus fuentes, símbolos ni recursos.
+ *
+ * - Color: un solo acento (--primary). Los demás colores tienen significado fijo.
+ * - Prioridad: la asigna el sistema; ámbar y neutros, nunca rojo.
  * - Estado de revisión: lo decide una persona; el rojo solo existe en "requiere atención" (ADR 0007).
- * src/app/theme-contrast.test.ts comprueba que cada par de texto y fondo llegue a 4,5:1.
+ * - src/app/theme-contrast.test.ts lee los hexadecimales de :root y .dark y exige 4,5:1 en texto,
+ *   3:1 en el foco y en las series de los gráficos. Los materiales usan color-mix y se comprueban
+ *   contra su base sólida, que es el peor caso.
  */
 
 @theme inline {
+  /* Tipografía: la del sistema primero (en Apple se ve SF Pro sin descargarla) y luego Inter (SIL OFL). */
+  --font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -33,6 +40,9 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-separador: var(--separador);
+  --color-segmento: var(--segmento);
+  --color-borde-contraste: var(--borde-contraste);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -60,128 +70,357 @@
   --color-estado-justificada-foreground: var(--estado-justificada-foreground);
   --color-estado-requiere-atencion: var(--estado-requiere-atencion);
   --color-estado-requiere-atencion-foreground: var(--estado-requiere-atencion-foreground);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+
+  /* Radios: esquinas concéntricas (radio interior = radio exterior − margen). Cápsulas: rounded-full. */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
+  --radius-4xl: calc(var(--radius) * 2.5);
+  --radius-item: 0.75rem;
+  --radius-menu: 0.875rem;
+  --radius-tarjeta: 1.25rem;
+  --radius-barra: 1.5rem;
+  --radius-hoja: 1.75rem;
+
+  /* Profundidad: en claro, sombras mínimas; en oscuro, grises más claros y sin sombra. */
+  --shadow-tarjeta: var(--sombra-tarjeta);
+  --shadow-material: var(--sombra-material);
+
+  /* Movimiento: breve y con propósito. */
+  --ease-prisma: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Anchos: el contenido general y las páginas de lectura (metodología). */
+  --container-contenido: 75rem;
+  --container-lectura: 45rem;
+
+  /* Marca: degradado del ícono de Prisma (sin rojo). */
+  --color-marca-inicio: var(--marca-inicio);
+  --color-marca-fin: var(--marca-fin);
+}
+
+/*
+ * Escala tipográfica (estilos de texto de Apple en su tamaño por defecto, en rem para que crezca con el zoom).
+ * Nombres propios para escribir pantallas nuevas y, debajo, la escala de Tailwind reasignada para que el
+ * código existente (text-sm, text-xs…) siga la misma escala.
+ */
+@theme {
+  --text-titulo-grande: 2.125rem;
+  --text-titulo-grande--line-height: 2.5625rem;
+  --text-titulo-grande--font-weight: 700;
+  --text-titulo-grande--letter-spacing: -0.02em;
+  --text-titulo-1: 1.75rem;
+  --text-titulo-1--line-height: 2.125rem;
+  --text-titulo-1--font-weight: 700;
+  --text-titulo-1--letter-spacing: -0.02em;
+  --text-titulo-2: 1.375rem;
+  --text-titulo-2--line-height: 1.75rem;
+  --text-titulo-2--font-weight: 700;
+  --text-titulo-2--letter-spacing: -0.01em;
+  --text-titulo-3: 1.25rem;
+  --text-titulo-3--line-height: 1.5625rem;
+  --text-titulo-3--font-weight: 600;
+  --text-titulo-3--letter-spacing: -0.01em;
+  --text-encabezado: 1.0625rem;
+  --text-encabezado--line-height: 1.375rem;
+  --text-encabezado--font-weight: 600;
+  --text-cuerpo: 1.0625rem;
+  --text-cuerpo--line-height: 1.375rem;
+  --text-subtitulo: 0.9375rem;
+  --text-subtitulo--line-height: 1.25rem;
+  --text-nota: 0.8125rem;
+  --text-nota--line-height: 1.125rem;
+  --text-leyenda: 0.75rem;
+  --text-leyenda--line-height: 1rem;
+
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.5625rem;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 2.125rem;
+  --text-3xl: 2.125rem;
+  --text-3xl--line-height: 2.5625rem;
 }
 
 :root {
   --radius: 0.75rem;
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f2f2f7;
+  --foreground: #1d1d1f;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #1d1d1f;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #1e3a8a;
+  --popover-foreground: #1d1d1f;
+  --primary: #0066cc;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #475569;
-  --accent: #eff6ff;
-  --accent-foreground: #1e3a8a;
-  --destructive: #b91c1c;
-  --border: #e2e8f0;
-  --input: #cbd5e1;
-  --ring: #1d4ed8;
-  --chart-1: #1e3a8a;
-  --chart-2: #0e7490;
-  --chart-3: #b45309;
-  --chart-4: #64748b;
-  --chart-5: #6d28d9;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: #1e3a8a;
+  --secondary: #e5e5ea;
+  --secondary-foreground: #1d1d1f;
+  --muted: #ebebf0;
+  --muted-foreground: #636366;
+  --accent: #e5effa;
+  --accent-foreground: #0058b0;
+  --destructive: #c1121c;
+  --border: #d8d8dc;
+  --separador: #e3e3e8;
+  --borde-contraste: #6c6c70;
+  --input: #c7c7cc;
+  --segmento: #ffffff;
+  --marca-inicio: #0a6fd6;
+  --marca-fin: #3d3aa8;
+  --ring: #0071e3;
+  --chart-1: #0066cc;
+  --chart-2: #5e5ce6;
+  --chart-3: #b25000;
+  --chart-4: #8e8e93;
+  --chart-5: #00749c;
+  --sidebar: #f7f7fa;
+  --sidebar-foreground: #1d1d1f;
+  --sidebar-primary: #0066cc;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eff6ff;
-  --sidebar-accent-foreground: #1e3a8a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #1d4ed8;
-  --prioridad-alta: #fef3c7;
-  --prioridad-alta-foreground: #92400e;
-  --prioridad-media: #fefce8;
-  --prioridad-media-foreground: #854d0e;
-  --prioridad-baja: #f1f5f9;
-  --prioridad-baja-foreground: #475569;
-  --estado-sin-revisar: #f1f5f9;
-  --estado-sin-revisar-foreground: #475569;
-  --estado-en-revision: #eff6ff;
-  --estado-en-revision-foreground: #1d4ed8;
-  --estado-justificada: #f0fdf4;
-  --estado-justificada-foreground: #15803d;
-  --estado-requiere-atencion: #fef2f2;
-  --estado-requiere-atencion-foreground: #b91c1c;
+  --sidebar-accent: #e5effa;
+  --sidebar-accent-foreground: #0058b0;
+  --sidebar-border: #d8d8dc;
+  --sidebar-ring: #0071e3;
+  --prioridad-alta: #fff0d9;
+  --prioridad-alta-foreground: #9a4500;
+  --prioridad-media: #fff8db;
+  --prioridad-media-foreground: #765300;
+  --prioridad-baja: #eeeef2;
+  --prioridad-baja-foreground: #55555a;
+  --estado-sin-revisar: #eeeef2;
+  --estado-sin-revisar-foreground: #55555a;
+  --estado-en-revision: #e5effa;
+  --estado-en-revision-foreground: #0058b0;
+  --estado-justificada: #e4f5e9;
+  --estado-justificada-foreground: #1a7333;
+  --estado-requiere-atencion: #fdecec;
+  --estado-requiere-atencion-foreground: #c1121c;
+  --sombra-tarjeta: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 1px rgb(0 0 0 / 0.02);
+  --sombra-material: 0 8px 32px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
+  --velo: rgb(0 0 0 / 0.18);
 }
 
 .dark {
-  --background: #0b1220;
-  --foreground: #e2e8f0;
-  --card: #111a2e;
-  --card-foreground: #e2e8f0;
-  --popover: #111a2e;
-  --popover-foreground: #e2e8f0;
-  --primary: #93c5fd;
-  --primary-foreground: #0b1220;
-  --secondary: #1e293b;
-  --secondary-foreground: #e2e8f0;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #e2e8f0;
-  --destructive: #f87171;
-  --border: #1e293b;
-  --input: #334155;
-  --ring: #60a5fa;
-  --chart-1: #93c5fd;
-  --chart-2: #67e8f9;
-  --chart-3: #fcd34d;
-  --chart-4: #94a3b8;
-  --chart-5: #c4b5fd;
-  --sidebar: #0f172a;
-  --sidebar-foreground: #e2e8f0;
-  --sidebar-primary: #93c5fd;
-  --sidebar-primary-foreground: #0b1220;
-  --sidebar-accent: #1e293b;
-  --sidebar-accent-foreground: #e2e8f0;
-  --sidebar-border: #1e293b;
-  --sidebar-ring: #60a5fa;
-  --prioridad-alta: #451a03;
-  --prioridad-alta-foreground: #fcd34d;
-  --prioridad-media: #422006;
-  --prioridad-media-foreground: #fde68a;
-  --prioridad-baja: #1e293b;
-  --prioridad-baja-foreground: #cbd5e1;
-  --estado-sin-revisar: #1e293b;
-  --estado-sin-revisar-foreground: #cbd5e1;
-  --estado-en-revision: #172554;
-  --estado-en-revision-foreground: #93c5fd;
-  --estado-justificada: #052e16;
-  --estado-justificada-foreground: #86efac;
-  --estado-requiere-atencion: #450a0a;
-  --estado-requiere-atencion-foreground: #fca5a5;
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --card: #1c1c1e;
+  --card-foreground: #f5f5f7;
+  --popover: #2c2c2e;
+  --popover-foreground: #f5f5f7;
+  --primary: #409cff;
+  --primary-foreground: #000000;
+  --secondary: #2c2c2e;
+  --secondary-foreground: #f5f5f7;
+  --muted: #2c2c2e;
+  --muted-foreground: #a1a1a6;
+  --accent: #0f2a4a;
+  --accent-foreground: #8cc2ff;
+  --destructive: #ff6961;
+  --border: #38383a;
+  --separador: #2e2e30;
+  --borde-contraste: #8e8e93;
+  --input: #48484a;
+  --segmento: #636366;
+  --ring: #409cff;
+  --chart-1: #409cff;
+  --chart-2: #7d7aff;
+  --chart-3: #ff9f0a;
+  --chart-4: #98989d;
+  --chart-5: #40c8e0;
+  --sidebar: #161618;
+  --sidebar-foreground: #f5f5f7;
+  --sidebar-primary: #409cff;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #0f2a4a;
+  --sidebar-accent-foreground: #8cc2ff;
+  --sidebar-border: #38383a;
+  --sidebar-ring: #409cff;
+  --prioridad-alta: #3a2508;
+  --prioridad-alta-foreground: #ffb340;
+  --prioridad-media: #33290a;
+  --prioridad-media-foreground: #ffd60a;
+  --prioridad-baja: #2c2c2e;
+  --prioridad-baja-foreground: #aeaeb2;
+  --estado-sin-revisar: #2c2c2e;
+  --estado-sin-revisar-foreground: #aeaeb2;
+  --estado-en-revision: #0f2a4a;
+  --estado-en-revision-foreground: #8cc2ff;
+  --estado-justificada: #0e2e19;
+  --estado-justificada-foreground: #4cd964;
+  --estado-requiere-atencion: #3b1214;
+  --estado-requiere-atencion-foreground: #ff6961;
+  --sombra-tarjeta: none;
+  --sombra-material: 0 8px 32px rgb(0 0 0 / 0.4);
+  --velo: rgb(0 0 0 / 0.5);
+}
+
+/* Aumentar el contraste: texto secundario y bordes más marcados (HIG · Color y Accesibilidad). */
+@media (prefers-contrast: more) {
+  html {
+    --muted-foreground: #48484a;
+    --border: #8e8e93;
+    --separador: #aeaeb2;
+  }
+  html.dark {
+    --muted-foreground: #d1d1d6;
+    --border: #8e8e93;
+    --separador: #636366;
+  }
+}
+
+/*
+ * Materiales: vidrio solo en la capa de controles y navegación (HIG · Materials). El contenido va en
+ * superficies sólidas. Cada utilidad trae sus alternativas: fondo sólido si no hay backdrop-filter, si
+ * se pide reducir la transparencia o aumentar el contraste (con borde visible en este último caso).
+ */
+@utility material-barra {
+  background-color: color-mix(in srgb, var(--sidebar) 72%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  box-shadow: var(--sombra-material);
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--sidebar);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--sidebar);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-contrast: more) {
+    background-color: var(--sidebar);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: var(--borde-contraste);
+  }
+}
+
+/* Barra superior: el mismo vidrio, pegado arriba y con un solo separador abajo. */
+@utility material-cabecera {
+  background-color: color-mix(in srgb, var(--background) 72%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--background);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--background);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-contrast: more) {
+    background-color: var(--background);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom-color: var(--borde-contraste);
+  }
+}
+
+/* Menús, popovers y la paleta del buscador: más opacos que las barras, porque llevan mucho texto. */
+@utility material-menu {
+  background-color: color-mix(in srgb, var(--popover) 82%, transparent);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  box-shadow: var(--sombra-material);
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--popover);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--popover);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-contrast: more) {
+    background-color: var(--popover);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: var(--borde-contraste);
+  }
+}
+
+/* Hojas (diálogos): el vidrio más denso, para que el formulario se lea sobre cualquier contenido. */
+@utility material-hoja {
+  background-color: color-mix(in srgb, var(--popover) 90%, transparent);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.18);
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--popover);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--popover);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-contrast: more) {
+    background-color: var(--popover);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: var(--borde-contraste);
+  }
+}
+
+/* Velo detrás de hojas y diálogos. */
+@utility velo {
+  background-color: var(--velo);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    font-synthesis-weight: none;
+  }
   body {
     @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  html {
-    @apply font-sans;
-  }
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+/*
+ * Reducir movimiento (HIG · Motion y Accessibility): sin desplazamientos ni escalas, solo cambios de
+ * opacidad. Neutraliza las variables de tw-animate-css que usan los menús, hojas y diálogos.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    --tw-enter-scale: 1 !important;
+    --tw-exit-scale: 1 !important;
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    --tw-enter-rotate: 0 !important;
+    --tw-exit-rotate: 0 !important;
+    --tw-enter-blur: 0 !important;
+    --tw-exit-blur: 0 !important;
+    scroll-behavior: auto !important;
   }
 }

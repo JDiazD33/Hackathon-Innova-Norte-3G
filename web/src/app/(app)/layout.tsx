@@ -1,7 +1,8 @@
 import { CalendarDays } from "lucide-react";
 import { Suspense } from "react";
 
-import { AppNav, AppNavLinks } from "@/components/layout/app-nav";
+import { BarraLateral, BotonMostrarBarraLateral, ColumnaPrincipal } from "@/components/layout/armazon";
+import { BarraDePestanas } from "@/components/layout/barra-de-pestanas";
 import { Buscador, BuscadorCargando } from "@/components/layout/buscador";
 import { Marca } from "@/components/layout/marca";
 import { MenuMovil } from "@/components/layout/menu-movil";
@@ -12,61 +13,84 @@ import { SelectorTema } from "@/components/layout/tema";
 import { cargarEntidades, cargarManifest } from "@/lib/data/cached";
 import { formatFecha } from "@/lib/format";
 
-/** Estructura común: barra lateral, cabecera, contenido y pie (Lote B). */
+/**
+ * Estructura común de Prisma (Lote B · ADR 0008): dos capas.
+ * - Controles y navegación en vidrio: barra lateral flotante (≥ 1024 px), barra superior fija y, en el
+ *   celular, barra de pestañas inferior.
+ * - Contenido en superficies sólidas, con un ancho máximo de 1 200 px.
+ */
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const [manifest, entidades] = await Promise.all([cargarManifest(), cargarEntidades()]);
+  const fechaCorte = (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
+      <CalendarDays aria-hidden="true" className="size-3.5" />
+      Datos al {formatFecha(manifest.fecha_corte)}
+    </span>
+  );
 
   return (
-    <div className="flex min-h-screen">
+    <>
       <a
         href="#contenido"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:shadow"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
       >
         Saltar al contenido
       </a>
 
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-8 border-r bg-sidebar px-4 py-6 md:flex">
-        <Marca />
-        <Suspense fallback={<AppNavLinks entidad={null} />}>
-          <AppNav />
-        </Suspense>
-        <p className="mt-auto px-1 text-xs text-muted-foreground">
-          Señales para revisar, no acusaciones: la decisión siempre es de una persona.
-        </p>
-      </aside>
+      <BarraLateral
+        marca={<Marca />}
+        nota="Señales para revisar, no acusaciones: la decisión siempre es de una persona."
+      />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-2 px-4 py-3 md:px-8">
+      <ColumnaPrincipal>
+        <header className="sticky top-0 z-30 material-cabecera">
+          <div className="mx-auto flex h-14 w-full max-w-contenido items-center gap-2 px-4 md:px-6 lg:px-8">
+            <BotonMostrarBarraLateral />
             <MenuMovil marca={<Marca />} />
-            <div className="min-w-0 flex-1 sm:flex-none">
+            <div className="min-w-0 flex-1 md:flex-none">
               <Suspense fallback={<SelectorEntidadCargando />}>
                 <SelectorEntidad entidades={entidades} />
               </Suspense>
             </div>
-            <div className="w-full sm:w-auto">
-              <Suspense fallback={<BuscadorCargando />}>
-                <Buscador entidades={entidades} />
-              </Suspense>
-            </div>
+            <Suspense fallback={<BuscadorCargando />}>
+              <Buscador entidades={entidades} />
+            </Suspense>
             <div className="ms-auto flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
-                <CalendarDays aria-hidden="true" className="size-3.5" />
-                Datos al {formatFecha(manifest.fecha_corte)}
-              </span>
-              {manifest.modo === "publico" && <ModoDemostracion />}
+              <span className="hidden lg:inline-flex">{fechaCorte}</span>
+              {manifest.modo === "publico" && (
+                <span className="hidden md:inline-flex">
+                  <ModoDemostracion />
+                </span>
+              )}
               {/* Aquí va el selector de rol del Lote D (tarea 2.1). */}
               <SelectorTema />
             </div>
           </div>
+          {/* En celular y tablet, la fecha de corte y el modo siguen a la vista en una segunda línea. */}
+          <div className="mx-auto flex w-full max-w-contenido items-center gap-2 px-4 pb-2 md:px-6 lg:hidden">
+            {fechaCorte}
+            {manifest.modo === "publico" && (
+              <span className="md:hidden">
+                <ModoDemostracion />
+              </span>
+            )}
+          </div>
         </header>
 
-        <main id="contenido" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 outline-none md:px-8">
+        <main
+          id="contenido"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-contenido flex-1 px-4 pt-6 pb-10 outline-none md:px-6 md:pt-8 lg:px-8"
+        >
           {children}
         </main>
 
-        <Pie atribucion={manifest.atribucion} versionReglas={manifest.version_reglas} />
-      </div>
-    </div>
+        <div className="pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0">
+          <Pie atribucion={manifest.atribucion} versionReglas={manifest.version_reglas} />
+        </div>
+      </ColumnaPrincipal>
+
+      <BarraDePestanas />
+    </>
   );
 }
