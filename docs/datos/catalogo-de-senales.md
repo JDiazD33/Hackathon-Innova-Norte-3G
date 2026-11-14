@@ -50,6 +50,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Niveles:** alta (5 o más), media (3 o 4) y baja (1 o 2).
 - **Configuración:** los pesos y los cortes están en `pipeline/config/senales.toml`, junto con los parámetros y la versión de cada señal.
 - **Transparencia:** la interfaz siempre muestra el desglose ("alta: S01 + S03 = 6").
+- **Implementación:** `priority()` en `pipeline/src/pipeline/export.py`. El desglose lleva una entrada por cada señal que cita al proceso (heredadas de S03 incluidas), y un proceso sin señales con peso tiene `prioridad: null`. Los pesos y cortes usados viajan en `manifest.prioridad`. En La Libertad 2025–2026 hay 247 procesos con señales: 1 alta y 246 media (ver la [parte 5](partes-lote-a/parte-5-prioridad-y-paquete.md#resultado-13-de-noviembre)).
 
 ## Fichas de las señales
 

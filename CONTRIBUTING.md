@@ -73,6 +73,8 @@ uv run pipeline ingest        # La Libertad 2025–2026: data/interim/releases.p
 uv run pipeline normalize     # tablas en data/derived/tablas/*.parquet y manifiesto.json
 uv run pipeline signals       # señales activas (config/senales.toml): data/derived/senales/
 uv run pipeline cardinal      # contraste de S01 y S02 con R018 y R003 (necesita la herramienta de Cardinal)
+uv run pipeline export --modo publico   # paquete seudonimizado en web/data/publico/ (necesita PSEUDONYM_SECRET)
+uv run pipeline export --modo local     # paquete con nombres de empresas en web/data/local/ (nunca se sube)
 uv run pipeline spike ../data/raw/2026.jsonl.gz    # spike Q1–Q7: data/derived/spike-2026.json
 uv run pipeline spike ../data/raw/2025.jsonl.gz ../data/raw/2026.jsonl.gz   # los dos años juntos: spike-2025-2026.json
 uv run pipeline sample ../data/raw/2026.jsonl.gz ../data/interim/muestra-la-libertad-2026.jsonl
@@ -86,6 +88,8 @@ cargo install --git https://github.com/open-contracting/cardinal-rs --tag 0.0.9 
 ```
 
 Antes de escribir código de Next.js, lee `web/AGENTS.md`: Next 16 trae cambios y sus guías están en `web/node_modules/next/dist/docs/`.
+
+`export` lee `PSEUDONYM_SECRET` del entorno o de `pipeline/.env`: copia `pipeline/.env.example` a `pipeline/.env` y genera el secreto con `uv run python -c "import secrets; print(secrets.token_hex(32))"`. Con el mismo secreto y los mismos datos, los seudónimos no cambian entre ejecuciones. Cada archivo del paquete se valida contra `contracts/paquete-de-datos.schema.json` antes de escribirse; después, valídalo también desde `web/` con `PAQUETE_DIR=data/publico npm test -- paquete`.
 
 En `pipeline/`, `--department` y `--years` cambian la región y los años del spike (por defecto, LA LIBERTAD, 2025 y 2026). Cardinal solo calcula los indicadores que tienen su sección (`[R003]`, `[R018]`…) en el archivo de configuración: parte siempre del que genera `init`. Los resultados del spike están en [`docs/datos/fuente-de-datos.md`](docs/datos/fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a).
 

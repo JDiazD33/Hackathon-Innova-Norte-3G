@@ -38,9 +38,9 @@ Cada parte tiene su ficha (contexto, diseño propuesto, verificación) y su rama
 
 ## 5. A5 · Prioridad y paquete de datos
 
-- [ ] 5.1 Implementar la prioridad con su desglose. Verificar con pruebas: S01 + S03 da 6 (alta) y un proceso sin señales tiene prioridad nula.
-- [ ] 5.2 Implementar los seudónimos con HMAC (`PSEUDONYM_SECRET` en `.env`, documentado en `pipeline/.env.example`) y la regla de personas naturales. Verificar con una prueba que busca RUC y nombres en el paquete público y no encuentra ninguno.
-- [ ] 5.3 Exportar el paquete por entidad (con `indice.json` y los pesos de prioridad en el manifiesto) y validarlo contra `contracts/paquete-de-datos.schema.json`. Verificar que la validación pasa, que un `ocid` faltante hace fallar la exportación y que, desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete` termina en verde.
+- [x] 5.1 Implementar la prioridad con su desglose. Verificar con pruebas: S01 + S03 da 6 (alta) y un proceso sin señales tiene prioridad nula.
+- [x] 5.2 Implementar los seudónimos con HMAC (`PSEUDONYM_SECRET` en `.env`, documentado en `pipeline/.env.example`) y la regla de personas naturales. Verificar con una prueba que busca RUC y nombres en el paquete público y no encuentra ninguno.
+- [x] 5.3 Exportar el paquete por entidad (con `indice.json` y los pesos de prioridad en el manifiesto) y validarlo contra `contracts/paquete-de-datos.schema.json`. Verificar que la validación pasa, que un `ocid` faltante hace fallar la exportación y que, desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete` termina en verde.
 - [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local.
 
 ## 6. A6 · Señales opcionales e integración (Fase 2)

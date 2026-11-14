@@ -15,6 +15,7 @@ Cada paso tiene su comando y lee lo que dejó el anterior, así que se puede rep
 | Normalización | `uv run pipeline normalize` | `data/interim/` | `data/derived/tablas/*.parquet` y `manifiesto.json` |
 | Señales | `uv run pipeline signals` | `data/derived/tablas/` y `config/senales.toml` | `data/derived/senales/senales.parquet`, `expedientes-simulados.json` y `manifiesto.json` (activas, desactivadas, conteos y exclusiones) |
 | Contraste con Cardinal | `uv run pipeline cardinal` | Tablas, señales y la herramienta de Cardinal (`.tools/` o el PATH) | `data/derived/senales/contraste-cardinal.json` |
+| Paquete de datos | `uv run pipeline export --modo publico` o `--modo local` | Tablas, señales, `config/senales.toml` y `PSEUDONYM_SECRET` | `web/data/publico/` o `web/data/local/`: manifiesto, entidades, procesos y señales por entidad, proveedores, expedientes simulados e índice, validados contra `contracts/paquete-de-datos.schema.json` |
 
 ## Estructura
 
@@ -29,6 +30,8 @@ Cada paso tiene su comando y lee lo que dejó el anterior, así que se puede rep
 | `src/pipeline/normalize.py` | Tablas normalizadas, correcciones de calidad y manifiesto |
 | `src/pipeline/signals/` | Configuración de las señales (`settings.py`), grupos de comparación (`groups.py`), reglas (`s01.py`, `s02.py`, `s03.py`, `s04.py`, `s08.py`) y cálculo (`compute.py`) |
 | `src/pipeline/cardinal.py` | Contraste con los indicadores R018 y R003 de Cardinal, que se ejecuta como herramienta externa |
+| `src/pipeline/export.py` | Prioridad de revisión, seudónimos, ocultamiento de nombres y RUC en los textos, y exportación del paquete validado |
+| `.env.example` | Variables de entorno sin sus valores (`PSEUDONYM_SECRET`). El `.env` con los valores no se sube |
 | `src/pipeline/spike.py` | Consultas del spike (Q1–Q7 y calidad), muestra por región y cobertura de Cardinal |
 | `src/pipeline/cli.py` | Comando `uv run pipeline` |
 | `tests/` | Pruebas con releases sintéticos (`tests/factories.py`), sin nombres ni RUC reales |

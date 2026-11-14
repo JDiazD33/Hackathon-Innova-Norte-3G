@@ -88,7 +88,7 @@ Una fila por participante o proveedor adjudicado.
 | `proveedor_id` | `tender.tenderers[].id` y `awards[].suppliers[].id` |
 | `ruc` | Los 11 dígitos, solo si el identificador es `PE-RUC-` seguido de 11 dígitos |
 | `nombre` | El `name` más reciente con que aparece |
-| `tipo` | `persona_natural` o `persona_juridica` según los dos primeros dígitos del RUC (`[proveedores]` de la configuración); `desconocido` si no hay RUC, como en los consorcios |
+| `tipo` | `persona_natural` o `persona_juridica` según los dos primeros dígitos del RUC (`[proveedores]` de la configuración); `desconocido` si no hay RUC. En La Libertad 2025–2026 son `desconocido` 3 495 proveedores con código corto de 7 dígitos, que son consorcios (3 395 llevan "CONSORCIO" en el nombre), 80 proveedores extranjeros con código "L" y 10 dígitos (79 son personas) y 7 empresas extranjeras con código de 11 dígitos que empieza con 99 |
 
 ## `items`
 

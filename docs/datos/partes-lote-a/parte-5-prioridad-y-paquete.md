@@ -14,10 +14,61 @@ Ordenar los procesos con una prioridad de revisión transparente y exportar el p
 
 ## Tareas
 
-- [ ] 5.1 Implementar la prioridad con su desglose. Verificar con pruebas: S01 + S03 da 6 (alta) y un proceso sin señales tiene prioridad nula.
-- [ ] 5.2 Implementar los seudónimos con HMAC (`PSEUDONYM_SECRET` en `.env`, documentado en `pipeline/.env.example`) y la regla de personas naturales. Verificar con una prueba que busca RUC y nombres en el paquete público y no encuentra ninguno.
-- [ ] 5.3 Exportar el paquete por entidad (con `indice.json` y los pesos de prioridad en el manifiesto) y validarlo contra `contracts/paquete-de-datos.schema.json`. Verificar que la validación pasa, que un `ocid` faltante hace fallar la exportación y que, desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete` termina en verde.
-- [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local.
+- [x] 5.1 Implementar la prioridad con su desglose. Verificar con pruebas: S01 + S03 da 6 (alta) y un proceso sin señales tiene prioridad nula.
+- [x] 5.2 Implementar los seudónimos con HMAC (`PSEUDONYM_SECRET` en `.env`, documentado en `pipeline/.env.example`) y la regla de personas naturales. Verificar con una prueba que busca RUC y nombres en el paquete público y no encuentra ninguno.
+- [x] 5.3 Exportar el paquete por entidad (con `indice.json` y los pesos de prioridad en el manifiesto) y validarlo contra `contracts/paquete-de-datos.schema.json`. Verificar que la validación pasa, que un `ocid` faltante hace fallar la exportación y que, desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete` termina en verde.
+- [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local. *Los dos paquetes ya están generados, pasan la prueba de la web y `git status` no muestra el local. Falta que Joaquín confirme que la web carga el público y que el equipo lo revise antes de subirlo.*
+
+## Resultado (13 de noviembre)
+
+Todo está en `pipeline/src/pipeline/export.py`, en lugar de los tres módulos propuestos: `priority()`, `pseudonyms()`, `redact()` y la exportación comparten los datos que se cargan una sola vez.
+
+### Paquete real de La Libertad 2025–2026
+
+| Dato | Valor |
+|---|---|
+| Procesos, entidades | 5 036 procesos de 127 entidades |
+| Señales | 121: S01 = 69, S03 = 46 y S08 = 6 (simuladas). S02 y S04 van en `senales_desactivadas` con su motivo |
+| Proveedores en `proveedores.json` | 2 591: los ganadores de algún proceso y los proveedores de S03 |
+| Prioridad | 247 procesos con señales: 1 alta (S01 + S03 = 6) y 246 media (una señal de peso 3). Ninguno queda en baja, porque todas las señales activas pesan 3 |
+| Tamaño | 259 archivos y 13,2 MB por paquete; cada exportación tarda unos 9 s |
+
+Con las señales activas de hoy la prioridad es casi binaria (media o alta). Conviene revisar los pesos y cortes con el equipo cuando se decidan S02 y S04.
+
+### Privacidad
+
+- **Proveedores:** el identificador es siempre el seudónimo (`P0001`, alias "Proveedor 0001"), ordenado por HMAC-SHA256 del RUC, o del código si no hay RUC.
+  - En modo público, ningún proveedor lleva nombre, RUC ni enlace a la Ficha Única.
+  - En modo local, solo las personas jurídicas llevan nombre, RUC y enlace. Las personas naturales y los `desconocido` (consorcios y códigos sin RUC) nunca llevan nombre.
+- **Textos libres** (descripción del proceso y títulos de documentos). Ocultan los nombres que el paquete no muestra: los de todos los proveedores en modo público, y los de todos menos las empresas en modo local.
+  - Los números con forma de RUC se cambian por "[RUC omitido]" en los dos modos.
+  - El nombre se cambia por "[proveedor]" en los procesos donde el proveedor participa y también en los demás textos (por ejemplo, la empresa beneficiaria de un plan de negocio que aparece en la descripción de otro proceso). Fuera de sus procesos, el nombre debe tener al menos dos palabras y ocho caracteres, para no ocultar palabras sueltas.
+  - **Excepción, los consorcios:** reciben un código corto en cada adjudicación, no tienen RUC y suelen llamarse como el lugar de la obra ("SAN MARTIN", "LOS ANGELES"). Su nombre solo se oculta en sus propios procesos, para no borrar nombres de calles y centros poblados en los demás. Aun así, en 7 descripciones el lugar coincide con el nombre del consorcio que participa y queda oculto (por ejemplo, "CENTRO DE SALUD [proveedor] I-3").
+  - **Proveedores extranjeros:** los 80 con código "L" y 10 dígitos son casi todos personas (79 de 80), y hay 7 empresas con código de 11 dígitos que empieza con 99. Quedan como `desconocido`: no llevan nombre en ningún modo, y su nombre se oculta en todos los textos.
+  - La búsqueda es por palabras completas e ignora mayúsculas, tildes y espacios repetidos. Es un complemento: lo que protege a los proveedores son los campos estructurados, que en modo público nunca llevan nombres.
+- **Revisión de los paquetes** (búsqueda de los 11 933 nombres de 8 o más caracteres de la tabla `proveedores` y de la expresión de RUC de la prueba de la web):
+  - público: 0 números con forma de RUC, 0 nombres de personas naturales o jurídicas y 0 de proveedores extranjeros. Quedan 12 coincidencias con nombres de consorcios que son nombres de lugares ("SAN MARTIN", "LOS ANGELES", "GUADALUPITO"…), en descripciones de otros procesos o en el nombre de una municipalidad;
+  - local: ninguna persona natural ni proveedor extranjero; las empresas aparecen con nombre, como corresponde a ese modo.
+
+### Mapeo al contrato
+
+- `objeto`: goods → bienes, services → servicios, works → obras (consultoría de obras si el método es de consultoría).
+- `descripcion`: la de la fuente; si falta, la nomenclatura (`tender.title`).
+- `fechas.inicio_presentacion` y `fin_presentacion`: `null` (el spike mostró que `tenderPeriod` solo trae la fecha de la convocatoria). `url_seace`: `null`.
+- `numero_postores`: participantes registrados, como en las señales.
+- `documentos`: solo los que tienen título y una URL http(s) válida.
+- `entidades[].id`: el `buyer.id` de la fuente (`PE-CONSUCODE-…`), que cumple el patrón `$defs.id` del schema.
+- `entidades[].resumen`: `monto_total` suma los montos referenciales en soles; `top_proveedores` ordena por participación en el monto adjudicado en soles; `tendencia_mensual` usa el mes de la convocatoria; `por_categoria` cuenta procesos por categoría de sus señales.
+- Señales: los proveedores de S03 llevan su seudónimo en `objeto.id`, en `entradas.proveedor_id` y en el `id` de la señal (`S03-<seudónimo>-<entidad>`). La entidad solo decide el archivo.
+- `manifest.exclusiones` junta las de las tablas y las de las señales con cantidad mayor que cero.
+
+### Verificación
+
+- `uv run pytest`: 123 pruebas en verde, incluidas las 16 de `tests/test_export.py`. `uv run ruff check` y `uv run ruff format --check`: sin observaciones. `openspec validate --all --strict`: 4 de 4.
+- Exportación real: `uv run pipeline export --modo publico` y `--modo local`.
+- Desde `web/`, con Node 22.19 (`CONTRIBUTING.md` pide Node 24; `npm ci` avisa, pero funciona): `npm ci`, `PAQUETE_DIR=data/publico npm test -- paquete` y `PAQUETE_DIR=data/local npm test -- paquete`, 10 de 10 pruebas en verde en cada uno.
+- Desde `web/`, `PAQUETE_DATOS=publico npm run build` termina bien y la página generada muestra los 5.036 procesos y entidades del paquete real. Es una prueba previa: la confirmación de la tarea 5.4 es de Joaquín.
+- `git status` muestra `web/data/publico/` sin subir y no muestra `web/data/local/` (lo ignora el `.gitignore`).
 
 ## Diseño propuesto
 
@@ -65,4 +116,4 @@ Ordenar los procesos con una prioridad de revisión transparente y exportar el p
 
 ## Archivos
 
-`pipeline/src/pipeline/priority.py`, `pipeline/src/pipeline/pseudonyms.py`, `pipeline/src/pipeline/export.py`, `pipeline/.env.example`, `pipeline/pyproject.toml` (`jsonschema`), `pipeline/src/pipeline/cli.py`, `pipeline/tests/`, `web/data/publico/` (generado) y `CONTRIBUTING.md`.
+`pipeline/src/pipeline/export.py`, `pipeline/.env.example`, `pipeline/pyproject.toml` y `pipeline/uv.lock` (`jsonschema`), `pipeline/src/pipeline/cli.py`, `pipeline/tests/test_export.py`, `web/data/publico/` (generado, se sube después de revisarlo) y `CONTRIBUTING.md`.

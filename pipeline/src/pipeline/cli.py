@@ -12,6 +12,7 @@ from pipeline import spike
 from pipeline.cardinal import contrast, find_cardinal
 from pipeline.config import DEFAULT_CONFIG, DEFAULT_DATA_DIR, ConfigError, load_config
 from pipeline.download import DownloadError, SourceNotAllowedError, download_all
+from pipeline.export import MODES, WEB_DATA_DIR, ExportError, export
 from pipeline.ingest import ingest
 from pipeline.normalize import StaleIngestError, normalize
 from pipeline.signals.compute import compute_signals
@@ -127,6 +128,26 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="ejecutable de Cardinal (por defecto, el del PATH o el de .tools/)",
     )
+
+    export_parser = commands.add_parser(
+        "export", help="exporta el paquete de datos del contrato, público o local"
+    )
+    _add_pipeline_arguments(export_parser)
+    export_parser.add_argument(
+        "--signals-config",
+        type=Path,
+        default=DEFAULT_SIGNALS_CONFIG,
+        help="parámetros de las señales (por defecto, config/senales.toml)",
+    )
+    export_parser.add_argument(
+        "--modo",
+        choices=MODES,
+        required=True,
+        help="publico (seudonimizado) o local (con nombres de empresas; nunca se sube)",
+    )
+    export_parser.add_argument(
+        "--out", type=Path, help="carpeta del paquete (por defecto, web/data/<modo>)"
+    )
     return parser
 
 
@@ -219,6 +240,19 @@ def _run_cardinal(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_export(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    settings = load_signals_config(args.signals_config)
+    manifest = export(config, settings, args.data_dir, args.modo, args.out)
+    counts = manifest["conteos"]
+    out = args.out or WEB_DATA_DIR / args.modo
+    print(
+        f"Paquete {args.modo} en {out}: {counts['procesos']} procesos, {counts['senales']} "
+        f"señales, {counts['proveedores']} proveedores y {counts['entidades']} entidades"
+    )
+    return 0
+
+
 def _run_spike(args: argparse.Namespace) -> int:
     sources: list[Path] = args.sources
     stem = _file_stem(sources)
@@ -280,6 +314,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "normalize": _run_normalize,
         "signals": _run_signals,
         "cardinal": _run_cardinal,
+        "export": _run_export,
     }
     try:
         return handlers[args.command](args)
@@ -289,6 +324,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         DownloadError,
         FileNotFoundError,
         StaleIngestError,
+        ExportError,
     ) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
