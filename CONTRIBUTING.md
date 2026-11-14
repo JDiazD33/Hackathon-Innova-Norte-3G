@@ -96,6 +96,15 @@ Antes de escribir código de Next.js, lee `web/AGENTS.md`: Next 16 trae cambios 
 
 En `pipeline/`, `--department` y `--years` cambian la región y los años del spike (por defecto, LA LIBERTAD, 2025 y 2026). Cardinal solo calcula los indicadores que tienen su sección (`[R003]`, `[R018]`…) en el archivo de configuración: parte siempre del que genera `init`. Los resultados del spike están en [`docs/datos/fuente-de-datos.md`](docs/datos/fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a).
 
+## Despliegue
+
+- **Enlace público:** <https://hackathon-innova-norte-3g.vercel.app>. Es el que se comparte con el jurado y los validadores.
+- **Proyecto:** `hackathon-innova-norte-3g` en Vercel (plan gratuito), conectado a este repositorio. Lo administra Joaquín. Solo se publica `web/`: la carpeta raíz es `web`, el preset es Next.js y los comandos son los de por defecto. El pipeline no se despliega.
+- **Cuándo se actualiza:** cada push a `main` publica en producción. Cada PR tiene su propia vista previa, que pide iniciar sesión en Vercel; para que otra persona la vea, se comparte con el botón *Share* del despliegue.
+- **Datos:** sin variables de entorno, la web usa el fixture. Cuando `web/data/publico/` esté revisado y en `main`, se agrega `PAQUETE_DATOS=publico` en *Settings → Environment Variables* y se vuelve a desplegar.
+- **Volver atrás:** botón *Rollback* en la página del proyecto en Vercel.
+- Vercel construye desde GitHub, así que `web/data/local/`, que no se sube, nunca llega al enlace público.
+
 ## Datos y seguridad
 
 - Fuente y atribución obligatoria: [`docs/datos/fuente-de-datos.md`](docs/datos/fuente-de-datos.md).

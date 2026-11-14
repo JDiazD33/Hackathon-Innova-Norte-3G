@@ -46,7 +46,8 @@ Datos: OECE – Contrataciones Abiertas (SEACE), vía OCP Data Registry, licenci
 
 ## Enlace al prototipo
 
-*[Pendiente: URL pública y repositorio]*
+- Prototipo: <https://hackathon-innova-norte-3g.vercel.app> *[hoy con datos de prueba; revisar cuando use el paquete con datos reales]*
+- Repositorio: <https://github.com/JDiazD33/Hackathon-Innova-Norte-3G>
 
 ## Limitaciones conocidas
 

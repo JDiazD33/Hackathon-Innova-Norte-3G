@@ -89,7 +89,7 @@ Dos interfaces separan la interfaz de usuario de sus datos:
 
 ## Despliegue
 
-- **Enlace público:** Vercel (plan gratuito) o un servicio equivalente, con el paquete de datos seudonimizado.
+- **Enlace público:** <https://hackathon-innova-norte-3g.vercel.app>, en Vercel (plan gratuito), con el paquete de datos seudonimizado. Se publica solo `web/`, y cada push a `main` lo actualiza ([detalle](../../CONTRIBUTING.md#despliegue)). Hasta que el paquete público esté en el repositorio, muestra el fixture.
 - **Respaldo:** la misma aplicación ejecutándose en una laptop con los datos incluidos y sin internet, más el video de la demo.
 - **Datos:** el paquete se regenera con el pipeline. El manifiesto indica la fecha de corte que se muestra en la cabecera.
 

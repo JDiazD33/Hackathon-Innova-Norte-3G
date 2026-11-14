@@ -10,7 +10,8 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 
 | | |
 |---|---|
-| Fase | Fase 0 casi cerrada: documentación, OpenSpec y base de código web. Ahora va el código de cada lote; después, la interfaz ([orden de trabajo](docs/plan/cronograma-y-lotes.md#orden-de-trabajo-primero-el-código-después-la-interfaz)) |
+| Fase | Fase 0 por cerrar. La parte de código de los cuatro lotes ya está en `main`, y el panel y la bandeja tienen interfaz. Siguen las pantallas de C y D y el paquete con datos reales ([estado](docs/plan/cronograma-y-lotes.md#estado-al-14-de-noviembre)) |
+| Demo en línea | [hackathon-innova-norte-3g.vercel.app](https://hackathon-innova-norte-3g.vercel.app), con datos de prueba (fixture) hasta que esté el paquete con datos reales. Se actualiza con cada push a `main` ([despliegue](CONTRIBUTING.md#despliegue)) |
 | Desafío | **Por confirmar.** Recomendado: 2 · Integridad institucional y compliance. Alternativa: 1 · Contrataciones públicas y ejecución de obras ([encaje](docs/producto/vision-y-encaje.md#encaje-con-los-desafíos)) |
 | Próximo hito | Entrega del Stage-Gate 1: **miércoles 25 de noviembre de 2026, 11:59 p. m.** (meta interna: 6:00 p. m.) |
 | Equipo y lotes | A · Datos y señales: Stefano · B · Base web, panel y bandeja: Joaquín (líder) · C · Fichas y explicación: Sebastián · D · Revisión y transparencia: André ([fases y lotes](docs/plan/cronograma-y-lotes.md)) |
@@ -40,8 +41,8 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 | `docs/` | Bases, producto, datos, arquitectura, ADR, diseño, plan y entregables | Listo |
 | `openspec/` | Un change por lote (OpenSpec, en español) y skills de OpenSpec para Claude Code y Codex | Listo |
 | `contracts/` | JSON Schema del paquete de datos | Listo (contrato v1) |
-| `pipeline/` | Descarga, normalización y cálculo de señales (Python + DuckDB) | Por crear (Lote A) |
-| `web/` | Aplicación web (Next.js 16 + TypeScript + Tailwind CSS; shadcn/ui en la fase de interfaz) | Base lista: pruebas, contrato, fixture y acceso a datos. Faltan las pantallas |
+| `pipeline/` | Descarga, normalización y cálculo de señales (Python + DuckDB) | En marcha (Lote A): de la descarga al paquete de datos ([pasos](pipeline/README.md#pasos)) |
+| `web/` | Aplicación web (Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui) | Panel y bandeja listos y [publicados](https://hackathon-innova-norte-3g.vercel.app); la lógica de C y D ya está integrada. Faltan sus pantallas |
 | `data/` | Datos crudos y derivados; no se suben al repositorio | Por crear (Lote A) |
 
 ## Datos y licencias

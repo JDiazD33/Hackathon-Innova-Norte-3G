@@ -36,6 +36,7 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 ## 5. B5 · Despliegue y ejecución local
 
 - [ ] 5.1 Desplegar en Vercel con `PAQUETE_DATOS=publico`. Verificar desde otro dispositivo que el enlace abre el panel, la bandeja y una ficha.
+  - 14 de noviembre: publicado en <https://hackathon-innova-norte-3g.vercel.app> (proyecto `hackathon-innova-norte-3g`, carpeta raíz `web`, conectado a `main`), todavía con el fixture. Contra el enlace público, no contra localhost, se comprobó que el panel, la bandeja y `/api/busqueda` responden con datos (400 ante un id no válido), así que el despliegue incluye los JSON. Las vistas previas piden iniciar sesión en Vercel; el dominio de producción es público. Falta definir `PAQUETE_DATOS=publico` cuando el paquete esté en `main`, abrir una ficha cuando exista la pantalla del Lote C y repetir la revisión desde un celular.
 - [ ] 5.2 Documentar en `CONTRIBUTING.md` la ejecución local para la demo (`npm run build` y `npm run start`). Verificar con el Wi-Fi apagado.
 
 ## 6. Verificación del lote
@@ -50,6 +51,6 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 - `npm run typecheck`, `npm run lint`, `npm test` y `npm run build`: en verde. Las pruebas incluyen el contraste de los tokens (`src/app/theme-contrast.test.ts`, 4,5:1 en claro y oscuro).
 - Revisión en el navegador con el build de producción: panel y bandeja en modo claro y oscuro, a 375 px (sin desplazamiento horizontal) y a 1280 px, recorrido con el teclado, cambio de entidad, filtro de prioridad y buscador con Ctrl + K.
 - Los enlaces a `/procesos`, `/proveedores`, `/revision` y `/metodologia` devuelven 404 hasta que los lotes C y D creen esas pantallas.
-- Pendiente: despliegue (5.x), que necesita una cuenta de Vercel del equipo, y la verificación de cierre 6.1 con datos reales.
+- Pendiente: completar 5.1 (paquete público y ficha), 5.2 y la verificación de cierre 6.1 con datos reales. El enlace público ya funciona (ver 5.1).
 
 - Archivar el change con `openspec-archive-change` cuando la entrega del Stage-Gate 1 esté confirmada.
