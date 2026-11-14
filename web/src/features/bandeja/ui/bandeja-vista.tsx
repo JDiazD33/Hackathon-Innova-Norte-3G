@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Inbox, SearchX } from "lucide-react";
+import { ChevronRight, Download, Inbox, SearchX } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 import { FILTROS_VACIOS, filtrarFilas, hayFiltrosActivos, type FilaBandeja, type FiltrosBandeja } from "../bandeja";
 import type { DatosBandeja } from "../cargar";
+import { filasACsv, nombreArchivoCsv } from "../exportar";
 import { FiltrosDeBandeja } from "./filtros";
 
 const hrefProceso = (ocid: string) => `/procesos/${encodeURIComponent(ocid)}`;
@@ -40,6 +41,18 @@ export function BandejaVista({ entidad, datos }: { entidad: { id: string; nombre
       <TituloDePagina
         titulo="Señales"
         descripcion={`Procesos de ${entidad.nombre} que ameritan revisión, ordenados por prioridad. Una señal no es una acusación: la decisión siempre es de una persona.`}
+        acciones={
+          total > 0 && (
+            <Button
+              variant="secondary"
+              disabled={visibles.length === 0}
+              onClick={() => descargarCsv(filasACsv(visibles, estadoDe, entidad.nombre), nombreArchivoCsv(entidad.id))}
+            >
+              <Download aria-hidden="true" />
+              Exportar CSV
+            </Button>
+          )
+        }
       />
 
       {total > 0 && <FiltrosDeBandeja opciones={datos.opciones} filtros={filtros} onChange={setFiltros} />}
@@ -75,6 +88,21 @@ export function BandejaVista({ entidad, datos }: { entidad: { id: string; nombre
       )}
     </div>
   );
+}
+
+/**
+ * Descarga el CSV de los procesos visibles (con los filtros aplicados). Se arma en el navegador, así que
+ * funciona sin internet y no envía datos a ningún servidor. Se abre en Excel, Power BI y Google Sheets.
+ */
+function descargarCsv(contenido: string, nombre: string) {
+  const url = URL.createObjectURL(new Blob([contenido], { type: "text/csv;charset=utf-8" }));
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.append(enlace);
+  enlace.click();
+  enlace.remove();
+  URL.revokeObjectURL(url);
 }
 
 /** Escritorio ancho: tabla en estilo lista, con la cabecera fija bajo la barra de filtros. */
