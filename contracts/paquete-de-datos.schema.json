@@ -217,6 +217,10 @@
         "ocid": { "$ref": "#/$defs/id" },
         "entidad_id": { "$ref": "#/$defs/id" },
         "descripcion": { "type": "string", "minLength": 1 },
+        "nomenclatura": {
+          "description": "Nomenclatura del proceso en el SEACE (tender.title), con la que se lo busca en el portal. Desde el contrato 1.1; puede faltar en paquetes 1.0.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
         "metodo": { "type": "string", "minLength": 1 },
         "objeto": { "enum": ["bienes", "servicios", "obras", "consultoria_de_obras", "otro"] },
         "moneda": { "type": "string", "pattern": "^[A-Z]{3}$" },
@@ -236,7 +240,11 @@
             "culminacion": { "$ref": "#/$defs/fechaONula" }
           }
         },
-        "numero_postores": { "type": ["integer", "null"], "minimum": 0 },
+        "numero_postores": {
+          "description": "Participantes registrados en el proceso, no ofertas: la fuente no publica las ofertas (bids).",
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
         "estado": { "type": ["string", "null"] },
         "ganadores": { "type": "array", "items": { "$ref": "#/$defs/id" } },
         "documentos": {

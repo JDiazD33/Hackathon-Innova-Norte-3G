@@ -1,6 +1,8 @@
-# Contrato del paquete de datos (v1)
+# Contrato del paquete de datos (v1.1)
 
 Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, y los **lotes B, C y D** lo leen solo a través de `DataSource`. Lo acuerdan A y B en la Fase 0, y los cuatro lo aprueban.
+
+**Versiones:** 1.0 (Fase 0) y 1.1 (14 de noviembre: `nomenclatura` y la aclaración de `numero_postores`, decisiones 1 y 10 del Lote A). Un cambio que solo agrega campos opcionales sube la versión menor.
 
 **Cambios al contrato:** cualquier cambio de forma pasa por un PR que actualiza, a la vez:
 
@@ -32,7 +34,7 @@ Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, 
 
 ```json
 {
-  "version_contrato": "1.0",
+  "version_contrato": "1.1",
   "version_reglas": "2026.11.1",
   "generado": "2026-11-15T10:00:00-05:00",
   "fecha_corte": "2026-10-04",
@@ -89,6 +91,7 @@ Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, 
     "ocid": "ocds-dgv273-…",
     "entidad_id": "entidad-0001",
     "descripcion": "Adquisición de equipos de laboratorio",
+    "nomenclatura": "AS-SM-12-2026-UNT-1",
     "metodo": "Adjudicación simplificada",
     "objeto": "bienes | servicios | obras | consultoria_de_obras",
     "moneda": "PEN",
@@ -120,6 +123,9 @@ Es el punto de encuentro entre lotes. El **Lote A** lo produce con el pipeline, 
 ```
 
 `prioridad` vale `null` si el proceso no tiene señales.
+
+- **`nomenclatura`** (desde la versión 1.1): la nomenclatura del proceso en el SEACE (`tender.title`). Como la fuente no trae una URL por proceso (`url_seace` va en `null`), es la forma de encontrarlo en el portal. Vale `null` si la fuente no la trae. Es opcional en el schema para que los paquetes 1.0 sigan siendo válidos; el pipeline la escribe siempre desde la 1.1.
+- **`numero_postores`**: cuenta los **participantes registrados**, no las ofertas presentadas, porque la fuente no publica las ofertas (`bids`). Por eso un proceso desierto puede tener muchos "postores". El nombre del campo no cambia.
 
 ## `senales/<entidad_id>.json`
 

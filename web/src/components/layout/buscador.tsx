@@ -98,10 +98,10 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
         open={abierto}
         onOpenChange={cambiarAbierto}
         title="Buscar"
-        description="Busca procesos por descripción u ocid, y proveedores por su seudónimo, en la entidad seleccionada."
+        description="Busca procesos por descripción, ocid o nomenclatura del SEACE, y proveedores por su seudónimo, en la entidad seleccionada."
       >
         <Command shouldFilter={false}>
-          <CommandInput value={consulta} onValueChange={setConsulta} placeholder="Descripción, ocid o proveedor…" />
+          <CommandInput value={consulta} onValueChange={setConsulta} placeholder="Descripción, ocid, nomenclatura o proveedor…" />
           <CommandList>
             <CommandEmpty>{mensajeVacio}</CommandEmpty>
             {procesos.length > 0 && (

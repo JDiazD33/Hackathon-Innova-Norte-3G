@@ -33,6 +33,24 @@ describe("buscar", () => {
     expect(buscar(indice, "ocds-fixture-e1-010")[0].id).toBe("ocds-fixture-e1-010");
   });
 
+  it("encuentra procesos por su nomenclatura del SEACE (contrato 1.1) y la muestra en el detalle", async () => {
+    const indice = await indiceDe("entidad-0001");
+    const [primero] = buscar(indice, "as-sm-3-2025-upfn-1");
+    expect(primero).toMatchObject({ tipo: "proceso", id: "ocds-fixture-e1-003" });
+    expect(primero.detalle).toContain("AS-SM-3-2025-UPFN-1");
+  });
+
+  it("sigue funcionando con paquetes 1.0, que no traen nomenclatura", async () => {
+    const procesos = (await fuente.listProcesses("entidad-0001")).map((p) => {
+      const copia = { ...p };
+      delete copia.nomenclatura;
+      return copia;
+    });
+    const indice = construirIndice(procesos, await fuente.listSuppliers(), "publico");
+    expect(indice.every((e) => !e.detalle.includes("undefined") && !e.texto.includes("undefined"))).toBe(true);
+    expect(buscar(indice, "ocds-fixture-e1-010")[0].id).toBe("ocds-fixture-e1-010");
+  });
+
   it("encuentra proveedores por su seudónimo", async () => {
     const indice = await indiceDe("entidad-0001");
     const [primero] = buscar(indice, "proveedor 0003");

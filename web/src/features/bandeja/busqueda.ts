@@ -23,7 +23,7 @@ export function normalizarTexto(texto: string): string {
 }
 
 /**
- * Índice de búsqueda de una entidad: sus procesos (por descripción y ocid) y los proveedores
+ * Índice de búsqueda de una entidad: sus procesos (por descripción, ocid y nomenclatura del SEACE) y los proveedores
  * que ganaron en ella. La identidad del proveedor sigue las reglas del Lote C, así que en modo
  * público solo se busca por seudónimo y una persona natural nunca se busca por su nombre.
  */
@@ -36,9 +36,11 @@ export function construirIndice(
     tipo: "proceso" as const,
     id: p.ocid,
     titulo: p.descripcion,
-    detalle: [p.metodo, p.fechas.convocatoria ? formatFecha(p.fechas.convocatoria) : null].filter(Boolean).join(" · "),
+    detalle: [p.nomenclatura, p.metodo, p.fechas.convocatoria ? formatFecha(p.fechas.convocatoria) : null]
+      .filter(Boolean)
+      .join(" · "),
     href: `/procesos/${encodeURIComponent(p.ocid)}`,
-    texto: normalizarTexto(`${p.descripcion} ${p.ocid}`),
+    texto: normalizarTexto(`${p.descripcion} ${p.ocid} ${p.nomenclatura ?? ""}`),
   }));
 
   const ganadores = new Set(procesos.flatMap((p) => p.ganadores));

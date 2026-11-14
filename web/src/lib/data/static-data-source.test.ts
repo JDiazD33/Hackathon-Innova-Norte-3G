@@ -12,7 +12,7 @@ const fuente = new StaticDataSource(FIXTURE_DIR);
 describe("StaticDataSource sobre el fixture", () => {
   it("lee el manifiesto", async () => {
     const manifest = await fuente.getManifest();
-    expect(manifest.version_contrato).toBe("1.0");
+    expect(manifest.version_contrato).toBe("1.1");
     expect(manifest.modo).toBe("publico");
   });
 
