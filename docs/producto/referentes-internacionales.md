@@ -8,7 +8,7 @@ No copiamos código ni textos de nadie. Tomamos los referentes de cuatro formas 
 |---|---|---|
 | **Usar como dependencia** | Instalamos una librería abierta y la llamamos desde nuestro código, respetando su licencia | Cardinal (MIT) |
 | **Implementar una metodología publicada** | Escribimos nuestro propio código siguiendo definiciones y fórmulas documentadas, y las citamos | Guía de banderas rojas de OCP |
-| **Inspirarnos en el diseño** | Tomamos principios y patrones de interfaz o de gobierno, no su software | Arachne (cerrado) |
+| **Inspirarnos en el diseño** | Tomamos principios y patrones de interfaz o de gobierno, no su software | Arachne (cerrado); guías de diseño de Apple |
 | **Aprender de su experiencia** | Usamos sus lecciones para no repetir errores | FUNES, Serenata de Amor |
 
 **Nuestro aporte propio:** adaptar todo eso a la normativa y a los datos del Perú, explicar cada señal en lenguaje claro y registrar la decisión humana.
@@ -26,6 +26,7 @@ No copiamos código ni textos de nadie. Tomamos los referentes de cuatro formas 
 | **FUNES** (Ojo Público, Perú) | No | — | Adaptaron el modelo europeo de Fazekas a la realidad peruana y tuvieron problemas para obtener datos; por eso usamos descargas oficiales |
 | **Serenata de Amor** (Brasil) | Código abierto, pero pensado para gastos parlamentarios | MIT | Señalar casos para que personas los verifiquen, sin decidir por ellas |
 | **Kingfisher Collect y OCDS Kit** (OCP) | **Sí**, si hiciera falta | BSD-3-Clause | Descargar y manipular datos OCDS. Hoy el OCP Data Registry ya nos entrega los archivos |
+| **Human Interface Guidelines** (Apple) | **No** su software ni sus recursos: fuentes SF, SF Symbols, kits e íconos | Guías de acceso público; los recursos tienen licencias propias | Principios y patrones de interfaz: el contenido primero, una capa de vidrio para los controles, tipografía y color con moderación ([ADR 0008](../adr/0008-prisma-y-diseno-inspirado-en-apple.md)) |
 
 ## Cardinal en detalle
 
@@ -76,6 +77,7 @@ No copiamos código ni textos de nadie. Tomamos los referentes de cuatro formas 
 | Explicación | Arachne, Early Warning Red Flags y Serenata de Amor | Tarjeta "Por qué aparece" |
 | Decisión humana | Arachne (sin decisiones automáticas) | Bandeja de revisión |
 | Datos | OCDS y OCP Data Registry | Descarga oficial, sin scraping |
+| Diseño visual | Guías de diseño de Apple | Tema y componentes propios sobre shadcn/ui, con Inter e íconos de lucide; sin recursos de Apple |
 
 ## Cómo citarlo
 

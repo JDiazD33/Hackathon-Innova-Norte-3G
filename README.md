@@ -1,6 +1,6 @@
-# Hackathon Innova Norte 3G · Señales explicables para contrataciones públicas
+# Prisma · Señales explicables para contrataciones públicas
 
-> **Nombre del producto:** por decidir ([opciones](docs/producto/vision-y-encaje.md#nombre-del-producto)). En el código, el nombre será un solo valor configurable.
+> **Prisma** descompone los datos de contrataciones en señales que una persona puede entender y revisar, como un prisma descompone la luz ([ADR 0008](docs/adr/0008-prisma-y-diseno-inspirado-en-apple.md)). En el código, el nombre está en un solo lugar: `web/src/config/producto.ts`.
 
 Plataforma web que analiza los datos abiertos de contrataciones públicas del Perú (estándar internacional OCDS). Detecta **señales que ameritan revisión** con una metodología probada en otros países y explica cada una para que una persona decida qué hacer. Una señal no es una acusación: la decisión siempre es humana.
 
@@ -10,7 +10,7 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 
 | | |
 |---|---|
-| Fase | Fase 0 por cerrar. La parte de código de los cuatro lotes ya está en `main`, y el panel y la bandeja tienen interfaz. Siguen las pantallas de C y D y el paquete con datos reales ([estado](docs/plan/cronograma-y-lotes.md#estado-al-14-de-noviembre)) |
+| Fase | Cierre de la Fase 0: la parte de código de los cuatro lotes ya está en `main` y la web está publicada. La Fase 1 (dom 15 – jue 19) trae el rediseño Prisma con las guías de Apple, las pantallas de C y D y los datos reales ([qué hace cada uno](docs/plan/fase-1/README.md)) |
 | Demo en línea | [hackathon-innova-norte-3g.vercel.app](https://hackathon-innova-norte-3g.vercel.app), con datos de prueba (fixture) hasta que esté el paquete con datos reales. Se actualiza con cada push a `main` ([despliegue](CONTRIBUTING.md#despliegue)) |
 | Desafío | **Por confirmar.** Recomendado: 2 · Integridad institucional y compliance. Alternativa: 1 · Contrataciones públicas y ejecución de obras ([encaje](docs/producto/vision-y-encaje.md#encaje-con-los-desafíos)) |
 | Próximo hito | Entrega del Stage-Gate 1: **miércoles 25 de noviembre de 2026, 11:59 p. m.** (meta interna: 6:00 p. m.) |

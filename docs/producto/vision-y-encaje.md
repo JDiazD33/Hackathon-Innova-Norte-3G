@@ -79,13 +79,9 @@ La arquitectura es la misma en ambos casos. Solo cambian el énfasis y el caso p
 
 ## Nombre del producto
 
-Pendiente. Opciones para votar; hay que verificar que no choquen con marcas existentes:
+**Prisma**, decidido el 14 de noviembre ([ADR 0008](../adr/0008-prisma-y-diseno-inspirado-en-apple.md)). Un prisma descompone la luz en sus colores; Prisma descompone los datos de contrataciones en señales que una persona puede entender y revisar.
 
-- **Faro:** ilumina lo que merece atención.
-- **Trazo:** la trazabilidad de cada decisión.
-- **Lupa Pública.**
-- **Señal Clara.**
-- **Vigía.**
+También se consideraron Faro, Trazo, Lupa Pública, Señal Clara y Vigía. Si el proyecto sigue después de la hackathon, hay que revisar el registro de marcas, porque "Prisma" ya lo usan otras organizaciones.
 
 ## Preguntas abiertas
 

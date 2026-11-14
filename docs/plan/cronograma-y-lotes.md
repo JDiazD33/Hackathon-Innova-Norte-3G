@@ -78,6 +78,8 @@ Acordado el 13 de noviembre. Cada lote termina primero su **lógica con pruebas*
 
 **Despliegue (14 de noviembre):** la web está publicada en <https://hackathon-innova-norte-3g.vercel.app>, en Vercel, y se actualiza con cada push a `main`. Usa el fixture hasta el punto 6. Detalles en [`CONTRIBUTING.md`](../../CONTRIBUTING.md#despliegue).
 
+**Siguiente tramo (Fase 1):** el producto se llama Prisma y toda su interfaz se rediseña con las guías de Apple ([ADR 0008](../adr/0008-prisma-y-diseno-inspirado-en-apple.md)). Lo que hace cada uno, en orden y con sus dependencias, está en [`fase-1/`](fase-1/README.md).
+
 ## Fase 0 · Cimientos (vie 13 – sáb 14)
 
 **Objetivo:** que los cuatro puedan trabajar en paralelo desde el domingo sin bloquearse.
@@ -102,7 +104,7 @@ Acordado el 13 de noviembre. Cada lote termina primero su **lógica con pruebas*
 | Lote | Partes |
 |---|---|
 | A | **A2** Ingesta y normalización de La Libertad · **A3** S01 y S02 · **A4** S03, S04 y contraste con Cardinal · **A5** Prioridad, seudonimización y paquete real |
-| B | **B3** Panel de la entidad · **B4** Bandeja con filtros y búsqueda · **B5** Despliegue y ejecución local sin internet |
+| B | **B3** Panel de la entidad · **B4** Bandeja con filtros y búsqueda · **B5** Despliegue y ejecución local sin internet · **B6** Rediseño Prisma con las guías de Apple |
 | C | **C1** Ficha del proceso y línea de tiempo · **C2** Tarjeta de señal · **C3** Comparación visual con resumen en texto · **C4** Ficha del proveedor |
 | D | **D1** Roles y `ReviewStore` · **D2** Registrar decisión e historial · **D3** Asignación y vista "Revisión" · **D4** Reporte de trazabilidad · **D5** Metodología, atribución y verificación del lenguaje |
 | Entregables | Entrevistas de problema (lun 16 – mié 18) · ficha del problema v1 |
@@ -174,6 +176,7 @@ Formato: `lote-<letra>/parte-<n>-<tema>`. Por ejemplo, `lote-a/parte-1-spike-dat
 | 13 nov | Referentes sin copiar: Cardinal como dependencia y Arachne como inspiración | ADR 0003 |
 | 13 nov | Señales sin probabilidad de corrupción; el rojo solo por decisión humana | ADR 0007 |
 | 13 nov | Fases 0–3, un lote por persona y un change de OpenSpec por lote | Este documento |
+| 14 nov | Nombre del producto: Prisma | ADR 0008 |
+| 14 nov | Interfaz con el lenguaje visual de las guías de Apple, sin usar sus recursos | ADR 0008 |
 | Pendiente | Desafío definitivo (recomendado: 2) | Inscripción |
-| Pendiente | Nombre del producto | `docs/producto/vision-y-encaje.md` |
 | Pendiente | Confirmar el reparto de lotes y quién integra | Este documento |

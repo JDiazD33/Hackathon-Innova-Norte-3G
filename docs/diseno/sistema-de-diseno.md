@@ -2,6 +2,8 @@
 
 Queremos una interfaz **bonita, sobria y confiable**: que se vea como una herramienta institucional seria y no como un tablero de alarmas. Se construye con shadcn/ui y Tailwind CSS ([ADR 0005](../adr/0005-web-nextjs-shadcn.md)).
 
+> **En rediseño (14 de noviembre):** la interfaz pasa al lenguaje visual de Prisma, inspirado en las guías de Apple ([ADR 0008](../adr/0008-prisma-y-diseno-inspirado-en-apple.md)). Joaquín actualiza este documento en la parte 5 del Lote B ([encargo](../plan/fase-1/lote-b-joaquin.md)). Siguen vigentes los principios, el vocabulario, la tarjeta de señal, las pantallas, la ética y la accesibilidad; cambian el color, la tipografía, la estructura y los componentes.
+
 ## Principios
 
 1. **Calma antes que alarma.** El sistema muestra señales, no culpables. Usa tonos ámbar y neutros, nunca rojo por sí solo.
