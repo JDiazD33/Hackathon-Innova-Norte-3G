@@ -10,20 +10,23 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 
 ## 2. C1 · Ficha del proceso
 
-- [ ] 2.1 Crear `/procesos/[ocid]` con el resumen y "Sin dato" en los valores nulos. Verificar con un proceso completo y otro con datos faltantes del fixture.
-- [ ] 2.2 Mostrar "No encontramos este proceso" cuando el ocid no existe. Verificar abriendo un ocid inventado.
-- [ ] 2.3 Construir la línea de tiempo con las fechas oficiales y las etapas simuladas marcadas. Verificar con el expediente simulado del fixture.
+- [x] 2.1 Crear `/procesos/[ocid]` con el resumen y "Sin dato" en los valores nulos. Verificar con un proceso completo y otro con datos faltantes del fixture.
+- [x] 2.2 Mostrar "No encontramos este proceso" cuando el ocid no existe. Verificar abriendo un ocid inventado.
+- [x] 2.3 Construir la línea de tiempo con las fechas oficiales y las etapas simuladas marcadas. Verificar con el expediente simulado del fixture.
   - Parte 1: `buildProcessTimeline` combina y ordena fechas, conserva las fechas nulas como "Sin dato" y marca los datos simulados. Pruebas con el fixture, fechas empatadas y zonas horarias. Pendiente la presentación visual.
-- [ ] 2.4 Listar los documentos oficiales con sus enlaces, o el mensaje cuando no hay. Verificar con el fixture.
+  - Parte 2: presentación visual y expediente simulado verificados con pruebas de componente; usa una etiqueta provisional hasta que André publique la suya.
+- [x] 2.4 Listar los documentos oficiales con sus enlaces, o el mensaje cuando no hay. Verificar con el fixture.
 - [ ] 2.5 Mostrar el historial del `ReviewStore` y el botón "Registrar revisión", que abre el diálogo del Lote D. Verificar que el botón aparece con el rol analista y no con el auditor.
+  - Parte 2: historial conectado a `useRevisiones()` y comprobado con una decisión sintética persistida en el navegador. Pendientes el diálogo y el selector de rol del Lote D, que todavía no están en `main`; no se marca como terminada.
 
 ## 3. C2 · Tarjeta de señal
 
-- [ ] 3.1 Crear la tarjeta con los seis bloques, la referencia internacional y la variante `print`. Verificar con una prueba de componente por cada señal del fixture.
+- [x] 3.1 Crear la tarjeta con los seis bloques, la referencia internacional y la variante `print`. Verificar con una prueba de componente por cada señal del fixture.
 - [x] 3.2 Escribir los textos con plantillas que omiten las frases cuyos datos son nulos. Verificar con pruebas que ningún texto contiene "null", "undefined" ni "NaN".
-- [ ] 3.3 Agregar las notas de calidad, la etiqueta "Dato simulado" en S08 y el enlace al SEACE o el aviso de que falta. Verificar con el fixture.
-- [ ] 3.4 Mostrar el desglose de la prioridad con texto y tooltip, accesible con el teclado. Verificar llegando con la tecla Tab.
+- [x] 3.3 Agregar las notas de calidad, la etiqueta "Dato simulado" en S08 y el enlace al SEACE o el aviso de que falta. Verificar con el fixture.
+- [x] 3.4 Mostrar el desglose de la prioridad con texto y tooltip, accesible con el teclado. Verificar llegando con la tecla Tab.
   - Parte 1: `describePriority` presenta nivel, pesos y puntaje del paquete sin recalcularlos. Pruebas con el fixture y con prioridad nula. Pendientes tooltip e interacción con teclado.
+  - Parte 2: reutiliza `PrioridadBadge`; desglose probado en el foco del componente y llegando con Tab en Edge.
 
 ## 4. C3 · Comparación visual
 
@@ -45,6 +48,16 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 - [ ] 7.1 Ejecutar las pruebas de componentes y `npm run build` en verde, y recorrer una ficha completa con datos reales en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
 
 ## Workflow follow-up
+
+### Verificación de la parte 2 · Tarjeta y ficha del proceso (14 de noviembre de 2026)
+
+- Tareas terminadas y verificadas: 2.1–2.4, 3.1, 3.3 y 3.4. Avance del change: 8/16.
+- `npm ci`: dependencias exactas instaladas, sin cambios en el lockfile. Comprobaciones con Node 24.22.3 temporal.
+- Base: 274 pruebas en 21 archivos. Pruebas nuevas: 24 aprobadas en 3 archivos; una por cada señal del fixture, además de interacción, datos faltantes y fichas.
+- Comprobaciones finales: `npm run typecheck`, `npm run lint`, `npm test` (298 pruebas en 24 archivos) y `npm run build`, todas en verde con Node 24. `openspec validate --all --strict`: 5 changes válidos.
+- Recorrido de producción en Edge: bandeja → ficha → explicación; tooltip con Tab, detalles con Enter, datos persistidos del historial, ficha no prerenderizada y proceso inexistente con `noindex`; sin errores de hidratación.
+- Capturas claras y oscuras a 375 y 1280 px, y oscura a 768 px, en `web/src/features/fichas/evidence/part-2/`; sin desborde horizontal.
+- Siguen pendientes 1.1 y 1.2 hasta la revisión humana del diseño y los textos. Se conserva S01 hasta que el equipo apruebe la propuesta de Stefano. No se marca 2.5 por la dependencia del Lote D ni 7.1 sin datos reales.
 
 ### Verificación de la parte 1 · Textos y lógica (13 de noviembre de 2026)
 
