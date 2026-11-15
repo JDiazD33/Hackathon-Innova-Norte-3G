@@ -32,5 +32,5 @@ export async function cargarIndiceBusqueda(entidadId: string): Promise<EntradaBu
     fuente.listSuppliers(),
     fuente.getManifest(),
   ]);
-  return construirIndice(procesos, proveedores, manifest.modo);
+  return construirIndice(procesos, proveedores, manifest.modo, entidadId);
 }

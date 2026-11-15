@@ -1,8 +1,9 @@
 "use client";
 
 import { CalendarDays, ChevronDown } from "lucide-react";
-import { useId } from "react";
+import { useId, useRef } from "react";
 
+import { useAltoEnVariable } from "@/components/layout/alto-en-variable";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ControlSegmentado } from "@/components/ui/control-segmentado";
@@ -34,13 +35,17 @@ export function FiltrosDeBandeja({
   filtros: FiltrosBandeja;
   onChange: (filtros: FiltrosBandeja) => void;
 }) {
+  // Fija justo debajo de la cabecera (mida lo que mida) y publica su alto para la cabecera de la tabla.
+  const ref = useRef<HTMLElement>(null);
+  useAltoEnVariable(ref, "--alto-filtros");
   const cambiar = (cambios: Partial<FiltrosBandeja>) => onChange({ ...filtros, ...cambios });
   const prioridad: OpcionPrioridad = filtros.prioridades.length === 1 ? filtros.prioridades[0] : "todas";
 
   return (
     <section
+      ref={ref}
       aria-label="Filtros"
-      className="sticky top-[5.75rem] z-20 -mx-1 rounded-barra material-barra lg:top-[4.25rem]"
+      className="sticky top-[calc(var(--alto-cabecera)+0.75rem)] z-20 -mx-1 rounded-barra material-barra"
     >
       <div className="flex items-center gap-2 overflow-x-auto p-2 [scrollbar-width:none] md:flex-wrap md:overflow-visible">
         <ControlSegmentado<OpcionPrioridad>

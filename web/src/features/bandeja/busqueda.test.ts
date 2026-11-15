@@ -51,6 +51,19 @@ describe("buscar", () => {
     expect(buscar(indice, "ocds-fixture-e1-010")[0].id).toBe("ocds-fixture-e1-010");
   });
 
+  it("sus enlaces conservan la entidad del índice, para abrir la ficha en esa entidad", async () => {
+    const indice = construirIndice(
+      await fuente.listProcesses("entidad-0002"),
+      await fuente.listSuppliers(),
+      "publico",
+      "entidad-0002",
+    );
+    const proveedor = indice.find((e) => e.tipo === "proveedor");
+    const proceso = indice.find((e) => e.tipo === "proceso");
+    expect(proveedor?.href).toMatch(/^\/proveedores\/P\d+\?entidad=entidad-0002$/);
+    expect(proceso?.href).toMatch(/^\/procesos\/[^?]+\?entidad=entidad-0002$/);
+  });
+
   it("encuentra proveedores por su seudónimo", async () => {
     const indice = await indiceDe("entidad-0001");
     const [primero] = buscar(indice, "proveedor 0003");

@@ -122,7 +122,7 @@ function TablaBandeja({
         <TableCaption className="sr-only">
           Procesos con señales de {entidad}, ordenados por prioridad de revisión
         </TableCaption>
-        <TableHeader className="[&_th]:sticky [&_th]:top-[7.5rem] [&_th]:z-10 [&_th]:bg-card">
+        <TableHeader className="[&_th]:sticky [&_th]:top-[calc(var(--alto-cabecera)+0.75rem+var(--alto-filtros))] [&_th]:z-10 [&_th]:bg-card">
           <TableRow className="hover:bg-transparent">
             <TableHead className="w-28 ps-5">Prioridad</TableHead>
             <TableHead>Proceso</TableHead>

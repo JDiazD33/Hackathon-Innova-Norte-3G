@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { BarraLateral, BotonMostrarBarraLateral, ColumnaPrincipal } from "@/components/layout/armazon";
 import { BarraDePestanas } from "@/components/layout/barra-de-pestanas";
 import { Buscador, BuscadorCargando } from "@/components/layout/buscador";
+import { CabeceraFija } from "@/components/layout/cabecera-fija";
 import { Marca } from "@/components/layout/marca";
 import { MenuMovil } from "@/components/layout/menu-movil";
 import { ModoDemostracion } from "@/components/layout/modo-demostracion";
@@ -43,7 +44,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       />
 
       <ColumnaPrincipal>
-        <header className="sticky top-0 z-30 material-cabecera">
+        <CabeceraFija>
+          {/*
+           * Primera línea: entidad, buscador, rol y tema. La fecha de corte y el modo entran aquí solo si la
+           * cabecera mide al menos 72rem (@6xl); si no, pasan a la segunda línea. El ancho es el de la propia
+           * cabecera, que ya descuenta la barra lateral.
+           */}
           <div className="mx-auto flex h-14 w-full max-w-contenido items-center gap-2 px-4 md:px-6 lg:px-8">
             <BotonMostrarBarraLateral />
             <MenuMovil marca={<Marca />} />
@@ -55,27 +61,28 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <Suspense fallback={<BuscadorCargando />}>
               <Buscador entidades={entidades} />
             </Suspense>
-            <div className="ms-auto flex items-center gap-2">
-              <span className="hidden lg:inline-flex">{fechaCorte}</span>
+            <div className="ms-auto flex shrink-0 items-center gap-2">
+              <span className="hidden @6xl/cabecera:inline-flex">{fechaCorte}</span>
               {manifest.modo === "publico" && (
-                <span className="hidden md:inline-flex">
+                <span className="hidden @6xl/cabecera:inline-flex">
                   <ModoDemostracion />
                 </span>
               )}
-              {/* Aquí va el selector de rol del Lote D (tarea 2.1). */}
+              {/*
+               * Selector de rol del Lote D (tarea 2.1), desde tablet y en una sola línea:
+               * <span className="hidden md:inline-flex"><RoleSelector /></span>
+               * En el celular no cabe sin una tercera línea; como la decisión se recomienda en escritorio
+               * (ADR 0001), ahí el rol se muestra dentro de Revisión y del diálogo de decisión.
+               */}
               <SelectorTema />
             </div>
           </div>
-          {/* En celular y tablet, la fecha de corte y el modo siguen a la vista en una segunda línea. */}
-          <div className="mx-auto flex w-full max-w-contenido items-center gap-2 px-4 pb-2 md:px-6 lg:hidden">
+          {/* Segunda línea: fecha de corte y modo cuando no caben arriba. */}
+          <div className="mx-auto flex min-h-7 w-full max-w-contenido flex-wrap items-center gap-2 px-4 pb-2 md:px-6 lg:px-8 @6xl/cabecera:hidden">
             {fechaCorte}
-            {manifest.modo === "publico" && (
-              <span className="md:hidden">
-                <ModoDemostracion />
-              </span>
-            )}
+            {manifest.modo === "publico" && <ModoDemostracion />}
           </div>
-        </header>
+        </CabeceraFija>
 
         <main
           id="contenido"

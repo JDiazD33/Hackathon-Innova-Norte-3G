@@ -389,6 +389,9 @@
   }
   html {
     @apply font-sans;
+    /* Altos de las barras fijas; los reemplaza la medición real (components/layout/alto-en-variable.ts). */
+    --alto-cabecera: 3.5rem;
+    --alto-filtros: 3.25rem;
     -webkit-text-size-adjust: 100%;
     font-synthesis-weight: none;
   }
