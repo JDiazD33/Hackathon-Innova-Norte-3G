@@ -11,11 +11,12 @@ El Lote A (datos y señales) se divide en partes. Cada parte tiene su ficha, su 
 | [3 · Señales S01 y S02](parte-3-senales-s01-s02.md) | 3.1–3.4 | `lote-a/parte-3-senales-s01-s02` | En `main`. La 3.4 (verificación en el SEACE) pasa a la parte 9 | Parte 2 |
 | [4 · S03, S04, S08 y Cardinal](parte-4-s03-s04-s08-cardinal.md) | 4.1–4.5 | `lote-a/parte-4-s03-s04-s08-cardinal` | En `main`. La 4.5 (verificación en el SEACE) pasa a la parte 9; S04 espera sus umbrales | Parte 3 |
 | [5 · Prioridad y paquete](parte-5-prioridad-y-paquete.md) | 5.1–5.4 | `lote-a/parte-5-prioridad-y-paquete` | En `main`. La 5.4 (paquete público en la web) pasa a la parte 8 | Partes 3 y 4; tarea 1.6 |
-| [6 · S05, S06 e integración](parte-6-opcionales-e-integracion.md) | 6.1–6.2 | `lote-a/parte-6-opcionales-e-integracion` | En `main`. 6.2: ya están en `main` las partes 3 y 4 de B y la parte 1 de C y de D; falta recorrer la demo cuando estén las pantallas de ficha, explicación, decisión y reporte | Parte 3 (6.1); PR de B, C y D (6.2) |
+| [6 · S05, S06 e integración](parte-6-opcionales-e-integracion.md) | 6.1–6.2 | `lote-a/parte-6-opcionales-e-integracion` | En `main`. 6.2: la demo completa se recorrió el 15 de noviembre sobre el PR #29 integrado con `main` (parte 11); falta que el #29 se apruebe y se fusione, y repetir el recorrido en `main` | Parte 3 (6.1); PR de B, C y D (6.2) |
 | [7 · Verificación final](parte-7-verificacion-final.md) | 7.1 | `lote-a/parte-7-verificacion` | En `main`. Las huellas se repitieron en `main` y son idénticas (parte 8) | Todas |
-| [8 · Decisiones y paquete público](parte-8-decisiones-y-paquete-publico.md) | 1.6 y 5.4 | `lote-a/parte-8-decisiones-y-paquete-publico` | 1.6 hecha: decisiones aprobadas (PR #11) y contrato 1.1 en `main`. Decisiones aplicadas en el PR #26, que se entrega con la parte 10 | Partes 1 a 7 |
-| [9 · Verificación en el SEACE](parte-9-verificacion-seace.md) | 3.4 y 4.5 | `lote-a/parte-9-verificacion-seace` | Lista de casos lista (15 de noviembre); falta la consulta manual del miércoles 18 al viernes 20 | Parte 8 |
-| [10 · Paquete público](parte-10-paquete-publico.md) | 5.4 | `lote-a/parte-10-paquete-publico` | Paquete generado y validado (8,8 MB), en PR; falta que se fusione y que Joaquín active Vercel y confirme la web | Parte 8 |
+| [8 · Decisiones y paquete público](parte-8-decisiones-y-paquete-publico.md) | 1.6 y 5.4 | `lote-a/parte-8-decisiones-y-paquete-publico` | En `main` (PR #26, con la parte 10). 1.6 hecha: decisiones aprobadas (PR #11) y contrato 1.1 (PR #13) | Partes 1 a 7 |
+| [9 · Verificación en el SEACE](parte-9-verificacion-seace.md) | 3.4 y 4.5 | `lote-a/parte-9-verificacion-seace` | Lista de casos en `main` (PR #27); la parte 11 agrega el análisis de versiones de un mismo procedimiento. Falta la consulta manual del miércoles 18 al viernes 20 | Parte 8 |
+| [10 · Paquete público](parte-10-paquete-publico.md) | 5.4 | `lote-a/parte-10-paquete-publico` | En `main` (PR #30). 5.4 cerrada: la web publicada en Vercel carga el paquete público | Parte 8 |
+| [11 · Cierre del Lote A](parte-11-cierre-lote-a.md) | 5.4 y 6.2; análisis para 3.4 y 4.5 | `lote-a/parte-11-cierre-lote-a` | En PR: cierra la 5.4, recorre la demo sobre el PR #29 y documenta las versiones de un mismo procedimiento | Partes 9 y 10 |
 
 ## Cómo empezar una parte
 
@@ -49,25 +50,25 @@ Cuando la parte anterior ya esté en `main`, la rama sale de `origin/main`. Con 
   - `tender.tenderPeriod` no tiene duración;
   - `tender.procurementMethod` falta en los métodos de la Ley 32069;
   - los consorcios cambian de código en cada adjudicación;
-  - el monto final cubre el 9,1 % de los contratos.
+  - el monto final cubre el 9,1 % de los contratos;
+  - un procedimiento nulo o retrotraído se vuelve a publicar con otro `ocid` y la misma nomenclatura ([parte 9](parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento)).
 
-## Qué falta, por qué y quién (14 de noviembre, con el Lote A en `main`)
+## Qué falta, por qué y quién (15 de noviembre)
 
 Lo que queda del Lote A depende de decisiones del equipo, de las pantallas de los otros lotes o de revisiones manuales. El detalle está en cada ficha.
 
-### Decisiones y paquete público (parte 8)
+### Decisiones del equipo
 
 | Qué falta | Por qué no se hizo | Qué hace falta | Quién |
 |---|---|---|---|
-| 5.4 · Paquete público en la web | El paquete está generado y validado en la [parte 10](parte-10-paquete-publico.md); falta fusionarlo | Fusionar su PR; Joaquín activa `PAQUETE_DATOS=publico` en Vercel y confirma que la web lo carga | Joaquín |
 | Umbrales de S04 | Están cargados con su norma (art. 14 de las leyes 32185 y 32513), pero S04 marcaría de 540 a 841 procesos según la calibración | Confirmar los montos y decidir si se activa y con qué calibración | Joaquín y el equipo |
-| Texto de S01 | Depende de la decisión 1 | Que diga "participantes registrados" en lugar de "ofertas" | Sebastián |
+| Versiones de un mismo procedimiento | Hay 331 versiones anteriores (nulas o retrotraídas) que se evalúan como procesos aparte. Cambian S03 (de 30 a 28), S05 (de 7 a 5) y S04 | Decidir con la verificación en el SEACE si se dejan de evaluar ([parte 9](parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento)) | Stefano y el equipo |
 
 ### Bloqueado por las pantallas de los otros lotes
 
 | Qué falta | Por qué no se hizo | Qué hace falta | Quién |
 |---|---|---|---|
-| 6.2 · Recorrer la demo completa | El panel y la bandeja ya están en `main`; la ficha, la explicación, la decisión y el reporte se construyen en la Fase 1 (H1, martes 17) | Cuando estén en `main`, regenerar el paquete y recorrer la demo con el paquete público y con el fixture | B, C y D; recorre Stefano |
+| 6.2 · Recorrer la demo completa | Las pantallas están en el PR #29, que no tiene aprobaciones, y el #22 tiene conflictos. Sobre el #29 integrado con `main`, el recorrido completo ya funciona con el paquete público ([parte 6](parte-6-opcionales-e-integracion.md)) | Aprobar y fusionar el #29; repetir el recorrido en `main` con el paquete público y con el fixture | Otra persona del equipo aprueba el #29; recorre Stefano |
 
 ### Revisiones manuales y documentación
 
@@ -75,4 +76,4 @@ Lo que queda del Lote A depende de decisiones del equipo, de las pantallas de lo
 |---|---|---|---|
 | 3.4 · Verificar en el SEACE 5 casos de S01 (y de S02, si se activa) | Es una revisión manual en el portal, que el pipeline no puede automatizar sin hacer scraping. Está programada del miércoles 18 al viernes 20 | [Parte 9](parte-9-verificacion-seace.md): los 5 casos de S01 están listos; confirmar que `numero_postores` son participantes registrados | Stefano |
 | 4.5 · Verificar en el SEACE 5 casos de S03 y 5 de S04 | Revisión manual, en la misma parte 9. S04 está desactivada hasta tener sus umbrales | [Parte 9](parte-9-verificacion-seace.md): los 5 casos de S03 y los 5 de S04 están listos, con lo que hay que mirar en cada uno | Stefano |
-| Archivar el change de OpenSpec | Siguen abiertas 3.4, 4.5, 5.4 y 6.2, y falta confirmar la entrega del Stage-Gate 1 | `/opsx:archive` cuando todo esté cerrado | Stefano |
+| Archivar el change de OpenSpec | Siguen abiertas 3.4, 4.5 y 6.2, y falta confirmar la entrega del Stage-Gate 1 | `/opsx:archive` cuando todo esté cerrado | Stefano |

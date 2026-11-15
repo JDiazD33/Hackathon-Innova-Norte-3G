@@ -7,7 +7,7 @@ La tarea 6.1 puede adelantarse a la parte 5 si se quiere que S05 salga en el pri
 ## Tareas
 
 - [x] 6.1 Implementar S05 y S06 solo si los datos alcanzan la cobertura mínima. Verificar con pruebas, o con la desactivación registrada en el manifiesto.
-- [ ] 6.2 Integrar en `main` los PR de los lotes B, C y D que estén aprobados. Verificar recorriendo la demo completa en local: bandeja → ficha → explicación → decisión → reporte. *Espera a que esos PR estén aprobados y a que Stefano los fusione.*
+- [ ] 6.2 Integrar en `main` los PR de los lotes B, C y D que estén aprobados. Verificar recorriendo la demo completa en local: bandeja → ficha → explicación → decisión → reporte. *El 15 de noviembre se recorrió la demo completa sobre el PR #29 integrado con `main` (ver abajo). Falta que el #29 se apruebe y se fusione, y repetir el recorrido en `main`.*
 
 ## Resultado de la tarea 6.1 (14 de noviembre)
 
@@ -62,6 +62,32 @@ Para adelantarla, se armó una integración local de prueba, sin tocar `main` ni
 - Stefano fusione en `main` los PR aprobados (los del Lote A también necesitan la revisión de otra persona).
 
 Después se regenera el paquete y se recorre la demo con el paquete público y con el fixture.
+
+## Recorrido con el PR #29 (tarea 6.2, 15 de noviembre)
+
+La 6.2 sigue abierta: el PR #29 (Lote B, parte 15), que integra la revisión, la metodología y el reporte del Lote D, no tiene aprobaciones, y el #22 del Lote D tiene conflictos. Para adelantarla, se recorrió la demo sobre una integración local, sin subir nada: la rama del #29 más `main` (que ya trae el paquete público de la parte 10), fusionadas sin commit en un worktree temporal.
+
+| Comprobación | Resultado |
+|---|---|
+| Fusión con `main` | Sin conflictos |
+| `PAQUETE_DIR=data/publico npm test` | 344 pruebas en verde (33 archivos) |
+| `npm run typecheck` y `npm run lint` | En verde |
+| `PAQUETE_DATOS=publico npm run build` | Termina bien, con las rutas `/`, `/senales`, `/procesos/[ocid]`, `/proveedores/[id]`, `/revision`, `/reporte/[ocid]` y `/metodologia` |
+| Bandeja | El Instituto Regional de Oftalmología muestra 21 procesos con señales, por prioridad y con su nomenclatura |
+| Ficha | `LP-SM-1-2026-IRO/COMITE-1`: nomenclatura, 2 participantes registrados, la señal S03 y los documentos |
+| Explicación | Completa: qué encontramos, la comparación con el grupo (46.3% frente a un límite de 6.8%), qué revisar, qué no significa y los datos usados |
+| Decisión | En Revisión se registró "Requiere atención" con un comentario, y quedó en el historial del navegador |
+| Reporte | Muestra los datos, la señal con su explicación, el historial con la decisión, las reglas `2026.11.2` y la licencia |
+| S01 | La tarjeta dice "Un solo participante registrado" y "Este proceso tuvo 1 participante registrado" |
+
+Al terminar se borraron las revisiones de prueba del navegador y se eliminó el worktree.
+
+**Notas para B y D:**
+
+- El selector de proceso de Revisión lista los 78 procesos de la entidad por fecha y empieza por uno sin señales. Ayudaría empezar por los que tienen señales, o por el proceso desde el que se llega.
+- Dos versiones de un mismo procedimiento salen con el mismo texto: `LP-SM-1-2026-IRO/COMITE-1`, una CONVOCADO y otra CONSENTIDO. Con la nomenclatura y el estado en cada opción se distinguen ([versiones](parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento)).
+
+**Para cerrar la 6.2:** que otra persona del equipo apruebe el PR #29, que se fusione y que se repita el recorrido en `main` con el paquete público y con el fixture.
 
 ## Diseño propuesto
 
