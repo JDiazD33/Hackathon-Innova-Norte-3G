@@ -2,7 +2,8 @@ import type { CategoriaSenal, CodigoSenal, Manifest } from "@/lib/data/types";
 
 /** Redacción propia a partir de docs/datos/catalogo-de-senales.md (catálogo v1). */
 export const SIGNAL_METHODOLOGY = {
-  S01: { name: "Oferta única", category: "competencia", rule: "Procedimiento competitivo con exactamente un postor; se excluye la contratación directa.", reference: "Cardinal R018 · guía de OCP", simulated: false },
+  // Decisión 1 del Lote A: la fuente no publica ofertas (`bids`) y `numero_postores` cuenta participantes registrados.
+  S01: { name: "Un solo participante registrado", category: "competencia", rule: "Procedimiento competitivo con exactamente un participante registrado y al menos una adjudicación; quedan fuera la contratación directa, los métodos dudosos y los procesos desiertos.", reference: "Cardinal R018 · guía de OCP", simulated: false },
   S02: { name: "Plazo corto para presentar ofertas", category: "tiempos", rule: "Duración en días calendario inferior al percentil configurado del grupo de comparación (valor inicial del catálogo: 10).", reference: "Cardinal R003 · guía de OCP", simulated: false },
   S03: { name: "Proveedor recurrente atípico en una entidad", category: "concentracion", rule: "Participación del proveedor superior al límite de comparación en una ventana de 12 meses y al menos tres adjudicaciones, según los parámetros del catálogo v1.", reference: "Guía de OCP · concentración en Arachne", simulated: false },
   S04: { name: "Compras similares cercanas en el tiempo", category: "fraccionamiento", rule: "Dos o más procesos de la misma entidad y clase de ítem, dentro de la ventana configurada (inicial: 60 días), cuya suma supera el umbral del método superior.", reference: "Guía de OCP · trazabilidad de las compras", simulated: false },
