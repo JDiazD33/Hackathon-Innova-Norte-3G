@@ -2,7 +2,7 @@
 
 15 de noviembre de 2026 · rama `lote-c/parte-4-validacion-c-y-d`.
 
-La rama parte de `origin/main` (`0fab640`) e incorpora los commits del PR #29 (`641d616`) con autorización del usuario. Se conserva el trabajo de Joaquín y la autoría de cada commit. El PR #29 y `main` no se fusionan desde esta entrega; el #22 espera la fusión del #29 para cerrarse.
+La rama parte de `origin/main` (`0fab640`) e incorpora los commits del PR #29, incluida su actualización `d068e30`, con autorización del usuario. Se conserva el trabajo de Joaquín y la autoría de cada commit. El PR #29 y `main` no se fusionan desde esta entrega; el #22 espera la fusión del #29 para cerrarse.
 
 ## Cambios propios
 
@@ -25,7 +25,7 @@ Dependencias instaladas con `npm ci`, sin cambiar el lockfile. Comprobaciones ej
 |---|---|
 | `npm run typecheck` | Aprobado |
 | `npm run lint` | Aprobado, sin avisos |
-| `npm test` | 348/348 pruebas en 34 archivos |
+| `npm test -- --maxWorkers=4` | 353/353 pruebas en 35 archivos |
 | `$env:PAQUETE_DATOS='publico'; npm run build` | Aprobado, sin avisos |
 | `openspec validate --all --strict` (raíz) | 5 changes válidos |
 
@@ -49,6 +49,8 @@ Sobre el build público de producción local, con contextos aislados y comentari
 
 El [registro del navegador](browser-verification.json) contiene resultados y límites. S02 se consulta con el fixture, aparte del build real, porque la fuente no publica plazos suficientes y el paquete la desactiva.
 
+Las capturas del recorrido se tomaron antes de incorporar `d068e30`; el selector de Revisión recibió después ese ajuste de orden y etiquetas. La última integración se verificó con tipos, lint, 353 pruebas y build público. La confirmación de voz se registra por separado a continuación.
+
 ## Capturas
 
 | Pantalla | Claro | Oscuro |
@@ -66,13 +68,13 @@ Además: [confirmaciones](acciones-confirmadas.jpg), [ficha móvil](proceso-real
 
 Se guardaron los árboles accesibles de [S02](s02-accessibility.yml) y [S03](s03-accessibility.yml). El SVG queda fuera del árbol y en móvil se mantiene la frase equivalente. Eso no acredita una prueba de voz.
 
-La herramienta inició Narrador y pudo abrir su «Resumen de voz». Su ventana tiene un nivel de acceso superior y la escritura automática en su búsqueda no funcionó; el usuario ayuda a comprobar los anuncios. La lectura de los resúmenes de S02/S03 se mantiene pendiente hasta verificarla y no se marca C 4.1 como aprobada con solo los árboles accesibles.
+La herramienta inició Narrador y abrió su «Resumen de voz». La escritura automática en su búsqueda quedó limitada por Windows, por lo que la prueba se completó con ayuda del usuario. Sebastián confirmó expresamente que escuchó completos ambos resúmenes, con los valores y las aclaraciones indicados abajo. Se cierra C 4.1 como prueba asistida; no se afirma haber grabado audio ni realizado una auditoría completa de accesibilidad. El [registro de voz](narrator-verification.json) distingue la confirmación humana de la inspección automatizada del árbol accesible.
 
-Para completar la lectura con Narrador y Edge:
+Casos comprobados y guía para repetir la lectura con Narrador y Edge:
 
 1. Con el fixture, abrir `/procesos/ocds-fixture-e1-003` y desplegar S02: percentil 9,7, un 9,7 % con plazo igual o menor y franja central entre 25 y 75.
 2. Con el paquete público, abrir `/procesos/ocds-dgv273-seacev3-1162822` y desplegar S03: proveedor 46,3 %, mediana 1,2 %, cuartil superior 3,2 % y límite 6,8 %, con la aclaración de que las referencias no son proveedores individuales.
 3. Recorrer encabezados, expansión, datos usados y casillas; comprobar nombre, estado y foco. En móvil la comparación debe entenderse sin el gráfico.
 4. Registrar qué se anunció y si hubo repeticiones o pérdidas de contexto. [Guía de Microsoft sobre historial de voz y copia de la última frase](https://support.microsoft.com/en-us/accessibility/windows/narrator/chapter-2-narrator-basics?preview=true).
 
-También quedan abiertos comentarios humanos sobre diseño/comprensión, rondas con usuarios y confirmación del catálogo definitivo. Avance registrado: C 12/16 y D 17/20; no se archivan los changes.
+También quedan abiertos comentarios humanos sobre diseño/comprensión, rondas con usuarios y confirmación del catálogo definitivo. Avance registrado: C 13/16 y D 17/20; no se archivan los changes. Al terminar se cerraron las ventanas de prueba de Edge/Narrador y los servidores temporales, por solicitud del usuario.

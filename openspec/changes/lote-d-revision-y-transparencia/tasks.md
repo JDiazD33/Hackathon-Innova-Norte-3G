@@ -58,7 +58,7 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
 ## 8. Verificación del lote
 
 - [x] 8.1 Ejecutar las pruebas y `npm run build` en verde, y recorrer decisión → asignación → reporte en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
-  - Validación integrada con datos reales (15 de noviembre): recorridos completos en dos contextos independientes, claro y oscuro, incluidas las validaciones de comentario/nota, historial y rol auditor. 348 pruebas y build público aprobados. Se cierra la comprobación técnica 8.1; las tareas de revisión humana y accesibilidad siguen abiertas.
+  - Validación integrada con datos reales (15 de noviembre): recorridos completos en dos contextos independientes, claro y oscuro, incluidas las validaciones de comentario/nota, historial y rol auditor. La última integración pasó 353 pruebas y el build público. Se cierra la comprobación técnica 8.1; las tareas de revisión humana y accesibilidad siguen abiertas.
   - Verificada esta entrega independiente: 282 pruebas y compilación aprobadas, con recorrido en Edge y capturas claras/oscuras. El cierre completo del lote sigue abierto junto con la integración de C y las revisiones humanas pendientes.
   - Integración con `main` (15 de noviembre): `npm run typecheck`, `npm run lint`, `npm test` (343 pruebas) y `npm run build` en verde. Recorrido con el build de producción en modo oscuro a 1280 px: ficha → decisión → bandeja → Revisión (pestaña "Decididos") → reporte. La ficha y Revisión también se revisaron en modo claro a 375 px. La asignación no se volvió a recorrer en el navegador (la cubre `review-flow.test.tsx`). Sigue abierta hasta la revisión humana del equipo.
 
@@ -67,9 +67,9 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
 ### Validación integrada de C y D · 15 de noviembre de 2026
 
 - El usuario asume ambos lotes y autorizó incorporar el PR #29 únicamente en la rama nueva `lote-c/parte-4-validacion-c-y-d`. Se conserva la autoría de sus commits. El cierre del #22 espera la fusión del #29, que no se realiza en esta entrega.
-- Completadas 6.2 y 8.1. Avance: 17/20; quedan 1.3 (comentarios del equipo), 7.1 (lista completa de accesibilidad, incluida la lectura por voz y el zoom real) y 7.2 (catálogo definitivo).
+- Completadas 6.2 y 8.1. Avance: 17/20; quedan 1.3 (comentarios del equipo), 7.1 (lista completa de accesibilidad y zoom real) y 7.2 (catálogo definitivo). La lectura de voz de los resúmenes S02/S03 sí se confirmó de forma asistida; no equivale a una auditoría completa de accesibilidad.
 - Correcciones propias: las confirmaciones de decisión y asignación se ajustan al ancho de su botón y no desplazan las acciones vecinas; la metodología refleja los mínimos configurados de S03/S05 y diferencia sus grupos comparables. No se modificaron componentes compartidos, pipeline ni paquete público.
-- `npm ci` sin cambios en el lockfile; tipos, lint, 348 pruebas en 34 archivos y build público aprobados. Cinco changes de OpenSpec válidos en modo estricto. No se repiten comprobaciones tras cambios exclusivos de documentación.
+- Se conserva además `d068e30` del PR #29 (selector ordenado y casos distinguibles). `npm ci` sin cambios en el lockfile; tipos, lint, 353 pruebas en 35 archivos y build público aprobados al terminar la integración. Cinco changes de OpenSpec válidos en modo estricto. No se repiten comprobaciones tras cambios exclusivos de documentación.
 - Verificados atribución en todas las pantallas, rol persistido, permisos del auditor, decisiones y asignaciones desde la ficha real, pestañas de Revisión y reporte con `SignalCard variant="print"`, nomenclatura e historial. Impresión emulada sin navegación, casillas ni botones de expansión; fondo blanco y texto negro. Sin errores de JavaScript ni solicitudes a otros orígenes en los recorridos registrados.
 - Evidencias compartidas con C en `web/src/features/fichas/evidence/part-4-c-y-d/README.md`. La prueba de voz se registra aparte de los árboles accesibles y no se considera aprobada hasta comprobar los anuncios reales.
 

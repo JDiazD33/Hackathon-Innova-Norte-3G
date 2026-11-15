@@ -34,7 +34,7 @@
   ],
   "pageErrors": [],
   "screenReader": {
-    "status": "pending",
-    "reason": "Narrador iniciado; la herramienta no pudo leer la ventana de voz por el nivel de integridad de Windows."
+    "status": "confirmed-assisted",
+    "reason": "Sebastián confirmó mediante dos respuestas del chat la escucha completa de S03 (paquete real) y S02 (fixture) con Narrador. Detalle en narrator-verification.json."
   }
 }
