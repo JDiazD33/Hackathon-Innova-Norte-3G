@@ -10,6 +10,7 @@ import { ModoDemostracion } from "@/components/layout/modo-demostracion";
 import { Pie } from "@/components/layout/pie";
 import { SelectorEntidad, SelectorEntidadCargando } from "@/components/layout/selector-entidad";
 import { SelectorTema } from "@/components/layout/tema";
+import { RoleSelector } from "@/features/revision/ui/role-selector";
 import { cargarEntidades, cargarManifest } from "@/lib/data/cached";
 import { formatFecha } from "@/lib/format";
 
@@ -44,7 +45,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
       <ColumnaPrincipal>
         <header className="sticky top-0 z-30 material-cabecera">
-          <div className="mx-auto flex h-14 w-full max-w-contenido items-center gap-2 px-4 md:px-6 lg:px-8">
+          <div className="mx-auto flex min-h-14 w-full max-w-contenido flex-wrap items-center gap-2 px-4 py-2 md:px-6 lg:px-8">
             <BotonMostrarBarraLateral />
             <MenuMovil marca={<Marca />} />
             <div className="min-w-0 flex-1 md:flex-none">
@@ -62,7 +63,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
                   <ModoDemostracion />
                 </span>
               )}
-              {/* Aquí va el selector de rol del Lote D (tarea 2.1). */}
+              <RoleSelector />
               <SelectorTema />
             </div>
           </div>
