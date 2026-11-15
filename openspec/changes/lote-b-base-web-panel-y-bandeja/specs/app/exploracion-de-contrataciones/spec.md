@@ -46,6 +46,17 @@ La bandeja SHALL permitir filtrar por prioridad, categoría de señal, método d
 - **WHEN** la combinación de filtros no deja procesos
 - **THEN** la bandeja muestra un mensaje claro y el botón "Limpiar filtros", que restablece la lista completa
 
+### Requirement: Exportar la bandeja
+La bandeja SHALL permitir descargar en CSV los procesos que se ven con los filtros aplicados, con su prioridad, señales, nomenclatura y estado de revisión, para abrirlos en Excel, Power BI o Google Sheets sin conexión. El archivo MUST neutralizar los textos que una hoja de cálculo interpretaría como fórmula.
+
+#### Scenario: Exportar con filtros
+- **WHEN** la persona filtra por prioridad alta y elige "Exportar CSV"
+- **THEN** descarga un archivo con una fila por cada proceso de prioridad alta y las tildes se ven bien en Excel
+
+#### Scenario: Texto que parece una fórmula
+- **WHEN** la descripción de un proceso empieza con "="
+- **THEN** el archivo la guarda como texto y la hoja de cálculo no la ejecuta
+
 ### Requirement: Estado de revisión en la bandeja
 La bandeja SHALL mostrar para cada proceso el estado de revisión vigente que informa el almacén de revisiones, y SHALL mostrar "Sin revisar" cuando no exista ninguna decisión.
 

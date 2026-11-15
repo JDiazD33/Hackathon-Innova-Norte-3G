@@ -35,6 +35,8 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 - [ ] 4.4 Implementar el buscador global (Ctrl o Cmd + K) por descripción, ocid y seudónimo. Verificar que elegir un resultado abre la ficha correcta.
   - Parte 4: el buscador encuentra procesos y proveedores (probado con "mobiliario" y por ocid). Falta verificar que abre la ficha cuando el Lote C cree `/procesos/[ocid]` y `/proveedores/[id]`.
 
+- [x] 4.5 Exportar a CSV los procesos visibles de la bandeja (con filtros), para Excel, Power BI y Google Sheets, sin librerías nuevas y con protección contra fórmulas. Verificar con pruebas de la función y abriendo el archivo.
+
 ## 5. B5 · Despliegue y ejecución local
 
 - [ ] 5.1 Desplegar en Vercel con `PAQUETE_DATOS=publico`. Verificar desde otro dispositivo que el enlace abre el panel, la bandeja y una ficha.

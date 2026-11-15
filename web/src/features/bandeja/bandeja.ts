@@ -20,6 +20,8 @@ export interface SenalFila {
 /** Una fila de la bandeja: un proceso con prioridad de revisión. */
 export interface FilaBandeja {
   ocid: string;
+  /** Nomenclatura del SEACE (contrato 1.1); `null` en paquetes 1.0. */
+  nomenclatura: string | null;
   descripcion: string;
   metodo: string;
   objeto: ObjetoProceso;
@@ -41,6 +43,7 @@ export function construirFilas(procesos: readonly Proceso[], senales: readonly S
     return [
       {
         ocid: p.ocid,
+        nomenclatura: p.nomenclatura ?? null,
         descripcion: p.descripcion,
         metodo: p.metodo,
         objeto: p.objeto,
