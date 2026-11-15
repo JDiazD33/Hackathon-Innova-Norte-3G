@@ -142,12 +142,15 @@ Las reglas pasan a `2026.11.2`. También se ajustaron la spec de S01 y S03, las 
 - `PAQUETE_DATOS=publico npm run build` y `npm run start`: el panel muestra la entidad con sus procesos, la señal S05, las categorías, la tendencia y los proveedores con seudónimo; la bandeja lista sus 21 procesos con señales, con prioridad, método, señal, fecha y monto.
 - **Privacidad:** 0 números con forma de RUC y 0 nombres de personas naturales o jurídicas en el paquete público (quedan 12 nombres de consorcios que son nombres de lugares, como en la parte 5). `git status` no muestra `web/data/local/`.
 - **Huellas:** dos ejecuciones completas de la cadena dan huellas idénticas en los 537 archivos.
+- **Con la web actual de `main`** (`fce1475`, con la ficha del proceso y la del proveedor, 15 de noviembre): `npm run typecheck`, `npm run lint`, `npm test` (333 pruebas) y la prueba de contrato del paquete, en verde. La ficha del proceso y la del proveedor cargan con los datos reales; el texto de S03 ya dice "Obtuvo 13 de los 36 procesos adjudicados".
 
 **Pendiente:**
 
 - Joaquín confirma los umbrales de S04, y el equipo elige si se activa y con qué calibración.
 - Fusionar el PR del paquete. Después, Joaquín activa `PAQUETE_DATOS=publico` en Vercel y confirma que la web carga el paquete: eso cierra la 5.4.
-- Sebastián cambia el texto de S01 a "participantes registrados".
+- **Sebastián:**
+  - el texto de S01, que todavía dice "Oferta única" y "Este proceso recibió 1 oferta";
+  - mostrar la `nomenclatura` en la ficha del proceso, para buscarlo en el SEACE. Hoy dice "La fuente no publica un enlace para este proceso".
 
 ## Ya verificado en `main` (pendiente de la parte 7)
 
