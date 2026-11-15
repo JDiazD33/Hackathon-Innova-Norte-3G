@@ -34,8 +34,9 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
 
 ## 5. D4 · Reporte de trazabilidad
 
-- [ ] 5.1 Crear `/reporte/[ocid]` con los datos, las tarjetas del Lote C en su variante `print`, el historial, la fuente, la versión de las reglas y la fecha. Verificar en la vista previa de impresión que no aparece la navegación.
+- [x] 5.1 Crear `/reporte/[ocid]` con los datos, las tarjetas del Lote C en su variante `print`, el historial, la fuente, la versión de las reglas y la fecha. Verificar en la vista previa de impresión que no aparece la navegación.
   - Parcial: la ruta, los datos, la línea de tiempo, los seis bloques de explicación, el historial local, la fuente, la versión, la fecha y la impresión sin navegación están implementados y verificados. Por decisión explícita del usuario, D permanece independiente y no incorpora los commits de C. El reporte usa las plantillas puras de explicación ya presentes en `main`; sustituir esta presentación por `SignalCard variant="print"` y conectar los diálogos desde las fichas queda pendiente.
+  - Integración (15 de noviembre, rama `lote-b/parte-15-integracion-lote-d`): con `main` fusionado, el reporte usa `SignalCard variant="print"` y se retiró `report-explanation.tsx`. Con el build de producción, `/reporte/ocds-fixture-e1-007` mostró las tarjetas S03 y S08 con sus seis bloques y sin casillas, la etiqueta "Dato simulado" en S08 y el historial con la decisión de prueba. No aparecieron la navegación principal ni peticiones a otros orígenes. El CSS de impresión del PR #22 no cambió.
 
 ## 6. D5 · Metodología, atribución y lenguaje
 
@@ -43,6 +44,7 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
   - Página visual implementada a partir del catálogo actual y los referentes documentados. Señales activas/desactivadas, pesos, cortes, fuente, exclusiones, correcciones y fechas salen del manifiesto. La prueba usa pesos distintos para comprobar que el ejemplo refleja el paquete. La revisión del catálogo definitivo sigue en 7.2.
 - [ ] 6.2 Mostrar la atribución del manifiesto en el pie de todas las pantallas. Verificar en el panel, la bandeja, las fichas y el reporte.
   - Verificada en las pantallas D y en el reporte independiente. Falta comprobar el conjunto con las fichas de C integradas; no se modificaron sus rutas.
+  - Integración (15 de noviembre): con las fichas de C en la misma rama, el pie común del layout (atribución del manifiesto, versión de las reglas y enlace a la metodología) se vio en la ficha del proceso y en Revisión. El panel, la bandeja y las fichas usan ese mismo layout. El reporte la muestra en su propio pie, y su prueba lo comprueba. Queda abierta hasta revisar el pie con el paquete público.
 - [x] 6.3 Crear la prueba automática de vocabulario con su lista permitida. Verificar que falla al agregar "posible fraude" en un componente de prueba y que pasa con las frases de la metodología.
 - [x] 6.4 Confirmar que la app no incluye analítica. Verificar revisando `package.json` y la pestaña de red del navegador durante la demo.
 
@@ -55,6 +57,7 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
 
 - [ ] 8.1 Ejecutar las pruebas y `npm run build` en verde, y recorrer decisión → asignación → reporte en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
   - Verificada esta entrega independiente: 282 pruebas y compilación aprobadas, con recorrido en Edge y capturas claras/oscuras. El cierre completo del lote sigue abierto junto con la integración de C y las revisiones humanas pendientes.
+  - Integración con `main` (15 de noviembre): `npm run typecheck`, `npm run lint`, `npm test` (343 pruebas) y `npm run build` en verde. Recorrido con el build de producción en modo oscuro a 1280 px: ficha → decisión → bandeja → Revisión (pestaña "Decididos") → reporte. La ficha y Revisión también se revisaron en modo claro a 375 px. La asignación no se volvió a recorrer en el navegador (la cubre `review-flow.test.tsx`). Sigue abierta hasta la revisión humana del equipo.
 
 ## Workflow follow-up
 
