@@ -237,7 +237,10 @@ export function ProcessView({ detail }: { detail: ProcessDetail }) {
           )}
         </CardContent>
       </Card>
-      <ProcessHistory ocid={process.ocid} />
+      <ProcessHistory
+        ocid={process.ocid}
+        description={process.descripcion || SIN_DATO}
+      />
     </div>
   );
 }
