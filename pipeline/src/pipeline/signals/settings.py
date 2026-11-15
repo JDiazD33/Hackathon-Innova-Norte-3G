@@ -36,6 +36,7 @@ class MethodTable:
     competitive: tuple[str, ...]
     non_competitive: tuple[str, ...]
     variants: dict[str, str]
+    doubtful: tuple[str, ...]  # without a signal: not known whether there was competition
 
 
 @dataclass(frozen=True)
@@ -43,6 +44,7 @@ class S01Settings:
     switch: SignalSwitch
     unit: str
     threshold_description: str
+    awarded_only: bool  # evaluate only processes with at least one award
 
 
 @dataclass(frozen=True)
@@ -58,6 +60,7 @@ class S03Settings:
     switch: SignalSwitch
     window_months: int
     minimum_awards: int
+    minimum_share: float  # besides the fence, the share must reach this value
 
 
 @dataclass(frozen=True)
@@ -84,6 +87,7 @@ class S05Settings:
     direct_methods: tuple[str, ...]  # base methods that count as direct contracting
     minimum_processes: int
     minimum_direct: int
+    minimum_share: float  # besides the fence, the share must reach this value
 
 
 @dataclass(frozen=True)
@@ -149,6 +153,14 @@ def get_text_list(data: dict[str, Any], key: str, path: Path) -> tuple[str, ...]
     return tuple(value)
 
 
+def get_share(data: dict[str, Any], key: str, path: Path) -> float:
+    """A proportion from 0 (no minimum) to less than 1."""
+    value = get_number(data, key, path)
+    if not 0 <= value < 1:
+        raise ConfigError(f"El parámetro '{key}' de {path} debe estar entre 0 y 1")
+    return value
+
+
 def _switch(data: dict[str, Any], code: str, path: Path) -> SignalSwitch:
     active = get_bool(data, f"{code}.activa", path)
     reason = None if active else get_text(data, f"{code}.motivo", path)
@@ -184,7 +196,14 @@ def _methods(data: dict[str, Any], path: Path) -> MethodTable:
                 f"La variante '{name}' de {path} apunta a '{base}', que no está en "
                 "metodos.competitivos ni en metodos.no_competitivos"
             )
-    return MethodTable(competitive, non_competitive, dict(variants))
+    doubtful = get_text_list(data, "metodos.dudosos", path)
+    classified = sorted(set(doubtful) & (known | set(variants)))
+    if classified:
+        raise ConfigError(
+            f"Un método dudoso no puede estar también clasificado en {path}: "
+            + ", ".join(classified)
+        )
+    return MethodTable(competitive, non_competitive, dict(variants), doubtful)
 
 
 CATEGORIES = {"bienes": "goods", "servicios": "services", "obras": "works"}
@@ -258,6 +277,7 @@ def _s05(
         direct_methods=direct,
         minimum_processes=get_positive_int(data, "S05.minimo_procesos", path),
         minimum_direct=get_positive_int(data, "S05.minimo_directas", path),
+        minimum_share=get_share(data, "S05.proporcion_minima", path),
     )
 
 
@@ -330,6 +350,7 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
             switch=switches["S01"],
             unit=get_text(data, "S01.unidad", path),
             threshold_description=get_text(data, "S01.descripcion_umbral", path),
+            awarded_only=get_bool(data, "S01.solo_con_adjudicacion", path),
         ),
         s02=S02Settings(
             switch=switches["S02"],
@@ -341,6 +362,7 @@ def load_signals_config(path: Path = DEFAULT_SIGNALS_CONFIG) -> SignalsConfig:
             switch=switches["S03"],
             window_months=get_positive_int(data, "S03.ventana_meses", path),
             minimum_awards=get_positive_int(data, "S03.minimo_adjudicaciones", path),
+            minimum_share=get_share(data, "S03.participacion_minima", path),
         ),
         s04=_s04(data, path, switches["S04"], methods),
         s05=_s05(data, path, switches["S05"], methods),

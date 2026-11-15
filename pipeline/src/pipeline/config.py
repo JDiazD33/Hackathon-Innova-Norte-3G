@@ -52,6 +52,11 @@ class SupplierConfig:
 
 
 @dataclass(frozen=True)
+class PackageConfig:
+    documents_per_type: int  # documents of each type per process, the most recent ones
+
+
+@dataclass(frozen=True)
 class PipelineConfig:
     path: Path
     rules_version: str
@@ -59,6 +64,7 @@ class PipelineConfig:
     download: DownloadConfig
     scope: ScopeConfig
     suppliers: SupplierConfig
+    package: PackageConfig
 
 
 def read_toml(path: Path) -> dict[str, Any]:
@@ -116,6 +122,12 @@ def load_config(path: Path = DEFAULT_CONFIG) -> PipelineConfig:
     for prefix in (*natural, *legal):
         if not _RUC_PREFIX.fullmatch(prefix):
             raise ConfigError(f"Los prefijos de RUC de {path} deben tener dos dígitos: '{prefix}'")
+    documents = get_value(data, "paquete.documentos_por_tipo", path)
+    if isinstance(documents, bool) or not isinstance(documents, int) or documents < 1:
+        raise ConfigError(
+            f"El parámetro 'paquete.documentos_por_tipo' de {path} "
+            "debe ser un entero mayor que cero"
+        )
     return PipelineConfig(
         path=path,
         rules_version=get_text(data, "version_reglas", path),
@@ -135,6 +147,7 @@ def load_config(path: Path = DEFAULT_CONFIG) -> PipelineConfig:
             years=get_years(data, "alcance.anios", path),
         ),
         suppliers=SupplierConfig(natural_person_prefixes=natural, legal_person_prefixes=legal),
+        package=PackageConfig(documents_per_type=documents),
     )
 
 

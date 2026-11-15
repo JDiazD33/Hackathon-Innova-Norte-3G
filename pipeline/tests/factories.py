@@ -31,6 +31,9 @@ anios = [2025, 2026]
 [proveedores]
 prefijos_ruc_persona_natural = ["10", "15", "16", "17"]
 prefijos_ruc_persona_juridica = ["20"]
+
+[paquete]
+documentos_por_tipo = 1
 """
 
 

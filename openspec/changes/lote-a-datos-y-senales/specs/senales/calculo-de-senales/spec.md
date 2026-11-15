@@ -6,19 +6,24 @@ Calcular de forma reproducible las señales que ameritan revisión en las contra
 
 ## ADDED Requirements
 
-### Requirement: Señal de oferta única (S01)
-El sistema SHALL marcar con S01 cada proceso de un método competitivo que tenga exactamente un postor. La contratación directa SHALL quedar fuera de esta señal.
+### Requirement: Señal de un solo participante registrado (S01)
+El sistema SHALL marcar con S01 cada proceso de un método competitivo que tenga exactamente un participante registrado (`numero_postores`, porque la fuente no publica ofertas) y al menos una adjudicación. La contratación directa y los métodos dudosos SHALL quedar fuera de esta señal.
 
-#### Scenario: Adjudicación simplificada con un postor
-- **WHEN** una adjudicación simplificada registra un solo postor
-- **THEN** el proceso tiene la señal S01 con valor 1 y unidad "postores"
+#### Scenario: Adjudicación simplificada con un participante
+- **WHEN** una adjudicación simplificada adjudicada registra un solo participante
+- **THEN** el proceso tiene la señal S01 con valor 1 y unidad "participantes registrados"
 
 #### Scenario: Contratación directa
 - **WHEN** una contratación directa registra un solo postor
 - **THEN** el proceso no tiene la señal S01
 
+#### Scenario: Proceso desierto
+- **WHEN** un proceso competitivo con un solo participante no tiene ninguna adjudicación
+- **THEN** el proceso no tiene la señal S01
+- **AND** el manifiesto suma una exclusión de S01 con el motivo "proceso sin adjudicación"
+
 #### Scenario: Sin dato de postores
-- **WHEN** un proceso no informa el número de postores
+- **WHEN** un proceso no informa el número de participantes
 - **THEN** S01 no se evalúa para ese proceso
 - **AND** el manifiesto suma una exclusión de S01 con el motivo "sin dato de postores"
 
@@ -35,7 +40,7 @@ El sistema SHALL marcar con S02 un proceso cuyo plazo de presentación de oferta
 - **AND** el resultado indica el ámbito "nacional"
 
 ### Requirement: Señal de proveedor recurrente atípico (S03)
-El sistema SHALL marcar con S03 la combinación de proveedor y entidad cuando, en una ventana de 12 meses, la participación del proveedor en el monto o en el número de adjudicaciones de la entidad supere la valla superior de Tukey de los proveedores de esa entidad, y el proveedor tenga al menos 3 adjudicaciones.
+El sistema SHALL marcar con S03 la combinación de proveedor y entidad cuando, en una ventana de 12 meses, la participación del proveedor en el monto o en el número de adjudicaciones de la entidad supere la valla superior de Tukey de los proveedores de esa entidad y alcance la participación mínima configurada (5 % por defecto), y el proveedor tenga al menos 3 adjudicaciones.
 
 #### Scenario: Proveedor con participación atípica
 - **WHEN** un proveedor ganó 9 de los 12 procesos de una entidad en 12 meses y esa participación supera la valla superior
@@ -44,6 +49,10 @@ El sistema SHALL marcar con S03 la combinación de proveedor y entidad cuando, e
 
 #### Scenario: Pocas adjudicaciones
 - **WHEN** un proveedor tiene 2 adjudicaciones, aunque su participación sea atípica
+- **THEN** no se genera S03
+
+#### Scenario: Participación baja sobre una valla baja
+- **WHEN** un proveedor ganó 3 de 100 procesos (3 %), la valla de su entidad es 1 % y la participación mínima es 5 %
 - **THEN** no se genera S03
 
 ### Requirement: Señal de compras similares cercanas (S04)

@@ -46,6 +46,7 @@ def test_missing_section_is_named(tmp_path: Path) -> None:
         ('departamento = "LA LIBERTAD"', 'departamento = ""', "alcance.departamento"),
         ("name={archivo}", "name=2026.jsonl.gz", "url_plantilla"),
         ('["20"]', '["2"]', "dos dígitos"),
+        ("documentos_por_tipo = 1", "documentos_por_tipo = 0", "paquete.documentos_por_tipo"),
     ],
 )
 def test_invalid_values_are_rejected(tmp_path: Path, old: str, new: str, message: str) -> None:

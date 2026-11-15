@@ -28,6 +28,18 @@ No copiamos código ni textos de nadie. Tomamos los referentes de cuatro formas 
 | **Kingfisher Collect y OCDS Kit** (OCP) | **Sí**, si hiciera falta | BSD-3-Clause | Descargar y manipular datos OCDS. Hoy el OCP Data Registry ya nos entrega los archivos |
 | **Human Interface Guidelines** (Apple) | **No** su software ni sus recursos: fuentes SF, SF Symbols, kits e íconos | Guías de acceso público; los recursos tienen licencias propias | Principios y patrones de interfaz: el contenido primero, una capa de vidrio para los controles, tipografía y color con moderación ([ADR 0008](../adr/0008-prisma-y-diseno-inspirado-en-apple.md)) |
 
+## Dependencias del pipeline
+
+El pipeline del Lote A usa estas librerías abiertas como dependencias, sin copiar su código. Las versiones exactas están en `pipeline/uv.lock`.
+
+| Dependencia | Versión | Licencia | Para qué la usamos |
+|---|---|---|---|
+| **DuckDB** | 2.0.0 | MIT | Lee los archivos OCDS comprimidos, arma las tablas normalizadas y calcula las señales con SQL |
+| **jsonschema** | 4.26.0 | MIT | Valida cada archivo del paquete de datos contra el JSON Schema del contrato antes de escribirlo |
+| **ocdscardinal** (Cardinal) | 0.0.9 | MIT | Contraste de S01 con el indicador R018 ([detalle](#cardinal-en-detalle)) |
+
+Para las pruebas y el formato se usan pytest y ruff (MIT), que no forman parte del paquete.
+
 ## Cardinal en detalle
 
 - **Qué es:** librería y herramienta de línea de comandos de Open Contracting Partnership para calcular banderas rojas e indicadores con datos OCDS. Está escrita en Rust y tiene un paquete de Python, `ocdscardinal` (versión 0.0.9 de octubre de 2026, MIT, Python ≥ 3.11).
@@ -95,3 +107,5 @@ En la ficha técnica, en la página de metodología y en el pie de la aplicació
 - [ProACT del Banco Mundial](https://anticor.world/en/main/news_page/the_world_bank_launches_a_prototype_platform_to_counter_corruption_in_public_procurement)
 - [FUNES, según OCP](https://www.open-contracting.org/2020/09/10/funes-the-corruption-detecting-algorithm-that-never-forgets/) · [GIJN](https://gijn.org/es/articulos/memoria-contra-la-corrupcion-datos-y-algoritmos-para-investigar-compras-publicas/)
 - [Serenata de Amor](https://github.com/okfn-brasil/serenata-de-amor) · [Kingfisher Collect](https://github.com/open-contracting/kingfisher-collect) · [OCDS Kit](https://github.com/open-contracting/ocdskit)
+- [DuckDB](https://duckdb.org/) · [licencia MIT](https://github.com/duckdb/duckdb/blob/main/LICENSE)
+- [jsonschema](https://python-jsonschema.readthedocs.io/) · [licencia MIT](https://github.com/python-jsonschema/jsonschema/blob/main/COPYING)
