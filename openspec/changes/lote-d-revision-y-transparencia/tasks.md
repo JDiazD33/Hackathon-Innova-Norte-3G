@@ -42,7 +42,8 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
 
 - [x] 6.1 Crear `/metodologia` con el catálogo, la fórmula de prioridad, los referentes con sus licencias, la fuente, los límites, la versión y la fecha de corte. Verificar comparándola con `docs/datos/catalogo-de-senales.md` y con el manifiesto.
   - Página visual implementada a partir del catálogo actual y los referentes documentados. Señales activas/desactivadas, pesos, cortes, fuente, exclusiones, correcciones y fechas salen del manifiesto. La prueba usa pesos distintos para comprobar que el ejemplo refleja el paquete. La revisión del catálogo definitivo sigue en 7.2.
-- [ ] 6.2 Mostrar la atribución del manifiesto en el pie de todas las pantallas. Verificar en el panel, la bandeja, las fichas y el reporte.
+- [x] 6.2 Mostrar la atribución del manifiesto en el pie de todas las pantallas. Verificar en el panel, la bandeja, las fichas y el reporte.
+  - Cierre técnico (15 de noviembre): build con `PAQUETE_DATOS=publico`, respuestas HTTP 200 y atribución exacta del manifiesto más enlace a metodología dentro de `footer` en panel, `/senales`, ficha de proceso, ficha de proveedor, revisión, metodología y reporte. Comprobación sobre HTML servido en localhost:3001; no sustituye la revisión visual de 7.1.
   - Verificada en las pantallas D y en el reporte independiente. Falta comprobar el conjunto con las fichas de C integradas; no se modificaron sus rutas.
   - Integración (15 de noviembre): con las fichas de C en la misma rama, el pie común del layout (atribución del manifiesto, versión de las reglas y enlace a la metodología) se vio en la ficha del proceso y en Revisión. El panel, la bandeja y las fichas usan ese mismo layout. El reporte la muestra en su propio pie, y su prueba lo comprueba. Queda abierta hasta revisar el pie con el paquete público.
 - [x] 6.3 Crear la prueba automática de vocabulario con su lista permitida. Verificar que falla al agregar "posible fraude" en un componente de prueba y que pasa con las frases de la metodología.
@@ -51,7 +52,8 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
 ## 7. Accesibilidad (Fase 2)
 
 - [ ] 7.1 Revisar todas las pantallas con la lista de accesibilidad de `docs/diseno/sistema-de-diseno.md` y corregir lo pendiente. Verificar marcando cada punto de la lista.
-- [ ] 7.2 Comparar la metodología con el catálogo de señales final antes de la entrega. Verificar que no hay diferencias.
+- [x] 7.2 Comparar la metodología con el catálogo de señales final antes de la entrega. Verificar que no hay diferencias.
+  - Comparada con el catálogo aprobado y manifiesto `2026.11.2` de `main` (15 de noviembre): S01 participante registrado con adjudicación; S03 y S05 con mínimos del 5 % y sus grupos de comparación; S04 con método, objeto y umbral; S06 con moneda y cobertura; S07 prevista y S08 exclusivamente sintética. Señales activas, motivos de desactivación, pesos, cortes, fechas y versión salen del manifiesto. Pruebas de metodología con fixture y paquete público aprobadas. Reabrir esta tarea si el equipo modifica el catálogo antes de entregar.
 
 ## 8. Verificación del lote
 
@@ -60,6 +62,14 @@ Sebastián asume la implementación en reemplazo de André por indicación del u
   - Integración con `main` (15 de noviembre): `npm run typecheck`, `npm run lint`, `npm test` (343 pruebas) y `npm run build` en verde. Recorrido con el build de producción en modo oscuro a 1280 px: ficha → decisión → bandeja → Revisión (pestaña "Decididos") → reporte. La ficha y Revisión también se revisaron en modo claro a 375 px. La asignación no se volvió a recorrer en el navegador (la cubre `review-flow.test.tsx`). Sigue abierta hasta la revisión humana del equipo.
 
 ## Workflow follow-up
+
+### Cierre técnico de André · 15 de noviembre de 2026
+
+- Rama `lote-d/parte-6-cierre-y-flujo`, basada en la integración de Joaquín `641d616` e incorporando `main` `0fab640`. Se conservan commits, datos y autorías de los compañeros.
+- Guía de revisión humana inspirada en Arachne, enlace de Revisión a la ficha con entidad, orientación para sustentar decisiones y asignaciones, y metodología reconciliada con reglas `2026.11.2` y tipografía IBM Plex.
+- `npm run typecheck`, `npm run lint`, `npm test` (346 pruebas en 34 archivos), `PAQUETE_DIR=data/publico npm test -- paquete` (10 pruebas) y `PAQUETE_DATOS=publico npm run build`: aprobados. OpenSpec válido con `--strict`.
+- Estado: 17/20. Abiertas 1.3 (revisión del equipo), 7.1 (accesibilidad completa) y 8.1 (recorrido visual en ambos temas y PR). El acceso al navegador no respondió; no se presentan capturas antiguas como evidencia actual.
+- Flujo, evidencia, límites y pasos de aceptación: `web/src/features/revision/evidence/interface/cierre-2026-11-15.md`.
 
 ### Verificación de las pantallas independientes · 14 de noviembre de 2026
 

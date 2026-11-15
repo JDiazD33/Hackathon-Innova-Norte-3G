@@ -148,8 +148,9 @@ function DecisionForm({
                 className="aria-invalid:border-ring aria-invalid:ring-ring/20"
               />
               <p id={`${id}-help`} className="text-nota text-muted-foreground">
-                Explica el sustento o qué falta revisar. No incluyas datos
-                personales.
+                Indica el documento o enlace consultado, qué contrastaste y por
+                qué sustenta tu decisión. Si falta evidencia, describe la
+                revisión pendiente. No incluyas datos personales.
               </p>
               {errors.comment && (
                 <p id={`${id}-error`} role="alert" className="text-subtitulo">

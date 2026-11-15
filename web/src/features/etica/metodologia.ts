@@ -1,16 +1,16 @@
 import type { CategoriaSenal, CodigoSenal, Manifest } from "@/lib/data/types";
 
-/** Redacción propia a partir de docs/datos/catalogo-de-senales.md (catálogo v1). */
+/** Redacción propia a partir de docs/datos/catalogo-de-senales.md (reglas 2026.11.2). */
 export const SIGNAL_METHODOLOGY = {
   // Decisión 1 del Lote A: la fuente no publica ofertas (`bids`) y `numero_postores` cuenta participantes registrados.
   S01: { name: "Un solo participante registrado", category: "competencia", rule: "Procedimiento competitivo con exactamente un participante registrado y al menos una adjudicación; quedan fuera la contratación directa, los métodos dudosos y los procesos desiertos.", reference: "Cardinal R018 · guía de OCP", simulated: false },
   S02: { name: "Plazo corto para presentar ofertas", category: "tiempos", rule: "Duración en días calendario inferior al percentil configurado del grupo de comparación (valor inicial del catálogo: 10).", reference: "Cardinal R003 · guía de OCP", simulated: false },
-  S03: { name: "Proveedor recurrente atípico en una entidad", category: "concentracion", rule: "Participación del proveedor superior al límite de comparación en una ventana de 12 meses y al menos tres adjudicaciones, según los parámetros del catálogo v1.", reference: "Guía de OCP · concentración en Arachne", simulated: false },
-  S04: { name: "Compras similares cercanas en el tiempo", category: "fraccionamiento", rule: "Dos o más procesos de la misma entidad y clase de ítem, dentro de la ventana configurada (inicial: 60 días), cuya suma supera el umbral del método superior.", reference: "Guía de OCP · trazabilidad de las compras", simulated: false },
-  S05: { name: "Uso atípico de contratación directa", category: "competencia", rule: "Proporción de contratación directa superior al límite de comparación de entidades del mismo tipo. Se presenta a nivel de entidad y no suma a la prioridad del proceso.", reference: "Guía de OCP", simulated: false },
-  S06: { name: "Monto final mayor que el contratado", category: "ejecucion", rule: "Monto final igual o superior al monto contratado multiplicado por el factor configurado (inicial: 1,15). Solo se calcula cuando existen los montos necesarios.", reference: "Guía de OCP", simulated: false },
+  S03: { name: "Proveedor recurrente atípico en una entidad", category: "concentracion", rule: "Participación del proveedor en el monto o en los procesos adjudicados superior a la valla de Tukey (Q3 + 1,5 × RIC), en una ventana de 12 meses, con al menos tres procesos adjudicados y una participación mínima del 5 % según el catálogo 2026.11.2. Los consorcios con identificadores cambiantes no se acumulan como un mismo proveedor.", reference: "Guía de OCP · concentración en Arachne", simulated: false },
+  S04: { name: "Compras similares cercanas en el tiempo", category: "fraccionamiento", rule: "Dos o más procesos de la misma entidad, clase UNSPSC, método y tipo de objeto, dentro de la ventana configurada (inicial: 60 días), cuya suma supera el umbral del método superior. Solo se evalúan grupos con un umbral configurado; su activación depende del manifiesto.", reference: "Guía de OCP · trazabilidad de las compras", simulated: false },
+  S05: { name: "Uso atípico de contratación directa", category: "competencia", rule: "Proporción de contratación directa por monto referencial o cantidad superior a la valla de Tukey de entidades del mismo tipo, con al menos 10 procesos, tres contrataciones directas y una proporción mínima del 5 % según el catálogo 2026.11.2. Si el grupo regional tiene menos de 30 entidades, se usa el grupo nacional. Se presenta a nivel de entidad y no suma a la prioridad del proceso.", reference: "Guía de OCP", simulated: false },
+  S06: { name: "Monto final mayor que el contratado", category: "ejecucion", rule: "Monto final igual o superior al monto contratado multiplicado por el factor configurado (inicial: 1,15). Solo se calcula con montos en la misma moneda y cobertura suficiente de monto final (mínimo del catálogo: 10 %); el manifiesto informa si queda desactivada.", reference: "Guía de OCP", simulated: false },
   S07: { name: "Proveedor con sanción vigente adjudicado", category: "reputacional", rule: "Señal prevista para una fase posterior; requiere una fuente abierta y la comprobación de la vigencia en la fecha de adjudicación.", reference: "Categoría reputacional de Arachne", simulated: false },
-  S08: { name: "Sustento y separación de funciones del expediente", category: "trazabilidad", rule: "Ejemplo sintético de etapas a cargo de una misma persona, conformidad sin documento o pago sin conformidad registrada. Los datos abiertos no contienen este expediente interno.", reference: "Trazabilidad interna del caso de demostración", simulated: true },
+  S08: { name: "Sustento y separación de funciones del expediente", category: "trazabilidad", rule: "Ejemplo sintético de una misma persona a cargo del requerimiento, evaluación y conformidad, o de un pago sin conformidad documentada. Los datos abiertos no contienen este expediente interno.", reference: "Trazabilidad interna del caso de demostración", simulated: true },
 } satisfies Record<CodigoSenal, { name: string; category: CategoriaSenal; rule: string; reference: string; simulated: boolean }>;
 
 /** Referentes y forma de uso según docs/producto/referentes-internacionales.md. */
@@ -33,14 +33,14 @@ export const SOFTWARE_ACKNOWLEDGEMENTS = [
   { name: "Recharts", license: "MIT", use: "Gráficos y comparaciones" },
   { name: "lucide-react", license: "ISC", use: "Íconos de la interfaz" },
   { name: "next-themes", license: "MIT", use: "Preferencia de tema claro y oscuro" },
-  { name: "Inter", license: "SIL Open Font License 1.1", use: "Fuente alternativa incluida en la construcción de la aplicación" },
+  { name: "IBM Plex Sans y Mono", license: "SIL Open Font License 1.1", use: "Fuentes del diseño institucional incluidas en la construcción de la aplicación" },
 ] as const;
 
 export const METHODOLOGY_LIMITS = [
   "Una señal no prueba corrupción.",
   "La prioridad de revisión no es una probabilidad de corrupción.",
   "Los parámetros iniciales del catálogo son configurables. Cada explicación debe mostrar el umbral y las entradas usados por la versión de la regla del paquete.",
-  "Los grupos comparables usan método, año y, cuando hay cobertura, tipo de objeto. Si el grupo tiene menos de 30 casos, el catálogo prevé ampliar la referencia al ámbito nacional e indicarlo.",
+  "Los grupos de comparación dependen de la señal: S01 usa método y año; S03 compara proveedores de la misma entidad; S05 compara entidades del mismo tipo. Cuando corresponde ampliar la referencia regional al ámbito nacional por falta de casos, la explicación lo indica.",
   "Los datos abiertos no incluyen compras sin procedimiento de selección, incluidas las menores a 8 UIT; esto limita el análisis de compras similares.",
   "La fuente no publica pagos, hitos ni modificaciones contractuales. El monto final permite una comparación cuando existe, pero no reconstruye todos los cambios del contrato.",
   "Las etapas internas, sus responsables y los pagos de S08 son datos simulados y deben identificarse como tales.",

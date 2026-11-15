@@ -149,7 +149,7 @@ function AssignmentForm({
                 onChange={(event) => setNote(event.target.value)}
                 required
                 aria-invalid={Boolean(errors.note)}
-                aria-describedby={errors.note ? `${id}-note-error` : undefined}
+                aria-describedby={`${id}-note-help${errors.note ? ` ${id}-note-error` : ""}`}
                 className="aria-invalid:border-ring aria-invalid:ring-ring/20"
               />
               {errors.note && (
@@ -157,8 +157,9 @@ function AssignmentForm({
                   {errors.note}
                 </p>
               )}
-              <p className="text-nota text-muted-foreground">
-                Describe la revisión pendiente sin incluir datos personales.
+              <p id={`${id}-note-help`} className="text-nota text-muted-foreground">
+                Indica qué documento o dato debe contrastar el rol destinatario
+                y cuál es el siguiente paso, sin incluir datos personales.
               </p>
             </div>
             {errors.form && <p role="alert">{errors.form}</p>}

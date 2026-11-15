@@ -12,6 +12,20 @@ afterEach(cleanup);
 const source = new StaticDataSource(path.join(process.cwd(), "data/fixture"));
 
 describe("Página de metodología", () => {
+  it("refleja el paquete público y explica los mínimos aprobados de S03 y S05", async () => {
+    const publicSource = new StaticDataSource(path.join(process.cwd(), "data/publico"));
+    const manifest = await publicSource.getManifest();
+    render(<MethodologyView manifest={manifest} />);
+    expect(screen.getByText(manifest.atribucion)).toBeVisible();
+    expect(screen.getByText(manifest.version_reglas)).toBeVisible();
+    expect(screen.getByText(/participación mínima del 5 %/)).toBeVisible();
+    expect(screen.getByText(/proporción mínima del 5 %/)).toBeVisible();
+    for (const signal of manifest.senales_desactivadas) {
+      expect(screen.getByText(signal.motivo)).toBeVisible();
+    }
+    expect(screen.getByText("IBM Plex Sans y Mono")).toBeVisible();
+    expect(screen.queryByRole("row", { name: /^S05 / })).not.toBeInTheDocument();
+  });
   it("presenta el origen y los pesos recibidos sin sustituirlos por los valores iniciales", async () => {
     const manifest = await source.getManifest();
     manifest.prioridad = {

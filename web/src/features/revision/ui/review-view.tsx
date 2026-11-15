@@ -34,6 +34,7 @@ import { AssignmentDialog } from "./assignment-dialog";
 import { DecisionDialog } from "./decision-dialog";
 import { ReviewFiles } from "./review-files";
 import { ReviewHistory } from "./review-history";
+import { ReviewGuide } from "./review-guide";
 import { ReviewRoleProvider, useReviewRole } from "./review-role";
 
 export interface ReviewCase {
@@ -85,6 +86,11 @@ function ReviewContent({ entity, cases }: ReviewViewProps) {
   function actions(process: ReviewCase, primary = false) {
     return (
       <div className="flex flex-wrap items-start gap-2">
+        <Button asChild variant="outline">
+          <Link href={conEntidad(`/procesos/${encodeURIComponent(process.ocid)}`, entity.id)}>
+            Consultar ficha y evidencia
+          </Link>
+        </Button>
         <DecisionDialog
           ocid={process.ocid}
           title={process.description}
@@ -158,7 +164,7 @@ function ReviewContent({ entity, cases }: ReviewViewProps) {
         titulo="Revisión"
         descripcion={`Decisiones y asignaciones de ${entity.nombre}. Rol actual: ${ROLE_LABELS[role]}.`}
       />
-      <ReviewFiles />
+      <ReviewGuide entityId={entity.id} />
       <section aria-labelledby="review-cases" className="space-y-4">
         <h2 id="review-cases" className="text-titulo-2">
           Revisar un proceso
@@ -229,6 +235,7 @@ function ReviewContent({ entity, cases }: ReviewViewProps) {
           ))}
         </Tabs>
       </section>
+      <ReviewFiles />
     </div>
   );
 }
