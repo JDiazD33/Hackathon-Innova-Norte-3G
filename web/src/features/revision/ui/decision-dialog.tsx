@@ -87,7 +87,7 @@ function DecisionForm({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="grid max-w-full justify-items-start gap-2">
       <Dialog
         open={open}
         onOpenChange={(value) => {
@@ -175,7 +175,10 @@ function DecisionForm({
         </DialogContent>
       </Dialog>
       {feedback && (
-        <p role="status" className="text-subtitulo text-muted-foreground">
+        <p
+          role="status"
+          className="w-0 min-w-full break-words text-subtitulo text-muted-foreground"
+        >
           {feedback}
         </p>
       )}

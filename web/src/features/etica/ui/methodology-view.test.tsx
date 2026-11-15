@@ -36,4 +36,17 @@ describe("Página de metodología", () => {
       }),
     ).not.toBeInTheDocument();
   });
+
+  it("refleja las señales activas y los mínimos configurados del paquete público", async () => {
+    const publicSource = new StaticDataSource(path.join(process.cwd(), "data/publico"));
+    const manifest = await publicSource.getManifest();
+    render(<MethodologyView manifest={manifest} />);
+    expect(screen.getByText(manifest.atribucion)).toBeVisible();
+    expect(screen.getByText(manifest.version_reglas)).toBeVisible();
+    expect(screen.getByText(/participación mínima configurada/)).toBeVisible();
+    expect(screen.getByText(/proporción mínima configurada/)).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Plazo corto para presentar ofertas" })).not.toBeInTheDocument();
+    for (const item of manifest.senales_desactivadas)
+      expect(screen.getByText(item.motivo, { exact: false })).toBeVisible();
+  });
 });

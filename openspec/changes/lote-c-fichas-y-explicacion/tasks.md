@@ -49,9 +49,19 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 
 ## 7. Verificación del lote
 
-- [ ] 7.1 Ejecutar las pruebas de componentes y `npm run build` en verde, y recorrer una ficha completa con datos reales en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
+- [x] 7.1 Ejecutar las pruebas de componentes y `npm run build` en verde, y recorrer una ficha completa con datos reales en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
 
 ## Workflow follow-up
+
+### Validación de C y D con datos reales · 15 de noviembre de 2026
+
+- Rama separada `lote-c/parte-4-validacion-c-y-d`, desde `origin/main` (`0fab640`), con los commits del PR #29 incorporados por autorización explícita del usuario. No se fusiona el PR ni se modifica `main`.
+- Verificada 7.1 con el paquete público de Stefano, contrato 1.1 y reglas `2026.11.2`: bandeja → ficha del proceso → explicación → decisión → asignación → reporte. Ficha del proveedor real con S03, identidad protegida y enlaces a sus procesos. Recorridos independientes en claro y oscuro.
+- S01 y la nomenclatura ya venían resueltos en el PR #29. Los cambios propios de C muestran los mínimos de calibración recibidos en S03 y S05 y agregan tres pruebas con el paquete real.
+- Las 76 señales publicadas producen explicaciones completas, sin valores ausentes literales; los mínimos se prueban con valores distintos y ausentes, sin fijar el 5 % en las plantillas.
+- Comprobaciones finales desde `web/`, con Node 24.22.3 temporal: tipos y lint aprobados; 348 pruebas aprobadas en 34 archivos; build de producción con `PAQUETE_DATOS=publico` aprobado. OpenSpec: 5 changes válidos en modo estricto.
+- Evidencia en `web/src/features/fichas/evidence/part-4-c-y-d/`: capturas claras/oscuras, impresión emulada, anchos de 375, 768 y 1280 px, reflujo a 640 px, contraste aumentado y movimiento reducido. S02 se consulta con el fixture porque está desactivada en el paquete real; S03 se consulta con datos reales.
+- Avance: 12/16. Siguen pendientes los comentarios del equipo sobre diseño y comprensión (1.1 y 1.2), la lectura de voz de 4.1 y las rondas con usuarios de 6.1. La entrevista y los otros lotes quedan fuera de esta entrega.
 
 ### Verificación de la parte 3 · Comparación y ficha del proveedor (14 de noviembre de 2026)
 

@@ -1,0 +1,40 @@
+{
+  "browser": "Microsoft Edge / Playwright",
+  "package": "publico",
+  "rules": "2026.11.2",
+  "counts": {
+    "procesos": 5036,
+    "senales": 76,
+    "proveedores": 2591,
+    "entidades": 127
+  },
+  "case": {
+    "ocid": "ocds-dgv273-seacev3-1162822",
+    "entity": "PE-CONSUCODE-10046",
+    "supplier": "P0516"
+  },
+  "checks": [
+    "Bandeja → ficha real completa: nomenclatura, seis bloques, mínimo configurado, documentos, fuente y atribución en ambos temas",
+    "Ficha → decisión → asignación: campos obligatorios, historial y confirmaciones sin ensanchar la fila de acciones",
+    "Jefatura encuentra el caso real asignado y la decisión, con atribución en claro y oscuro",
+    "Auditor persiste tras recarga y en la ficha solo tiene lectura y reporte",
+    "Ficha real del proveedor: seudónimo, participación, procesos y S03 sin RUC ni enlace de identidad",
+    "Metodología coincide con las señales activas y desactivadas, los mínimos, las reglas y la atribución del paquete real",
+    "Reporte integrado usa las tarjetas print de C, historial y nomenclatura; impresión blanca sin navegación ni controles",
+    "Atribución pública verificada en panel, bandeja, proceso, proveedor, revisión, metodología y reporte",
+    "Pantallas C y D sin desbordamiento horizontal a 375, 768 y 1280 px",
+    "Reflujo a 640 px con contraste aumentado y movimiento reducido sin desbordamiento; zoom real de navegador pendiente de revisión manual",
+    "S02 revisada con fixture: frase accesible y SVG oculto al árbol; en móvil se conserva la frase. Lectura por voz pendiente de verificación manual",
+    "Sin errores de JavaScript ni solicitudes a otros orígenes durante los recorridos",
+    "Segundo contexto aislado en modo claro: ficha → decisión justificada con comentario obligatorio → asignación → reporte con ambos eventos; sin errores de JavaScript."
+  ],
+  "origins": [
+    "http://127.0.0.1:3007",
+    "http://127.0.0.1:3008"
+  ],
+  "pageErrors": [],
+  "screenReader": {
+    "status": "pending",
+    "reason": "Narrador iniciado; la herramienta no pudo leer la ventana de voz por el nivel de integridad de Windows."
+  }
+}

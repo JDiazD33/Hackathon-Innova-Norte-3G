@@ -10,6 +10,7 @@ export function explainS03(signal: Senal, context?: ExplanationContext) {
   const count = inputNumber(signal, "procesos_ganados");
   const total = inputNumber(signal, "procesos_entidad");
   const fence = signal.comparacion?.valla_superior;
+  const minimum = inputNumber(signal, "participacion_minima");
   const start = formatFecha(inputText(signal, "ventana_inicio"));
   const end = formatFecha(inputText(signal, "ventana_fin"));
   return completeExplanation(signal, {
@@ -27,6 +28,8 @@ export function explainS03(signal: Senal, context?: ExplanationContext) {
       isNumber(share) ? `Participación del proveedor: ${formatPorcentaje(share, 1)} (${signal.unidad}).` : null,
       count !== null ? `Procesos ganados por el proveedor: ${formatEntero(count)}.` : null,
       total !== null ? `Procesos adjudicados por la entidad: ${formatEntero(total)}.` : null,
+      minimum !== null && minimum >= 0 && minimum <= 1
+        ? `Participación mínima configurada: ${formatPorcentaje(minimum, 1)}.` : null,
       start !== SIN_DATO && end !== SIN_DATO ? `Periodo de la señal: del ${start} al ${end}.` : null,
     ],
   }, context);
