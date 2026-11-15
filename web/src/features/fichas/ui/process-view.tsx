@@ -9,21 +9,12 @@ import { describePriority } from "@/features/explicacion";
 import { SignalCard } from "@/features/explicacion/ui/signal-card";
 import { SimulatedDataBadge } from "@/features/explicacion/ui/simulated-data-badge";
 import { conEntidad } from "@/lib/entidad";
-import { formatEntero, formatFecha, formatSoles, SIN_DATO } from "@/lib/format";
+import { formatEntero, formatFecha, SIN_DATO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 import type { ProcessDetail } from "../process-detail";
+import { formatProcessAmount } from "../amount";
 import { ProcessHistory } from "./process-history";
-
-function amount(value: number | null, currency: string) {
-  if (value == null || !Number.isFinite(value)) return SIN_DATO;
-  if (currency === "PEN") return formatSoles(value);
-  return new Intl.NumberFormat("es-PE", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
 
 const OBJECT_LABELS = {
   bienes: "Bienes",
@@ -39,9 +30,15 @@ export function ProcessView({ detail }: { detail: ProcessDetail }) {
     ["Entidad", entity?.nombre ?? SIN_DATO],
     ["Método", process.metodo || SIN_DATO],
     ["Objeto", OBJECT_LABELS[process.objeto]],
-    ["Monto referencial", amount(process.monto_referencial, process.moneda)],
-    ["Monto adjudicado", amount(process.monto_adjudicado, process.moneda)],
-    ["Monto final", amount(process.monto_final, process.moneda)],
+    [
+      "Monto referencial",
+      formatProcessAmount(process.monto_referencial, process.moneda),
+    ],
+    [
+      "Monto adjudicado",
+      formatProcessAmount(process.monto_adjudicado, process.moneda),
+    ],
+    ["Monto final", formatProcessAmount(process.monto_final, process.moneda)],
     ["Estado del proceso", process.estado || SIN_DATO],
     ["Participantes registrados", formatEntero(process.numero_postores)],
   ];

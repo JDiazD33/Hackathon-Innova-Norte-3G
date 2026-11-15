@@ -32,12 +32,14 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 
 - [ ] 4.1 Crear los minigráficos de S01, S02, S03, S04 y S06 con un marcador del caso y una frase equivalente; en el celular se muestra solo la frase. Verificar con el fixture y con un lector de pantalla en S02 y S03.
   - Parte 1: `describeComparison` genera la frase del percentil, omite percentiles ausentes o inválidos y conserva los empates al describir participaciones. Pendientes gráficos y verificación con lector de pantalla.
+  - Parte 3: gráficos de S01, S02, S03, S04 y S06 implementados y recorridos con el fixture en claro y oscuro; solo la frase en móvil. S03 usa el caso, la mediana y el cuartil superior publicados (criterio delegado por Sebastián), sin inventar participaciones individuales. S01 etiqueta el complemento como «hasta 1» porque puede incluir cero. Árbol accesible de S02 y S03 guardado en las evidencias; se mantiene abierta hasta el recorrido con lector de pantalla real.
 
 ## 5. C4 · Ficha del proveedor
 
-- [ ] 5.1 Crear `/proveedores/[id]` con la participación, los procesos ganados y la tarjeta de S03. Verificar con el fixture.
-- [ ] 5.2 Aplicar las reglas de identidad según el modo (seudónimo en público; nombre, RUC y enlace en local; personas naturales siempre sin nombre). Verificar con un manifiesto de prueba de cada modo.
+- [x] 5.1 Crear `/proveedores/[id]` con la participación, los procesos ganados y la tarjeta de S03. Verificar con el fixture.
+- [x] 5.2 Aplicar las reglas de identidad según el modo (seudónimo en público; nombre, RUC y enlace en local; personas naturales siempre sin nombre). Verificar con un manifiesto de prueba de cada modo.
   - Parte 1: `getSupplierIdentity` aplica las reglas en ambos modos; pruebas de personas jurídicas, naturales, tipo desconocido y proveedores del fixture. Pendiente integrarla en la ficha visual.
+  - Parte 3: identidad integrada en la carga del servidor y en la ficha; pruebas con manifiestos público y local, incluida una persona natural cuyo nombre viene en la entrada y nunca aparece en el resultado ni en el HTML.
 
 ## 6. Ajustes tras la validación (Fase 2)
 
@@ -48,6 +50,14 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 - [ ] 7.1 Ejecutar las pruebas de componentes y `npm run build` en verde, y recorrer una ficha completa con datos reales en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
 
 ## Workflow follow-up
+
+### Verificación de la parte 3 · Comparación y ficha del proveedor (14 de noviembre de 2026)
+
+- Tareas nuevas terminadas y verificadas: 5.1 y 5.2. Avance: 10/16. La implementación visual de 4.1 está lista; queda su comprobación con lector de pantalla.
+- `npm run typecheck`, `npm run lint`, `npm test` (321 pruebas en 27 archivos) y `npm run build`, en verde con Node 24.22.3 temporal. No se modificaron dependencias ni archivos de otros lotes.
+- Producción en Edge: cinco gráficos en ambos temas, frase equivalente en móvil, proveedor → proceso con entidad conservada, proveedor inexistente y aislamiento de entidades; sin errores de ejecución ni desborde después del ajuste de tamaño.
+- Capturas claras y oscuras de las comparaciones y la ficha, a 375, 768 y 1280 px, y árbol accesible de S02 y S03 en `web/src/features/fichas/evidence/part-3/`.
+- Rama basada en la parte 2 y PR hacia `main` dependiente del #17. Siguen abiertas las tareas que requieren al Lote D, revisión humana, lector de pantalla y datos reales.
 
 ### Verificación de la parte 2 · Tarjeta y ficha del proceso (14 de noviembre de 2026)
 

@@ -3,7 +3,7 @@
 - **Código (ahora):** funciones puras con pruebas para:
   - unir las fechas oficiales del proceso con las etapas del expediente simulado en una línea de tiempo ordenada, con las etapas simuladas marcadas;
   - decidir qué identidad mostrar de un proveedor según el modo del manifiesto (`publico` o `local`) y su tipo: las personas naturales nunca muestran su nombre.
-- **Interfaz:** `/procesos/[ocid]`, con resumen, documentos, señales, línea de tiempo, historial y el estado "No encontramos este proceso". La ficha del proveedor corresponde a la parte 3.
+- **Interfaz:** `/procesos/[ocid]`, con resumen, documentos, señales, línea de tiempo e historial; y `/proveedores/[id]`, con identidad protegida, participación, procesos ganados y S03. Ambas tienen una vista para identificadores inexistentes.
 - **Spec:** `openspec/changes/lote-c-fichas-y-explicacion/specs/app/fichas-de-proceso-y-proveedor/spec.md`
 
 ## API de la parte 1
@@ -27,3 +27,13 @@ La ruta espera `params` como `Promise` dentro de `Suspense` y usa `notFound()` c
 **Dependencia pendiente:** el diálogo de decisión, el selector de rol y la etiqueta definitiva del Lote D no están en `main`. El historial está conectado, pero la tarea 2.5 permanece abierta hasta poder integrar el botón y comprobar los roles analista y auditor.
 
 Las capturas y el registro de verificación están en [`evidence/part-2/`](evidence/part-2/README.md).
+
+## API de la parte 3
+
+`loadSupplierDetail(source, supplierId, entityId)`, en `supplier-detail.ts`, proyecta la identidad en el servidor mediante `getSupplierIdentity`. La vista nunca recibe el objeto original del proveedor. `loadSupplierPage`, en `load-supplier.ts`, añade la caché del paquete; `SupplierView`, en `ui/supplier-view.tsx`, presenta el resultado.
+
+La participación corresponde a procesos con adjudicatarios en la entidad y al periodo del paquete. Cada proceso ganado cuenta una vez. Los montos de los procesos se agrupan por moneda, sin conversiones; los valores ausentes se advierten y no se convierten en cero. Una adjudicación compartida conserva el monto del proceso y explica que no se conoce el reparto por proveedor. Las cifras no reemplazan la medida ni la ventana específicas de S03.
+
+La entidad se conserva en `?entidad=` al abrir un proceso ganado. Un proveedor sin adjudicaciones en esa entidad tiene una ficha vacía, sin heredar señales de otra entidad. En público solo se muestra el seudónimo; en local se permiten los datos previstos por el contrato y nunca el nombre de una persona natural.
+
+Capturas y verificación: [`evidence/part-3/`](evidence/part-3/README.md).
