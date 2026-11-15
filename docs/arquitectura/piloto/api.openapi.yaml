@@ -1,0 +1,1211 @@
+openapi: 3.1.1
+info:
+  title: API de Prisma (piloto)
+  version: 0.1.0-diseno
+  summary: Contrato de la API del piloto en una entidad. Es un diseño; todavía no existe una implementación.
+  description: |
+    Diseño descrito en `docs/arquitectura/piloto/README.md` y decidido en el ADR 0009.
+
+    - Los nombres de recursos y campos están en español, como el paquete de datos y el archivo
+      de revisiones; los `operationId` están en inglés, como el código (ADR 0006).
+    - Las lecturas de datos devuelven los mismos objetos que el paquete de datos
+      (`contracts/paquete-de-datos.schema.json`), para que `ApiDataSource` cumpla la interfaz `DataSource`.
+    - El rol y la entidad siempre salen de la sesión. Ningún endpoint los acepta del navegador.
+    - Las escrituras de revisiones y la bitácora son de solo inserción: no hay `PUT` ni `DELETE` sobre ellas.
+    - Los errores usan `application/problem+json` (RFC 9457) con un campo `codigo` estable.
+  license:
+    name: Por definir con el equipo
+servers:
+  - url: /api/v1
+    description: Mismo origen que la web
+security:
+  - sesion: []
+tags:
+  - name: sesion
+    description: Inicio de sesión por OpenID Connect, sesión y passkeys
+  - name: datos
+    description: Lectura del paquete de datos cargado en PostgreSQL (equivale a DataSource)
+  - name: revisiones
+    description: Decisiones y asignaciones (equivale a ReviewStore)
+  - name: bitacora
+    description: Bitácora encadenada, solo para auditoría y administración
+  - name: cuentas
+    description: Cuentas de la entidad, solo para administración
+
+paths:
+  /sesion/inicio:
+    get:
+      tags: [sesion]
+      operationId: startLogin
+      summary: Redirige al proveedor de identidad
+      description: Genera `state`, `nonce` y el verificador PKCE, los guarda en una cookie temporal firmada y redirige.
+      security: []
+      parameters:
+        - name: volver_a
+          in: query
+          description: Ruta interna a la que se vuelve después de iniciar sesión. Se rechaza cualquier URL absoluta.
+          schema:
+            type: string
+            pattern: '^/(?!/)'
+            maxLength: 512
+            examples: ['/bandeja']
+      responses:
+        '302':
+          description: Redirección al proveedor de identidad
+          headers:
+            Location:
+              schema:
+                type: string
+  /sesion/retorno:
+    get:
+      tags: [sesion]
+      operationId: finishLogin
+      summary: Recibe la respuesta del proveedor de identidad
+      description: |
+        Canjea el código, valida el `id_token` (firma, emisor, audiencia, `nonce` y vigencia),
+        busca la cuenta habilitada por emisor y sujeto (o, la primera vez, por correo verificado),
+        crea la sesión y registra `sesion_iniciada` o `sesion_rechazada` en la bitácora.
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: |
+            Sesión creada: redirige a `volver_a` con la cookie de sesión.
+            Cuenta inexistente o desactivada: redirige a `/sin-acceso` sin crear sesión.
+          headers:
+            Set-Cookie:
+              description: '`__Host-prisma_sesion=…; Path=/; Secure; HttpOnly; SameSite=Lax`'
+              schema:
+                type: string
+            Location:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/Problema'
+  /sesion:
+    get:
+      tags: [sesion]
+      operationId: getSession
+      summary: Sesión actual, con la persona y el token CSRF
+      responses:
+        '200':
+          description: Sesión vigente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sesion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+    delete:
+      tags: [sesion]
+      operationId: logout
+      summary: Cierra la sesión y la revoca en la base
+      security:
+        - sesion: []
+          csrf: []
+      responses:
+        '204':
+          description: Sesión cerrada
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+
+  /sesion/passkeys/registro/opciones:
+    post:
+      tags: [sesion]
+      operationId: startPasskeyRegistration
+      summary: Opciones para registrar una passkey (Face ID, huella o llave de seguridad)
+      security:
+        - sesion: []
+          csrf: []
+      responses:
+        '200':
+          description: '`PublicKeyCredentialCreationOptionsJSON` de WebAuthn, con `userVerification: required`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAuthnJson'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /sesion/passkeys/registro:
+    post:
+      tags: [sesion]
+      operationId: finishPasskeyRegistration
+      summary: Guarda la clave pública de la passkey
+      description: Prisma guarda el identificador de la credencial y su clave pública. Ningún dato biométrico llega al servidor.
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebAuthnJson'
+      responses:
+        '201':
+          description: Passkey registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Passkey'
+        '400':
+          $ref: '#/components/responses/Problema'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /sesion/passkeys/verificacion/opciones:
+    post:
+      tags: [sesion]
+      operationId: startPasskeyVerification
+      summary: Desafío para verificar la identidad con una passkey
+      security:
+        - sesion: []
+          csrf: []
+      responses:
+        '200':
+          description: '`PublicKeyCredentialRequestOptionsJSON` de WebAuthn'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebAuthnJson'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /sesion/passkeys/verificacion:
+    post:
+      tags: [sesion]
+      operationId: finishPasskeyVerification
+      summary: Verifica la firma y renueva `verificado_en` de la sesión
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebAuthnJson'
+      responses:
+        '200':
+          description: Identidad verificada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sesion'
+        '400':
+          $ref: '#/components/responses/Problema'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+
+  /manifiesto:
+    get:
+      tags: [datos]
+      operationId: getManifest
+      summary: Manifiesto del paquete cargado (fecha de corte, versión de las reglas)
+      responses:
+        '200':
+          description: Manifiesto
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/manifest'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /entidades:
+    get:
+      tags: [datos]
+      operationId: listEntities
+      summary: Entidades del paquete
+      responses:
+        '200':
+          description: Lista de entidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/entidad'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /entidades/{entidad_id}:
+    parameters:
+      - $ref: '#/components/parameters/EntidadId'
+    get:
+      tags: [datos]
+      operationId: getEntity
+      summary: Una entidad
+      responses:
+        '200':
+          description: Entidad
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/entidad'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+  /entidades/{entidad_id}/procesos:
+    parameters:
+      - $ref: '#/components/parameters/EntidadId'
+    get:
+      tags: [datos]
+      operationId: listProcesses
+      summary: Procesos de una entidad
+      description: Devuelve una lista vacía si la entidad no existe, como `DataSource.listProcesses`.
+      responses:
+        '200':
+          description: Procesos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/proceso'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /entidades/{entidad_id}/senales:
+    parameters:
+      - $ref: '#/components/parameters/EntidadId'
+    get:
+      tags: [datos]
+      operationId: listSignals
+      summary: Señales de una entidad, incluidas las de nivel entidad
+      responses:
+        '200':
+          description: Señales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/senal'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /procesos/{ocid}:
+    parameters:
+      - $ref: '#/components/parameters/Ocid'
+    get:
+      tags: [datos]
+      operationId: getProcess
+      summary: Un proceso
+      responses:
+        '200':
+          description: Proceso
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/proceso'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+  /procesos/{ocid}/senales:
+    parameters:
+      - $ref: '#/components/parameters/Ocid'
+    get:
+      tags: [datos]
+      operationId: getSignalsForProcess
+      summary: Señales que afectan a un proceso, en el orden de su lista `senales`
+      responses:
+        '200':
+          description: Señales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/senal'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /procesos/{ocid}/expediente:
+    parameters:
+      - $ref: '#/components/parameters/Ocid'
+    get:
+      tags: [datos]
+      operationId: getExpediente
+      summary: Expediente interno del proceso, si existe
+      responses:
+        '200':
+          description: Expediente
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/expediente'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+  /proveedores:
+    get:
+      tags: [datos]
+      operationId: listSuppliers
+      summary: Proveedores del paquete
+      description: Las personas naturales (RUC que empieza con 10) siempre llegan con su seudónimo, nunca con su nombre.
+      responses:
+        '200':
+          description: Proveedores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/proveedor'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /proveedores/{proveedor_id}:
+    parameters:
+      - name: proveedor_id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [datos]
+      operationId: getSupplier
+      summary: Un proveedor
+      responses:
+        '200':
+          description: Proveedor
+          content:
+            application/json:
+              schema:
+                $ref: '../../../contracts/paquete-de-datos.schema.json#/$defs/proveedor'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+
+  /revisiones:
+    get:
+      tags: [revisiones]
+      operationId: listReviews
+      summary: Historial de revisiones de la entidad de la sesión
+      description: |
+        Orden cronológico. Con `despues_de`, devuelve solo las entradas nuevas, para refrescar
+        la copia en memoria de `ApiReviewStore`.
+      parameters:
+        - name: ocid
+          in: query
+          schema:
+            type: string
+        - name: despues_de
+          in: query
+          description: Devuelve entradas con `secuencia` mayor que este valor
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Entradas de revisión
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [entradas, ultima_secuencia]
+                properties:
+                  entradas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EntradaRevision'
+                  ultima_secuencia:
+                    type: integer
+                    minimum: 0
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+  /procesos/{ocid}/decisiones:
+    parameters:
+      - $ref: '#/components/parameters/Ocid'
+    post:
+      tags: [revisiones]
+      operationId: saveDecision
+      summary: Registra una decisión humana sobre un proceso
+      description: |
+        Roles: analista y jefatura. `justificada` y `requiere_atencion` exigen comentario.
+        `requiere_atencion` exige haber verificado la identidad en los últimos 15 minutos.
+        La decisión y su fila de bitácora se guardan en la misma transacción.
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaDecision'
+      responses:
+        '201':
+          description: Decisión registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Decision'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+        '422':
+          $ref: '#/components/responses/Invalido'
+  /procesos/{ocid}/asignaciones:
+    parameters:
+      - $ref: '#/components/parameters/Ocid'
+    post:
+      tags: [revisiones]
+      operationId: assign
+      summary: Asigna un proceso a un rol y, si se indica, a una persona de la entidad
+      description: Roles analista y jefatura. Una asignación nunca cambia el estado del proceso.
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaAsignacion'
+      responses:
+        '201':
+          description: Asignación registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asignacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+        '422':
+          $ref: '#/components/responses/Invalido'
+  /revisiones/exportacion:
+    get:
+      tags: [revisiones]
+      operationId: exportReviews
+      summary: Exporta las revisiones de la entidad con el sello de la bitácora
+      description: Roles analista, jefatura y auditor. La exportación queda registrada en la bitácora.
+      responses:
+        '200':
+          description: Archivo de revisiones, versión 2
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                examples: ['attachment; filename="revisiones-2027-03-01.json"']
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivoRevisionesV2'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+  /revisiones/importaciones:
+    post:
+      tags: [revisiones]
+      operationId: importReviews
+      summary: Importa un archivo exportado desde la demostración del MVP
+      description: |
+        Roles analista y jefatura; exige identidad verificada en los últimos 15 minutos.
+        Valida el archivo completo antes de guardar. Fusiona por `id` y rechaza conflictos sin
+        modificar nada, como `LocalReviewStore`. Las entradas quedan con `origen: importado`,
+        `autor: null` e `importado_por` con la cuenta de la sesión.
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchivoRevisionesV1'
+      responses:
+        '200':
+          description: Resultado de la importación
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [agregadas, duplicadas]
+                properties:
+                  agregadas:
+                    type: integer
+                    minimum: 0
+                  duplicadas:
+                    type: integer
+                    minimum: 0
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '409':
+          $ref: '#/components/responses/Problema'
+        '422':
+          $ref: '#/components/responses/Invalido'
+
+  /bitacora:
+    get:
+      tags: [bitacora]
+      operationId: listAuditLog
+      summary: Filas de la bitácora de la entidad, por orden de secuencia
+      description: Roles auditor y administrador.
+      parameters:
+        - name: despues_de
+          in: query
+          description: Devuelve filas con `secuencia` mayor que este valor
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limite
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: accion
+          in: query
+          schema:
+            $ref: '#/components/schemas/AccionBitacora'
+        - name: cuenta_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Página de la bitácora
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [filas, siguiente]
+                properties:
+                  filas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FilaBitacora'
+                  siguiente:
+                    description: Valor de `despues_de` para la página siguiente, o `null` si no hay más
+                    type: [integer, 'null']
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+  /bitacora/verificaciones:
+    post:
+      tags: [bitacora]
+      operationId: verifyAuditLog
+      summary: Recalcula la cadena de hashes de la entidad
+      description: Roles auditor y administrador. La verificación también queda registrada en la bitácora.
+      security:
+        - sesion: []
+          csrf: []
+      responses:
+        '200':
+          description: Resultado de la verificación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultadoVerificacion'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+  /bitacora/sellos:
+    get:
+      tags: [bitacora]
+      operationId: listDailySeals
+      summary: Sello diario de la cadena (hash de la última fila de cada día)
+      description: Roles auditor y administrador. Sirve para comparar con los sellos guardados fuera de la base.
+      parameters:
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Sellos diarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sello'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+
+  /cuentas:
+    get:
+      tags: [cuentas]
+      operationId: listAccounts
+      summary: Cuentas de la entidad
+      description: Rol administrador.
+      responses:
+        '200':
+          description: Cuentas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cuenta'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+    post:
+      tags: [cuentas]
+      operationId: createAccount
+      summary: Registra a una persona de la entidad
+      description: Rol administrador; exige identidad verificada en los últimos 15 minutos. La cuenta se enlaza en su primer inicio de sesión.
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaCuenta'
+      responses:
+        '201':
+          description: Cuenta registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cuenta'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '409':
+          $ref: '#/components/responses/Problema'
+        '422':
+          $ref: '#/components/responses/Invalido'
+  /cuentas/{cuenta_id}:
+    parameters:
+      - name: cuenta_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [cuentas]
+      operationId: updateAccount
+      summary: Cambia el rol o el cargo, o activa o desactiva una cuenta
+      description: |
+        Rol administrador; exige identidad verificada en los últimos 15 minutos.
+        Nadie puede cambiar su propia cuenta (`403` con el código `cuenta_propia`).
+        Desactivar una cuenta revoca sus sesiones. Cada cambio queda en la bitácora.
+      security:
+        - sesion: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambioCuenta'
+      responses:
+        '200':
+          description: Cuenta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cuenta'
+        '401':
+          $ref: '#/components/responses/NoAutenticado'
+        '403':
+          $ref: '#/components/responses/SinPermiso'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+        '422':
+          $ref: '#/components/responses/Invalido'
+
+components:
+  securitySchemes:
+    sesion:
+      type: apiKey
+      in: cookie
+      name: __Host-prisma_sesion
+      description: Identificador opaco de una sesión guardada en `seguridad.sesiones`. Dura 8 horas.
+    csrf:
+      type: apiKey
+      in: header
+      name: X-Prisma-CSRF
+      description: Token de `GET /sesion`. Obligatorio en toda petición que cambia datos.
+
+  parameters:
+    EntidadId:
+      name: entidad_id
+      in: path
+      required: true
+      schema:
+        type: string
+    Ocid:
+      name: ocid
+      in: path
+      required: true
+      description: Identificador OCDS del proceso
+      schema:
+        type: string
+        examples: ['ocds-dgv273-seacev3-2026-1192-2']
+
+  responses:
+    Problema:
+      description: Error con detalle
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problema'
+    NoAutenticado:
+      description: |
+        Sin sesión, sesión vencida o revocada (`sesion_requerida`), o acción sensible sin
+        verificación reciente de identidad (`reautenticacion_requerida`).
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problema'
+    SinPermiso:
+      description: El rol de la sesión no permite la acción (`sin_permiso`, `cuenta_propia`) o falta el token CSRF (`csrf_invalido`)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problema'
+    NoEncontrado:
+      description: El recurso no existe (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problema'
+    Invalido:
+      description: Datos inválidos, por ejemplo una decisión sin comentario (`comentario_requerido`)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problema'
+
+  schemas:
+    Rol:
+      type: string
+      enum: [analista, jefatura, auditor, administrador]
+    RolRevision:
+      description: Roles que pueden aparecer en una entrada de revisión (los mismos de `ReviewRole`)
+      type: string
+      enum: [analista, jefatura, auditor]
+    EstadoDecision:
+      type: string
+      enum: [en_revision, justificada, requiere_atencion]
+
+    Problema:
+      type: object
+      required: [type, title, status, codigo]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        codigo:
+          type: string
+          enum:
+            - sesion_requerida
+            - reautenticacion_requerida
+            - csrf_invalido
+            - sin_permiso
+            - cuenta_propia
+            - cuenta_no_habilitada
+            - no_encontrado
+            - comentario_requerido
+            - datos_invalidos
+            - conflicto_de_importacion
+            - cuenta_duplicada
+
+    Persona:
+      description: Quién hizo la acción. Sin DNI ni otros datos personales.
+      type: object
+      required: [id, nombre, cargo]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        cargo:
+          type: string
+    Sesion:
+      type: object
+      required: [cuenta, rol, entidad_id, csrf_token, expira_en, verificado_en, segundo_factor]
+      properties:
+        cuenta:
+          $ref: '#/components/schemas/Persona'
+        rol:
+          $ref: '#/components/schemas/Rol'
+        entidad_id:
+          type: string
+        csrf_token:
+          type: string
+        expira_en:
+          type: string
+          format: date-time
+        verificado_en:
+          description: Última verificación de identidad (inicio de sesión o passkey)
+          type: string
+          format: date-time
+        segundo_factor:
+          description: Cómo se verificó el segundo factor
+          type: string
+          enum: [proveedor_de_identidad, passkey, pendiente]
+    WebAuthnJson:
+      description: Objeto JSON de WebAuthn Level 3 (opciones o credencial serializada). Se valida con una librería de WebAuthn.
+      type: object
+      additionalProperties: true
+    Passkey:
+      type: object
+      required: [id, nombre, creada_en]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          description: Nombre que elige la persona, por ejemplo "Laptop de la oficina"
+          type: string
+          maxLength: 80
+        creada_en:
+          type: string
+          format: date-time
+        usada_en:
+          type: [string, 'null']
+          format: date-time
+
+    EntradaBase:
+      type: object
+      required: [id, ocid, rol, fecha, tipo, autor, origen, importado_por, secuencia]
+      properties:
+        id:
+          type: string
+        ocid:
+          type: string
+        rol:
+          $ref: '#/components/schemas/RolRevision'
+        fecha:
+          type: string
+          format: date-time
+        tipo:
+          type: string
+        autor:
+          description: Persona que registró la entrada. `null` en las entradas importadas de la demostración.
+          oneOf:
+            - $ref: '#/components/schemas/Persona'
+            - type: 'null'
+        origen:
+          type: string
+          enum: [prisma, importado]
+        importado_por:
+          oneOf:
+            - $ref: '#/components/schemas/Persona'
+            - type: 'null'
+        secuencia:
+          description: Secuencia de la fila de bitácora que registró esta entrada
+          type: integer
+          minimum: 1
+    Decision:
+      allOf:
+        - $ref: '#/components/schemas/EntradaBase'
+        - type: object
+          required: [tipo, estado, comentario]
+          properties:
+            tipo:
+              const: decision
+            estado:
+              $ref: '#/components/schemas/EstadoDecision'
+            comentario:
+              type: string
+              maxLength: 2000
+    Asignacion:
+      allOf:
+        - $ref: '#/components/schemas/EntradaBase'
+        - type: object
+          required: [tipo, asignado_a, asignado_a_cuenta, nota]
+          properties:
+            tipo:
+              const: asignacion
+            asignado_a:
+              $ref: '#/components/schemas/RolRevision'
+            asignado_a_cuenta:
+              description: Persona concreta, si la asignación no es solo a un rol
+              oneOf:
+                - $ref: '#/components/schemas/Persona'
+                - type: 'null'
+            nota:
+              type: string
+              maxLength: 2000
+    EntradaRevision:
+      oneOf:
+        - $ref: '#/components/schemas/Decision'
+        - $ref: '#/components/schemas/Asignacion'
+      discriminator:
+        propertyName: tipo
+        mapping:
+          decision: '#/components/schemas/Decision'
+          asignacion: '#/components/schemas/Asignacion'
+    NuevaDecision:
+      type: object
+      required: [estado]
+      additionalProperties: false
+      properties:
+        estado:
+          $ref: '#/components/schemas/EstadoDecision'
+        comentario:
+          description: Obligatorio para `justificada` y `requiere_atencion`
+          type: string
+          maxLength: 2000
+    NuevaAsignacion:
+      type: object
+      required: [asignado_a, nota]
+      additionalProperties: false
+      properties:
+        asignado_a:
+          $ref: '#/components/schemas/RolRevision'
+        asignado_a_cuenta:
+          description: Cuenta activa de la misma entidad y con el rol `asignado_a`
+          type: string
+          format: uuid
+        nota:
+          type: string
+          minLength: 1
+          maxLength: 2000
+
+    EntradaArchivoV1:
+      description: Entrada del archivo que exporta `LocalReviewStore` (`revisiones:v1`)
+      type: object
+      required: [id, ocid, rol, fecha, tipo]
+      properties:
+        id:
+          type: string
+        ocid:
+          type: string
+        rol:
+          $ref: '#/components/schemas/RolRevision'
+        fecha:
+          type: string
+          format: date-time
+        tipo:
+          type: string
+          enum: [decision, asignacion]
+        estado:
+          $ref: '#/components/schemas/EstadoDecision'
+        comentario:
+          type: string
+        asignado_a:
+          $ref: '#/components/schemas/RolRevision'
+        nota:
+          type: string
+    ArchivoRevisionesV1:
+      type: object
+      required: [version, entradas]
+      properties:
+        version:
+          const: 1
+        entradas:
+          type: array
+          maxItems: 5000
+          items:
+            $ref: '#/components/schemas/EntradaArchivoV1'
+    ArchivoRevisionesV2:
+      type: object
+      required: [version, entidad_id, exportado_en, exportado_por, entradas, sello]
+      properties:
+        version:
+          const: 2
+        entidad_id:
+          type: string
+        exportado_en:
+          type: string
+          format: date-time
+        exportado_por:
+          $ref: '#/components/schemas/Persona'
+        entradas:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntradaRevision'
+        sello:
+          description: Última fila de la bitácora al exportar. Permite comprobar después que el archivo coincide con la cadena.
+          type: object
+          required: [secuencia, hash]
+          properties:
+            secuencia:
+              type: integer
+              minimum: 0
+            hash:
+              $ref: '#/components/schemas/Hash'
+
+    Hash:
+      description: SHA-256 en hexadecimal
+      type: string
+      pattern: '^[0-9a-f]{64}$'
+    AccionBitacora:
+      type: string
+      enum:
+        - sesion_iniciada
+        - sesion_rechazada
+        - sesion_cerrada
+        - identidad_verificada
+        - passkey_registrada
+        - decision_registrada
+        - asignacion_registrada
+        - revision_importada
+        - revisiones_importadas
+        - revisiones_exportadas
+        - cuenta_registrada
+        - cuenta_actualizada
+        - bitacora_verificada
+    FilaBitacora:
+      type: object
+      required: [secuencia, ocurrido_en, cuenta, rol, accion, objeto_tipo, objeto_id, datos, hash_anterior, hash]
+      properties:
+        secuencia:
+          type: integer
+          minimum: 1
+        ocurrido_en:
+          type: string
+          format: date-time
+        cuenta:
+          description: Cuenta que hizo la acción. Un intento de inicio de sesión sin cuenta en Prisma no llega a la bitácora.
+          $ref: '#/components/schemas/Persona'
+        rol:
+          description: Rol de la cuenta en ese momento
+          $ref: '#/components/schemas/Rol'
+        accion:
+          $ref: '#/components/schemas/AccionBitacora'
+        objeto_tipo:
+          type: [string, 'null']
+          enum: [proceso, cuenta, archivo, sesion, bitacora, null]
+        objeto_id:
+          type: [string, 'null']
+        datos:
+          description: Detalle de la acción, por ejemplo el estado anterior y el nuevo
+          type: object
+          additionalProperties: true
+        hash_anterior:
+          $ref: '#/components/schemas/Hash'
+        hash:
+          $ref: '#/components/schemas/Hash'
+    ResultadoVerificacion:
+      type: object
+      required: [valida, filas_verificadas, primera_falla, sello]
+      properties:
+        valida:
+          type: boolean
+        filas_verificadas:
+          type: integer
+          minimum: 0
+        primera_falla:
+          description: Primera fila cuyo hash no coincide o cuya secuencia salta, o `null` si la cadena está completa
+          type: [integer, 'null']
+        sello:
+          $ref: '#/components/schemas/Sello'
+    Sello:
+      type: object
+      required: [fecha, secuencia, hash]
+      properties:
+        fecha:
+          type: string
+          format: date
+        secuencia:
+          type: integer
+          minimum: 0
+        hash:
+          $ref: '#/components/schemas/Hash'
+
+    Cuenta:
+      type: object
+      required: [id, nombre, correo, cargo, rol, activa, enlazada, creada_en]
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        correo:
+          type: string
+          format: email
+        cargo:
+          type: string
+        rol:
+          $ref: '#/components/schemas/Rol'
+        activa:
+          type: boolean
+        enlazada:
+          description: Si la persona ya inició sesión y la cuenta quedó enlazada a su proveedor de identidad
+          type: boolean
+        creada_en:
+          type: string
+          format: date-time
+    NuevaCuenta:
+      type: object
+      required: [nombre, correo, cargo, rol]
+      additionalProperties: false
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        correo:
+          description: Correo institucional, el mismo que entrega el proveedor de identidad
+          type: string
+          format: email
+        cargo:
+          type: string
+          minLength: 1
+          maxLength: 200
+        rol:
+          $ref: '#/components/schemas/Rol'
+    CambioCuenta:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        rol:
+          $ref: '#/components/schemas/Rol'
+        cargo:
+          type: string
+          minLength: 1
+          maxLength: 200
+        activa:
+          type: boolean

@@ -12,3 +12,4 @@ Un ADR por decisión: `NNNN-titulo.md`, con Contexto, Decisión y Consecuencias.
 | [0006](0006-convencion-de-nombres.md) | Código en inglés; interfaz, documentación y datos derivados en español | Aceptada |
 | [0007](0007-senales-no-acusaciones.md) | Señales, no acusaciones: prioridad explicable y decisión humana | Aceptada |
 | [0008](0008-prisma-y-diseno-inspirado-en-apple.md) | Nombre Prisma y diseño inspirado en las guías de Apple, sin usar sus recursos | Aceptada |
+| [0009](0009-backend-del-piloto.md) | Backend del piloto: API, inicio de sesión institucional y bitácora encadenada | Aceptada como diseño; se construye después de la hackathon |

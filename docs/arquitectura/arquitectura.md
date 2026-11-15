@@ -110,9 +110,11 @@ Sirve para el criterio de viabilidad, impacto y sostenibilidad.
 | Fase | Qué agrega |
 |---|---|
 | 1 · MVP (hackathon) | Una región, señales núcleo, revisión local en el navegador |
-| 2 · Piloto en una entidad | API (FastAPI) + PostgreSQL, inicio de sesión institucional, revisiones compartidas, actualización mensual automática desde el OCP Data Registry y fuente de sanciones (S07) |
+| 2 · Piloto en una entidad | API (FastAPI) + PostgreSQL, inicio de sesión institucional con passkeys, revisiones compartidas, bitácora encadenada, actualización mensual automática desde el OCP Data Registry y fuente de sanciones (S07) |
 | 3 · Integración | Carga de expedientes internos (requerimientos, conformidades, pagos) para la trazabilidad completa, más INFOBRAS para obras |
 | 4 · Escala | Varias entidades y regiones, comparación entre pares y un portal ciudadano de solo lectura |
+
+El diseño del backend del piloto (API, inicio de sesión, permisos y bitácora) está en [`piloto/`](piloto/README.md) y la decisión, en el [ADR 0009](../adr/0009-backend-del-piloto.md). No se construye antes del Stage-Gate 1.
 
 ## Riesgos técnicos
 
