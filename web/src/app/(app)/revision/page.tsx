@@ -4,6 +4,10 @@ import { Suspense } from "react";
 import { SinDatos } from "@/components/estado/sin-datos";
 import { Skeleton } from "@/components/ui/skeleton";
 import { loadReviewCases } from "@/features/revision/load-review-cases";
+import {
+  initialReviewCase,
+  PARAM_PROCESO,
+} from "@/features/revision/review-cases";
 import { ReviewView } from "@/features/revision/ui/review-view";
 import { cargarEntidades } from "@/lib/data/cached";
 import { elegirEntidad, PARAM_ENTIDAD } from "@/lib/entidad";
@@ -29,5 +33,12 @@ async function ReviewContent({
   if (!entity)
     return <SinDatos mensaje="El paquete no tiene entidades para revisar." />;
   const cases = await loadReviewCases(entity.id);
-  return <ReviewView key={entity.id} entity={entity} cases={cases} />;
+  return (
+    <ReviewView
+      key={entity.id}
+      entity={entity}
+      cases={cases}
+      initialOcid={initialReviewCase(cases, query[PARAM_PROCESO])}
+    />
+  );
 }
