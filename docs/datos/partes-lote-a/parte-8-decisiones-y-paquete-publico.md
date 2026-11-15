@@ -1,6 +1,6 @@
 # Parte 8 · Decisiones de señales y paquete público (tareas 1.6 y 5.4)
 
-**Rama:** `lote-a/parte-8-decisiones-y-paquete-publico`, desde `main`. **PR:** la propuesta de decisiones fue el #11, solo de documentos, aprobado y fusionado el 14 de noviembre. La configuración y el paquete público van en un segundo PR desde la misma rama.
+**Rama:** `lote-a/parte-8-decisiones-y-paquete-publico`, desde `main`. **PR:** la propuesta de decisiones fue el #11, solo de documentos, aprobado y fusionado el 14 de noviembre. La configuración y el paquete público se aplicaron en esta rama (PR #26) y se entregan con la [parte 10](parte-10-paquete-publico.md), que incluye estos commits.
 
 **Encargo:** [`docs/plan/fase-1/lote-a-stefano.md`](../../plan/fase-1/lote-a-stefano.md), secciones 2 y 3.
 
@@ -121,7 +121,7 @@ Lo que cambia es que 6 nombres pasan a "dudoso: sin señal". Para S01 no cambia 
 | 6 | S06 sigue desactivada por cobertura (9.1%) |
 | 7 | S03@2 con `participacion_minima = 0.05` |
 | 8 | S05@2 con `proporcion_minima = 0.05` |
-| 9 | `metodos.dudosos` con los 6 nombres; S01 los cuenta aparte ("método dudoso (sin señal)") |
+| 9 | `metodos.dudosos` con los 6 nombres: quedan sin señal y en `metodos_sin_clasificar` del manifiesto (en La Libertad, 175 procesos; ajuste de la parte 10) |
 | 10 | Cada proceso trae `nomenclatura` y el manifiesto declara el contrato 1.1 |
 | 11 | JSON sin sangría y un documento por tipo en cada proceso (`paquete.documentos_por_tipo` en `pipeline.toml`) |
 

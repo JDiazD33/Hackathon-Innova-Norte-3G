@@ -65,11 +65,11 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Qué no significa:** en mercados pequeños o con bienes muy especializados puede haber un solo proveedor capaz.
 - **Spike:** no hay `bids` y `tender.numberOfTenderers` cuenta participantes registrados. Un solo participante implica a lo sumo una oferta, así que la señal no da falsos positivos de oferta única, pero no ve los procesos con varios registrados y una sola oferta. En la muestra de La Libertad de `2026.jsonl.gz`, Cardinal R018 marca los mismos 57 procesos que nuestra consulta con su regla, pero no ve las licitaciones y concursos abreviados porque no traen `tender.procurementMethod`.
 - **Implementación (S01@2):** `uv run pipeline signals`.
-  - **Métodos competitivos:** salen de la tabla de métodos de `senales.toml`, por nombre de `procurementMethodDetails`. Los 6 métodos dudosos (`metodos.dudosos`: Régimen Especial, Convenio, Contratación Internacional y otros tres) quedan sin señal.
+  - **Métodos competitivos:** salen de la tabla de métodos de `senales.toml`, por nombre de `procurementMethodDetails`. Los 6 métodos dudosos (`metodos.dudosos`: Régimen Especial, Convenio, Contratación Internacional y otros tres) quedan sin señal: el manifiesto los nombra en `metodos_sin_clasificar` y S01 los cuenta como "método sin clasificar".
   - **Solo con adjudicación:** `solo_con_adjudicacion = true`. La comparación con el grupo usa todos los procesos con dato de participantes, porque la tabla nacional no trae adjudicaciones.
   - **Procesos que no se evalúan, y se cuentan:** los de estados excluidos (`CANCELADO`), sin comprador, de métodos dudosos o sin clasificar, sin dato de participantes y sin adjudicación.
   - **Comparación:** `proporcion_referencia` es la parte del grupo con 2 o más participantes, y `percentil_del_caso`, la parte con 1.
-  - **La Libertad 2025–2026:** 33 señales, todas de procesos adjudicados. No se evaluaron 892 procesos sin adjudicación, 504 sin dato de participantes, 175 de métodos dudosos y 46 cancelados.
+  - **La Libertad 2025–2026:** 33 señales, todas de procesos adjudicados. No se evaluaron 892 procesos sin adjudicación, 504 sin dato de participantes, 175 de métodos sin clasificar (los dudosos) y 46 cancelados.
 - **Contraste con Cardinal (`uv run pipeline cardinal`):** R018 se ejecutó sobre los 5 036 procesos, con `tender.procurementMethod` completado desde la tabla de métodos. Marca los mismos 33 procesos que S01 (100 % de coincidencia) y 38 más, con su motivo: 36 sin adjudicación y 2 cancelados. El informe queda en `data/derived/senales/contraste-cardinal.json`.
 
 ### S02 · Plazo corto para presentar ofertas

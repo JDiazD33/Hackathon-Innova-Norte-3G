@@ -13,7 +13,8 @@ El Lote A (datos y señales) se divide en partes. Cada parte tiene su ficha, su 
 | [5 · Prioridad y paquete](parte-5-prioridad-y-paquete.md) | 5.1–5.4 | `lote-a/parte-5-prioridad-y-paquete` | En `main`. La 5.4 (paquete público en la web) pasa a la parte 8 | Partes 3 y 4; tarea 1.6 |
 | [6 · S05, S06 e integración](parte-6-opcionales-e-integracion.md) | 6.1–6.2 | `lote-a/parte-6-opcionales-e-integracion` | En `main`. 6.2: ya están en `main` las partes 3 y 4 de B y la parte 1 de C y de D; falta recorrer la demo cuando estén las pantallas de ficha, explicación, decisión y reporte | Parte 3 (6.1); PR de B, C y D (6.2) |
 | [7 · Verificación final](parte-7-verificacion-final.md) | 7.1 | `lote-a/parte-7-verificacion` | En `main`. Las huellas se repitieron en `main` y son idénticas (parte 8) | Todas |
-| [8 · Decisiones y paquete público](parte-8-decisiones-y-paquete-publico.md) | 1.6 y 5.4 | `lote-a/parte-8-decisiones-y-paquete-publico` | 1.6 hecha: decisiones aprobadas (PR #11) y contrato 1.1 en `main`. Paquete público aplicado y validado, en su PR; falta que se fusione y que Joaquín confirme la web (5.4) | Partes 1 a 7 |
+| [8 · Decisiones y paquete público](parte-8-decisiones-y-paquete-publico.md) | 1.6 y 5.4 | `lote-a/parte-8-decisiones-y-paquete-publico` | 1.6 hecha: decisiones aprobadas (PR #11) y contrato 1.1 en `main`. Decisiones aplicadas en el PR #26, que se entrega con la parte 10 | Partes 1 a 7 |
+| [10 · Paquete público](parte-10-paquete-publico.md) | 5.4 | `lote-a/parte-10-paquete-publico` | Paquete generado y validado (8,8 MB), en PR; falta que se fusione y que Joaquín active Vercel y confirme la web | Parte 8 |
 
 ## Cómo empezar una parte
 
@@ -57,7 +58,7 @@ Lo que queda del Lote A depende de decisiones del equipo, de las pantallas de lo
 
 | Qué falta | Por qué no se hizo | Qué hace falta | Quién |
 |---|---|---|---|
-| 5.4 · Paquete público en la web | El paquete ya está aplicado y validado; falta fusionarlo | Fusionar su PR; Joaquín activa `PAQUETE_DATOS=publico` en Vercel y confirma que la web lo carga | Joaquín |
+| 5.4 · Paquete público en la web | El paquete está generado y validado en la [parte 10](parte-10-paquete-publico.md); falta fusionarlo | Fusionar su PR; Joaquín activa `PAQUETE_DATOS=publico` en Vercel y confirma que la web lo carga | Joaquín |
 | Umbrales de S04 | Están cargados con su norma (art. 14 de las leyes 32185 y 32513), pero S04 marcaría de 540 a 841 procesos según la calibración | Confirmar los montos y decidir si se activa y con qué calibración | Joaquín y el equipo |
 | Texto de S01 | Depende de la decisión 1 | Que diga "participantes registrados" en lugar de "ofertas" | Sebastián |
 
