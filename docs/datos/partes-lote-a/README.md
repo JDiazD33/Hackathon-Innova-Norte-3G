@@ -14,6 +14,7 @@ El Lote A (datos y señales) se divide en partes. Cada parte tiene su ficha, su 
 | [6 · S05, S06 e integración](parte-6-opcionales-e-integracion.md) | 6.1–6.2 | `lote-a/parte-6-opcionales-e-integracion` | En `main`. 6.2: ya están en `main` las partes 3 y 4 de B y la parte 1 de C y de D; falta recorrer la demo cuando estén las pantallas de ficha, explicación, decisión y reporte | Parte 3 (6.1); PR de B, C y D (6.2) |
 | [7 · Verificación final](parte-7-verificacion-final.md) | 7.1 | `lote-a/parte-7-verificacion` | En `main`. Las huellas se repitieron en `main` y son idénticas (parte 8) | Todas |
 | [8 · Decisiones y paquete público](parte-8-decisiones-y-paquete-publico.md) | 1.6 y 5.4 | `lote-a/parte-8-decisiones-y-paquete-publico` | 1.6 hecha: decisiones aprobadas (PR #11) y contrato 1.1 en `main`. Decisiones aplicadas en el PR #26, que se entrega con la parte 10 | Partes 1 a 7 |
+| [9 · Verificación en el SEACE](parte-9-verificacion-seace.md) | 3.4 y 4.5 | `lote-a/parte-9-verificacion-seace` | Lista de casos lista (15 de noviembre); falta la consulta manual del miércoles 18 al viernes 20 | Parte 8 |
 | [10 · Paquete público](parte-10-paquete-publico.md) | 5.4 | `lote-a/parte-10-paquete-publico` | Paquete generado y validado (8,8 MB), en PR; falta que se fusione y que Joaquín active Vercel y confirme la web | Parte 8 |
 
 ## Cómo empezar una parte
@@ -72,6 +73,6 @@ Lo que queda del Lote A depende de decisiones del equipo, de las pantallas de lo
 
 | Qué falta | Por qué no se hizo | Qué hace falta | Quién |
 |---|---|---|---|
-| 3.4 · Verificar en el SEACE 5 casos de S01 (y de S02, si se activa) | Es una revisión manual en el portal, que el pipeline no puede automatizar sin hacer scraping. Está programada del miércoles 18 al viernes 20 | Parte 9 (`lote-a/parte-9-verificacion-seace`): confirmar que `numero_postores` son participantes registrados | Stefano |
-| 4.5 · Verificar en el SEACE 5 casos de S03 y 5 de S04 | Revisión manual, en la misma parte 9. S04 está desactivada hasta tener sus umbrales | Revisar los casos de S03 listados en el PR #4 y 5 grupos de la estimación de S04 de la parte 8 | Stefano |
+| 3.4 · Verificar en el SEACE 5 casos de S01 (y de S02, si se activa) | Es una revisión manual en el portal, que el pipeline no puede automatizar sin hacer scraping. Está programada del miércoles 18 al viernes 20 | [Parte 9](parte-9-verificacion-seace.md): los 5 casos de S01 están listos; confirmar que `numero_postores` son participantes registrados | Stefano |
+| 4.5 · Verificar en el SEACE 5 casos de S03 y 5 de S04 | Revisión manual, en la misma parte 9. S04 está desactivada hasta tener sus umbrales | [Parte 9](parte-9-verificacion-seace.md): los 5 casos de S03 y los 5 de S04 están listos, con lo que hay que mirar en cada uno | Stefano |
 | Archivar el change de OpenSpec | Siguen abiertas 3.4, 4.5, 5.4 y 6.2, y falta confirmar la entrega del Stage-Gate 1 | `/opsx:archive` cuando todo esté cerrado | Stefano |
