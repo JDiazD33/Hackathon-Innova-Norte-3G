@@ -125,25 +125,19 @@ def _difference_reasons(con: duckdb.DuckDBPyConnection, settings: SignalsConfig)
     rows = con.execute(
         """
         WITH casos AS (
-            SELECT *,
-                   list_contains(CAST($doubtful AS VARCHAR[]), metodo_base) AS dudoso,
-                   ocid NOT IN (SELECT ocid FROM adjudicaciones) AS sin_adjudicacion
+            SELECT *, ocid NOT IN (SELECT ocid FROM adjudicaciones) AS sin_adjudicacion
             FROM casos_region
         )
         SELECT ocid,
                CASE WHEN excluido THEN 'S01 no evalúa procesos en estado ' || estado
                     WHEN entidad_id IS NULL THEN 'S01 no evalúa procesos sin comprador'
-                    WHEN dudoso THEN 'S01 no evalúa métodos dudosos'
                     WHEN competitivo IS NULL THEN 'S01 no evalúa métodos sin clasificar'
                     WHEN $awarded_only AND sin_adjudicacion
                         THEN 'S01 solo evalúa procesos con adjudicación'
                END AS motivo
         FROM casos
         """,
-        {
-            "doubtful": list(settings.methods.doubtful),
-            "awarded_only": settings.s01.awarded_only,
-        },
+        {"awarded_only": settings.s01.awarded_only},
     ).fetchall()
     return {ocid: reason for ocid, reason in rows if reason}
 

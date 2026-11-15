@@ -144,12 +144,12 @@ def test_s01_counts_what_it_cannot_evaluate(tmp_path: Path) -> None:
     )
     assert by_code(rows, "S01") == []
     assert exclusion(manifest, "S01", "sin dato de postores") == 1
-    assert exclusion(manifest, "S01", "método sin clasificar") == 1
-    assert exclusion(manifest, "S01", "método dudoso (sin señal)") == 1
+    # Doubtful methods (Convenio) are among the unclassified ones, without a signal.
+    assert exclusion(manifest, "S01", "método sin clasificar") == 2
     assert exclusion(manifest, "S01", "proceso sin adjudicación") == 1
     assert exclusion(manifest, "S01", "proceso en estado excluido") == 1
     assert exclusion(manifest, "S01", "sin comprador") == 0
-    assert manifest["metodos_sin_clasificar"] == ["Método de Prueba"]
+    assert manifest["metodos_sin_clasificar"] == ["Convenio", "Método de Prueba"]
     assert "Convenio" in manifest["parametros"]["metodos_dudosos"]
 
 

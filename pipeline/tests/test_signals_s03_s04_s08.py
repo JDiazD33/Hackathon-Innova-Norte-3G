@@ -270,3 +270,24 @@ def test_s03_without_minimum_share_flags_a_low_fence(tmp_path: Path) -> None:
     (signal,) = by_code(rows, "S03")
     assert signal["valor"] == 0.03
     assert signal["entradas"]["participacion_minima"] == 0.0
+
+
+def without_award_amounts(releases: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for data in releases:
+        for awarded in data.get("awards", []):
+            awarded["value"]["amount"] = None
+    return releases
+
+
+def test_s03_minimum_share_with_missing_amounts(tmp_path: Path) -> None:
+    """Without awarded amounts only the share of processes counts, with the same minimum."""
+    manifest, rows = run_signals(tmp_path, without_award_amounts(few_shares()))
+    assert by_code(rows, "S03") == []
+    assert exclusion(manifest, "S03", "adjudicación sin monto en soles") == 100
+    folder = tmp_path / "sin-minimo"
+    folder.mkdir()
+    text = SIGNALS_TOML.replace("participacion_minima = 0.05", "participacion_minima = 0.0")
+    _, rows = run_signals(folder, without_award_amounts(few_shares()), signals_text=text)
+    (signal,) = by_code(rows, "S03")
+    assert signal["entradas"]["medida"] == "procesos"
+    assert signal["calidad"] == ["hay adjudicaciones sin monto en soles: no suman al monto"]
