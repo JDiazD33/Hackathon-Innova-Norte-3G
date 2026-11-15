@@ -10,17 +10,23 @@
 --     select set_config('prisma.cuenta_id', '<uuid de la cuenta de la sesión>', true);
 --   antes de cualquier consulta. Con `true`, el valor dura solo esa transacción, así que es seguro
 --   con un pool de conexiones. Las políticas de Row Level Security y las funciones leen ese valor.
--- - Lo que este esquema garantiza: nadie con los permisos de la API puede editar ni borrar revisiones o
---   filas de la bitácora, y cualquier cambio hecho por fuera, con permisos de dueño, rompe la cadena de
---   hashes. Lo que no garantiza: si alguien toma el control de la API, puede actuar con cualquier cuenta.
---   Por eso la API valida la sesión y cada acción queda atribuida en la bitácora.
+-- - Si PostgreSQL detecta un bloqueo mutuo (código 40P01) o un conflicto de serialización (40001),
+--   la API reintenta la transacción una vez. Es raro, pero puede pasar en el primer inicio de sesión.
+-- - La API no escribe directamente en ninguna tabla: lee y ejecuta funciones. Cada función que cambia
+--   algo deja su fila en la bitácora en la misma transacción, así que no hay cambios sin registro ni
+--   filas de bitácora sueltas.
+-- - Lo que este esquema garantiza: con los permisos de la API nadie puede editar ni borrar revisiones o
+--   filas de la bitácora, ni escribir en ella una acción que no ocurrió; y cualquier cambio hecho por
+--   fuera, con permisos de dueño, rompe la cadena de hashes. Lo que no garantiza: si alguien toma el
+--   control de la API, puede actuar con cualquier cuenta. Por eso la API valida la sesión y cada acción
+--   queda atribuida en la bitácora.
 
 begin;
 
 -- 0. Roles de la base -------------------------------------------------------------------------------
 -- Sin inicio de sesión. Las credenciales se configuran fuera del repositorio, al desplegar.
---   prisma_migraciones  dueño de todos los objetos; solo lo usan las migraciones
---   prisma_api          la API: lee y escribe solo mediante funciones
+--   prisma_migraciones  dueño de todos los objetos; solo lo usan las migraciones y quien opera la base
+--   prisma_api          la API: lee tablas y ejecuta funciones; no escribe directamente en ninguna tabla
 --   prisma_carga        el paso de carga del pipeline: solo el esquema datos
 do $$
 begin
@@ -39,7 +45,7 @@ end $$;
 set local role prisma_migraciones;
 
 create schema datos;      -- paquete de datos cargado cada mes (lectura)
-create schema seguridad;  -- cuentas, sesiones y passkeys
+create schema seguridad;  -- entidades, cuentas, sesiones y passkeys
 create schema revision;   -- decisiones y asignaciones
 create schema auditoria;  -- bitácora encadenada
 
@@ -109,13 +115,23 @@ begin
   update datos.paquetes set vigente = true where id = p_paquete_id;
 end $$;
 
--- 2. Cuentas y contexto -----------------------------------------------------------------------------
+-- 2. Entidades, cuentas y contexto ------------------------------------------------------------------
+
+-- Entidades habilitadas en el piloto. `emisores` son los proveedores de identidad (claim iss) que la
+-- entidad acepta: una cuenta solo se enlaza y entra desde uno de ellos. Con Microsoft Entra, el emisor
+-- incluye el identificador del tenant de la entidad, así que una cuenta de otro tenant no sirve.
+create table seguridad.entidades (
+  entidad_id text primary key,  -- el mismo identificador que datos.entidades.entidad_id
+  nombre     text not null check (length(btrim(nombre)) between 1 and 300),
+  emisores   text[] not null check (cardinality(emisores) >= 1),
+  creada_en  timestamptz not null default now()
+);
+
 -- Datos personales mínimos: nombre, correo institucional, cargo, entidad y rol.
 -- Sin DNI, foto ni datos biométricos. `emisor` y `sujeto` son los claims iss y sub del proveedor OIDC.
-
 create table seguridad.cuentas (
   id         uuid primary key default gen_random_uuid(),
-  entidad_id text not null,  -- el mismo identificador que datos.entidades.entidad_id
+  entidad_id text not null references seguridad.entidades,
   nombre     text not null check (length(btrim(nombre)) between 1 and 200),
   correo     text not null check (correo ~ '^[^@[:space:]]+@[^@[:space:]]+$'),
   cargo      text not null check (length(btrim(cargo)) between 1 and 200),
@@ -195,7 +211,7 @@ create table seguridad.passkeys (
 -- La primera fila de cada cadena usa 32 bytes en cero como hash_anterior.
 
 create table auditoria.cadenas (
-  entidad_id       text primary key,
+  entidad_id       text primary key references seguridad.entidades,
   ultima_secuencia bigint not null default 0 check (ultima_secuencia >= 0),
   ultimo_hash      bytea not null default decode(repeat('00', 32), 'hex') check (length(ultimo_hash) = 32)
 );
@@ -207,11 +223,12 @@ create table auditoria.bitacora (
   cuenta_id     uuid not null references seguridad.cuentas,
   rol           text not null,  -- rol de la cuenta en ese momento
   accion        text not null check (accion in (
-                  'sesion_iniciada', 'sesion_rechazada', 'sesion_cerrada', 'identidad_verificada',
-                  'passkey_registrada', 'decision_registrada', 'asignacion_registrada',
-                  'revision_importada', 'revisiones_importadas', 'revisiones_exportadas',
-                  'cuenta_registrada', 'cuenta_actualizada', 'bitacora_verificada')),
-  objeto_tipo   text check (objeto_tipo in ('proceso', 'cuenta', 'archivo', 'sesion', 'bitacora')),
+                  'entidad_habilitada', 'sesion_iniciada', 'sesion_rechazada', 'sesion_cerrada',
+                  'identidad_verificada', 'passkey_registrada', 'decision_registrada',
+                  'asignacion_registrada', 'revision_importada', 'revisiones_importadas',
+                  'revisiones_exportadas', 'cuenta_registrada', 'cuenta_actualizada',
+                  'bitacora_verificada')),
+  objeto_tipo   text check (objeto_tipo in ('entidad', 'proceso', 'cuenta', 'archivo', 'sesion', 'bitacora')),
   objeto_id     text,
   datos         jsonb not null default '{}'::jsonb,
   hash_anterior bytea not null check (length(hash_anterior) = 32),
@@ -237,8 +254,21 @@ language sql stable set search_path = pg_catalog, pg_temp as $$
   )::text, 'UTF8'))
 $$;
 
--- Única forma de escribir en la bitácora. Bloquea la cadena de la entidad para que dos
--- transacciones no tomen la misma secuencia, y atribuye la fila a la cuenta del contexto.
+-- Bloquea la cadena de la entidad hasta el final de la transacción. Así, dos transacciones no toman
+-- la misma secuencia, y lo que una función lee antes de escribir no cambia mientras escribe.
+create function auditoria.bloquear_cadena(p_entidad_id text) returns auditoria.cadenas
+language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
+declare
+  v_cadena auditoria.cadenas;
+begin
+  insert into auditoria.cadenas (entidad_id) values (p_entidad_id) on conflict do nothing;
+  select * into v_cadena from auditoria.cadenas where entidad_id = p_entidad_id for update;
+  return v_cadena;
+end $$;
+
+-- Agrega una fila a la cadena, atribuida a la cuenta del contexto. Es de uso interno: la llaman las
+-- funciones que cambian algo, en su misma transacción. La API no puede ejecutarla, así que no puede
+-- escribir una acción que no ocurrió.
 create function auditoria.registrar(
   p_accion      text,
   p_objeto_tipo text default null,
@@ -257,8 +287,7 @@ begin
     raise exception 'sesion_requerida' using errcode = 'insufficient_privilege';
   end if;
 
-  insert into auditoria.cadenas (entidad_id) values (v_cuenta.entidad_id) on conflict do nothing;
-  select * into v_cadena from auditoria.cadenas where entidad_id = v_cuenta.entidad_id for update;
+  v_cadena := auditoria.bloquear_cadena(v_cuenta.entidad_id);
 
   v_fila.entidad_id    := v_cuenta.entidad_id;
   v_fila.secuencia     := v_cadena.ultima_secuencia + 1;
@@ -291,9 +320,8 @@ select distinct on (entidad_id, (ocurrido_en at time zone 'America/Lima')::date)
  order by entidad_id, (ocurrido_en at time zone 'America/Lima')::date, secuencia desc;
 
 -- 4. Revisiones (equivale a ReviewStore) ------------------------------------------------------------
--- Registro de eventos de solo inserción, como LocalReviewStore. El estado vigente de un proceso se
--- deriva de su última decisión. Cada evento tiene su propia fila en la bitácora, que guarda la huella
--- del evento: así la cadena también protege los comentarios y las notas.
+-- Registro de eventos de solo inserción, como LocalReviewStore. Cada evento tiene su propia fila en la
+-- bitácora, que guarda la huella del evento: así la cadena también protege los comentarios y las notas.
 
 create table revision.eventos (
   entidad_id         text not null,
@@ -325,7 +353,7 @@ create table revision.eventos (
   check ((origen = 'prisma') = (autor_id is not null and importado_por is null)),
   check ((origen = 'importado') = (autor_id is null and importado_por is not null))
 );
-create index eventos_por_proceso on revision.eventos (entidad_id, ocid, fecha);
+create index eventos_por_proceso on revision.eventos (entidad_id, ocid, bitacora_secuencia);
 
 create function revision.huella_evento(e revision.eventos) returns text
 language sql stable set search_path = pg_catalog, pg_temp as $$
@@ -348,14 +376,16 @@ language sql stable set search_path = pg_catalog, pg_temp as $$
   )::text, 'UTF8')), 'hex')
 $$;
 
--- Estado vigente de cada proceso revisado, como getState(ocid).
+-- Estado vigente de cada proceso, como getState(ocid): la última decisión tomada en Prisma, en el
+-- orden de la bitácora. Las entradas importadas de la demostración se ven en el historial como
+-- antecedente, pero nunca definen el estado: su fecha viene de un archivo y su autor es un rol simulado.
 create view revision.estado_vigente with (security_invoker = true) as
-select distinct on (entidad_id, ocid) entidad_id, ocid, estado, fecha
+select distinct on (entidad_id, ocid) entidad_id, ocid, estado, fecha, bitacora_secuencia
   from revision.eventos
- where tipo = 'decision'
- order by entidad_id, ocid, fecha desc, bitacora_secuencia desc;
+ where tipo = 'decision' and origen = 'prisma'
+ order by entidad_id, ocid, bitacora_secuencia desc;
 
--- Inserta un evento y su fila de bitácora en la misma transacción.
+-- Uso interno: inserta un evento y su fila de bitácora en la misma transacción.
 create function revision.insertar_evento(p_evento revision.eventos, p_accion text, p_datos jsonb)
 returns revision.eventos
 language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
@@ -395,6 +425,9 @@ begin
     raise exception 'no_encontrado' using errcode = 'no_data_found';
   end if;
 
+  -- Con la cadena bloqueada, nadie más puede decidir sobre un proceso de la entidad hasta que esta
+  -- transacción termine, así que el estado anterior que se registra es el real.
+  perform auditoria.bloquear_cadena(v_cuenta.entidad_id);
   select estado into v_anterior
     from revision.estado_vigente
    where entidad_id = v_cuenta.entidad_id and ocid = p_ocid;
@@ -465,7 +498,8 @@ begin
 end $$;
 
 -- Importa el archivo versión 1 que exporta LocalReviewStore. Todo o nada: valida cada entrada, fusiona
--- por id, cuenta los duplicados exactos y rechaza los conflictos sin guardar nada.
+-- por id, cuenta los duplicados exactos y rechaza los conflictos sin guardar nada. Las entradas
+-- importadas quedan como antecedente y nunca cambian el estado vigente (ver revision.estado_vigente).
 create function revision.importar(p_archivo jsonb, out agregadas integer, out duplicadas integer)
 language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
 declare
@@ -503,6 +537,10 @@ begin
        or v_evento.rol is null or v_evento.fecha is null then
       raise exception 'datos_invalidos' using errcode = 'check_violation', detail = 'entrada incompleta';
     end if;
+    -- Cinco minutos de margen por si el reloj de la computadora que exportó iba adelantado.
+    if v_evento.fecha > now() + interval '5 minutes' then
+      raise exception 'datos_invalidos' using errcode = 'check_violation', detail = 'fecha futura';
+    end if;
     if v_evento.tipo = 'decision' then
       v_evento.comentario := coalesce(v_evento.comentario, '');
     end if;
@@ -530,26 +568,43 @@ begin
             jsonb_build_object('agregadas', agregadas, 'duplicadas', duplicadas));
 end $$;
 
--- 5. Cuentas: registro, cambios e inicio de sesión ---------------------------------------------------
+-- Registra una exportación y devuelve su fila de bitácora, que es el sello del archivo.
+-- La API llama esta función primero, porque bloquea la cadena, y después lee las entradas en la misma
+-- transacción: así el archivo coincide exactamente con el sello.
+create function revision.registrar_exportacion(p_entradas integer) returns auditoria.bitacora
+language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
+begin
+  perform seguridad.exigir_cuenta(array['analista', 'jefatura', 'auditor']);
+  if p_entradas is null or p_entradas < 0 then
+    raise exception 'datos_invalidos' using errcode = 'check_violation', detail = 'entradas';
+  end if;
+  return auditoria.registrar('revisiones_exportadas', 'archivo', null,
+           jsonb_build_object('entradas', p_entradas));
+end $$;
 
--- Solo para quien opera la base, una vez por entidad: crea la primera cuenta de administración y
--- deja ese alta en la bitácora. La API no puede ejecutarla.
-create function seguridad.registrar_primera_cuenta(
-  p_entidad_id text, p_nombre text, p_correo text, p_cargo text
+-- 5. Entidades y cuentas: alta, cambios e inicio de sesión ------------------------------------------
+
+-- Solo para quien opera la base: habilita una entidad con los proveedores de identidad que acepta y
+-- su primera cuenta de administración. Deja las dos cosas en la bitácora. La API no puede ejecutarla.
+-- Para cambiar después los emisores de una entidad se escribe una migración, que queda en el repositorio.
+create function seguridad.habilitar_entidad(
+  p_entidad_id text, p_nombre text, p_emisores text[],
+  p_admin_nombre text, p_admin_correo text, p_admin_cargo text
 ) returns seguridad.cuentas
 language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
 declare
   v_cuenta seguridad.cuentas;
 begin
-  if exists (select 1 from seguridad.cuentas where entidad_id = p_entidad_id) then
-    raise exception 'La entidad % ya tiene cuentas', p_entidad_id using errcode = 'unique_violation';
-  end if;
+  insert into seguridad.entidades (entidad_id, nombre, emisores)
+  values (p_entidad_id, btrim(p_nombre), p_emisores);
   insert into seguridad.cuentas (entidad_id, nombre, correo, cargo, rol)
-  values (p_entidad_id, btrim(p_nombre), btrim(p_correo), btrim(p_cargo), 'administrador')
+  values (p_entidad_id, btrim(p_admin_nombre), btrim(p_admin_correo), btrim(p_admin_cargo), 'administrador')
   returning * into v_cuenta;
   perform set_config('prisma.cuenta_id', v_cuenta.id::text, true);
+  perform auditoria.registrar('entidad_habilitada', 'entidad', p_entidad_id,
+            jsonb_build_object('emisores', to_jsonb(p_emisores), 'por_operador', true));
   perform auditoria.registrar('cuenta_registrada', 'cuenta', v_cuenta.id::text,
-            jsonb_build_object('rol', v_cuenta.rol, 'cargo', v_cuenta.cargo, 'primera_cuenta', true));
+            jsonb_build_object('rol', v_cuenta.rol, 'cargo', v_cuenta.cargo, 'por_operador', true));
   return v_cuenta;
 end $$;
 
@@ -572,6 +627,8 @@ begin
 end $$;
 
 -- Nadie cambia su propia cuenta. Desactivar una cuenta revoca sus sesiones al instante.
+-- Como quien hace el cambio es un administrador activo y no puede cambiarse a sí mismo, la entidad
+-- nunca se queda sin administrador por esta vía.
 create function seguridad.actualizar_cuenta(
   p_cuenta_id uuid, p_rol text default null, p_cargo text default null, p_activa boolean default null
 ) returns seguridad.cuentas
@@ -584,9 +641,11 @@ begin
   if p_cuenta_id = v_admin.id then
     raise exception 'cuenta_propia' using errcode = 'insufficient_privilege';
   end if;
+  -- FOR NO KEY UPDATE no choca con las claves foráneas que apuntan a la cuenta, así que no bloquea
+  -- a quien está registrando una decisión con ella en ese momento.
   select * into v_antes from seguridad.cuentas
    where id = p_cuenta_id and entidad_id = v_admin.entidad_id
-   for update;
+   for no key update;
   if not found then
     raise exception 'no_encontrado' using errcode = 'no_data_found';
   end if;
@@ -612,8 +671,38 @@ begin
   return v_despues;
 end $$;
 
--- Busca la cuenta de quien vuelve del proveedor de identidad. La primera vez la enlaza por correo
--- verificado; después, solo por emisor y sujeto. Devuelve null si no hay cuenta.
+-- Solo para quien opera la base, si la entidad se queda sin un administrador que pueda actuar, por
+-- ejemplo porque el único dejó la entidad. Exige un motivo y queda en la bitácora. Para no llegar a
+-- usarla, cada entidad debería tener dos administradores. La API no puede ejecutarla.
+create function seguridad.designar_administrador_de_emergencia(p_cuenta_id uuid, p_motivo text)
+returns seguridad.cuentas
+language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
+declare
+  v_antes   seguridad.cuentas;
+  v_despues seguridad.cuentas;
+begin
+  if btrim(coalesce(p_motivo, '')) = '' then
+    raise exception 'datos_invalidos' using errcode = 'check_violation', detail = 'motivo';
+  end if;
+  select * into v_antes from seguridad.cuentas where id = p_cuenta_id for no key update;
+  if not found then
+    raise exception 'no_encontrado' using errcode = 'no_data_found';
+  end if;
+  update seguridad.cuentas set rol = 'administrador', activa = true
+   where id = p_cuenta_id
+  returning * into v_despues;
+  perform set_config('prisma.cuenta_id', p_cuenta_id::text, true);
+  perform auditoria.registrar('cuenta_actualizada', 'cuenta', p_cuenta_id::text, jsonb_build_object(
+    'antes',   jsonb_build_object('rol', v_antes.rol, 'cargo', v_antes.cargo, 'activa', v_antes.activa),
+    'despues', jsonb_build_object('rol', v_despues.rol, 'cargo', v_despues.cargo, 'activa', v_despues.activa),
+    'motivo', btrim(p_motivo), 'por_operador', true));
+  return v_despues;
+end $$;
+
+-- Busca la cuenta de quien vuelve del proveedor de identidad, solo si ese proveedor es uno de los que
+-- acepta la entidad de la cuenta. La primera vez la enlaza por correo verificado; después, solo por
+-- emisor y sujeto. Devuelve null si no hay cuenta. Así, una cuenta de otro proveedor con el mismo
+-- correo no puede entrar.
 create function seguridad.cuenta_para_inicio(
   p_emisor text, p_sujeto text, p_correo text, p_correo_verificado boolean
 ) returns seguridad.cuentas
@@ -621,17 +710,24 @@ language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
 declare
   v_cuenta seguridad.cuentas;
 begin
-  select * into v_cuenta from seguridad.cuentas where emisor = p_emisor and sujeto = p_sujeto;
+  select c.* into v_cuenta
+    from seguridad.cuentas c
+    join seguridad.entidades e on e.entidad_id = c.entidad_id
+   where c.emisor = p_emisor and c.sujeto = p_sujeto and p_emisor = any (e.emisores);
   if found then
     return v_cuenta;
   end if;
   if not coalesce(p_correo_verificado, false) then
     return null;
   end if;
-  update seguridad.cuentas
+  update seguridad.cuentas c
      set emisor = p_emisor, sujeto = p_sujeto
-   where lower(correo) = lower(btrim(p_correo)) and emisor is null
-  returning * into v_cuenta;
+    from seguridad.entidades e
+   where e.entidad_id = c.entidad_id
+     and p_emisor = any (e.emisores)
+     and lower(c.correo) = lower(btrim(p_correo))
+     and c.emisor is null
+  returning c.* into v_cuenta;
   if not found then
     return null;
   end if;
@@ -672,12 +768,66 @@ begin
   end if;
 end $$;
 
+-- Registra una passkey de la cuenta del contexto. La API ya verificó la respuesta de WebAuthn.
+create function seguridad.registrar_passkey(
+  p_credencial_id bytea, p_clave_publica bytea, p_contador bigint, p_transportes text[], p_nombre text
+) returns seguridad.passkeys
+language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
+declare
+  v_cuenta  seguridad.cuentas := seguridad.exigir_cuenta(array['analista', 'jefatura', 'auditor', 'administrador']);
+  v_passkey seguridad.passkeys;
+begin
+  insert into seguridad.passkeys (cuenta_id, credencial_id, clave_publica, contador, transportes, nombre)
+  values (v_cuenta.id, p_credencial_id, p_clave_publica, coalesce(p_contador, 0),
+          coalesce(p_transportes, '{}'), btrim(p_nombre))
+  returning * into v_passkey;
+  perform auditoria.registrar('passkey_registrada', 'cuenta', v_cuenta.id::text,
+            jsonb_build_object('passkey_id', v_passkey.id, 'nombre', v_passkey.nombre));
+  return v_passkey;
+end $$;
+
+-- Marca la sesión como verificada después de una firma válida con passkey, que la API ya comprobó.
+-- El contador de la passkey debe subir; si no sube, podría estar clonada y se rechaza. Algunas
+-- passkeys siempre envían 0: en ese caso no hay contador que comparar.
+create function seguridad.registrar_uso_de_passkey(
+  p_token_sha256 bytea, p_passkey_id uuid, p_contador bigint
+) returns void
+language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
+declare
+  v_cuenta  seguridad.cuentas := seguridad.exigir_cuenta(array['analista', 'jefatura', 'auditor', 'administrador']);
+  v_passkey seguridad.passkeys;
+begin
+  select * into v_passkey from seguridad.passkeys
+   where id = p_passkey_id and cuenta_id = v_cuenta.id
+   for update;
+  if not found then
+    raise exception 'no_encontrado' using errcode = 'no_data_found';
+  end if;
+  if (coalesce(p_contador, 0) <> 0 or v_passkey.contador <> 0)
+     and coalesce(p_contador, 0) <= v_passkey.contador then
+    raise exception 'passkey_rechazada' using errcode = 'insufficient_privilege';
+  end if;
+  update seguridad.sesiones
+     set verificado_en = now(), segundo_factor = 'passkey'
+   where token_sha256 = p_token_sha256 and cuenta_id = v_cuenta.id
+     and revocada_en is null and expira_en > now();
+  if not found then
+    raise exception 'sesion_requerida' using errcode = 'insufficient_privilege';
+  end if;
+  update seguridad.passkeys set contador = coalesce(p_contador, 0), usada_en = now()
+   where id = p_passkey_id;
+  perform auditoria.registrar('identidad_verificada', 'sesion', null,
+            jsonb_build_object('metodo', 'passkey', 'passkey_id', p_passkey_id));
+end $$;
+
 -- 6. Verificación de la cadena ----------------------------------------------------------------------
--- Recalcula cada hash en orden, comprueba que la secuencia no salte, que la cabeza de la cadena
--- coincida con la última fila (detecta filas borradas al final) y que cada evento de revisión tenga
--- la huella guardada en su fila. Devuelve la primera secuencia que falla, o null.
+-- Recalcula cada hash en orden y comprueba que la secuencia no salte, que la cabeza de la cadena
+-- coincida con la última fila (detecta filas borradas al final), que cada evento de revisión tenga su
+-- huella en la bitácora y que cada fila de decisión, asignación o importación tenga su evento.
+-- Devuelve la secuencia de la primera falla que encuentra, o null.
+-- Uso interno y de quien opera la base. La API usa auditoria.registrar_verificacion().
 create function auditoria.verificar(
-  p_entidad_id text default seguridad.entidad_actual(),
+  p_entidad_id text,
   out valida boolean, out filas_verificadas bigint, out primera_falla bigint
 )
 language plpgsql stable security definer set search_path = pg_catalog, pg_temp as $$
@@ -686,6 +836,7 @@ declare
   v_anterior bytea := decode(repeat('00', 32), 'hex');
   v_esperada bigint := 1;
   v_evento   revision.eventos;
+  v_huerfana bigint;
 begin
   valida := false;
   filas_verificadas := 0;
@@ -721,11 +872,47 @@ begin
     end if;
   end loop;
 
+  select b.secuencia into v_huerfana
+    from auditoria.bitacora b
+   where b.entidad_id = p_entidad_id
+     and b.accion in ('decision_registrada', 'asignacion_registrada', 'revision_importada')
+     and not exists (select 1 from revision.eventos e
+                      where e.entidad_id = b.entidad_id and e.bitacora_secuencia = b.secuencia)
+   order by b.secuencia
+   limit 1;
+  if found then
+    primera_falla := v_huerfana;
+    return;
+  end if;
+
   valida := true;
 end $$;
 
+-- Verifica la cadena de la entidad de la sesión y deja el resultado en la bitácora. Devuelve como
+-- sello la fila que registró la verificación.
+create function auditoria.registrar_verificacion(
+  out valida boolean, out filas_verificadas bigint, out primera_falla bigint,
+  out sello_fecha date, out sello_secuencia bigint, out sello_hash text
+)
+language plpgsql security definer set search_path = pg_catalog, pg_temp as $$
+declare
+  v_cuenta seguridad.cuentas := seguridad.exigir_cuenta(array['auditor', 'administrador']);
+  v_fila   auditoria.bitacora;
+begin
+  -- Con la cadena bloqueada, nadie agrega filas mientras se verifica.
+  perform auditoria.bloquear_cadena(v_cuenta.entidad_id);
+  select r.valida, r.filas_verificadas, r.primera_falla
+    into valida, filas_verificadas, primera_falla
+    from auditoria.verificar(v_cuenta.entidad_id) r;
+  v_fila := auditoria.registrar('bitacora_verificada', 'bitacora', null, jsonb_build_object(
+              'valida', valida, 'filas_verificadas', filas_verificadas, 'primera_falla', primera_falla));
+  sello_fecha := (v_fila.ocurrido_en at time zone 'America/Lima')::date;
+  sello_secuencia := v_fila.secuencia;
+  sello_hash := encode(v_fila.hash, 'hex');
+end $$;
+
 -- 7. Solo inserción ---------------------------------------------------------------------------------
--- Además de no dar permisos de UPDATE ni DELETE a la API, un trigger rechaza esos cambios para
+-- Además de no dar a la API permisos de escritura, un trigger rechaza UPDATE, DELETE y TRUNCATE para
 -- cualquier rol. Quien desactive el trigger con permisos de dueño rompe la cadena o la huella, y
 -- auditoria.verificar lo detecta.
 create function auditoria.impedir_cambios() returns trigger
@@ -762,15 +949,13 @@ create policy auditoria_de_la_entidad on auditoria.bitacora for select to prisma
 revoke all on schema datos, seguridad, revision, auditoria from public;
 revoke execute on all functions in schema datos, seguridad, revision, auditoria from public;
 
+-- La API solo lee tablas y ejecuta funciones: no tiene INSERT, UPDATE ni DELETE en ninguna tabla.
 grant usage on schema datos, seguridad, revision, auditoria to prisma_api;
 grant select on all tables in schema datos to prisma_api;
-grant select on seguridad.cuentas, revision.eventos, revision.estado_vigente,
+grant select on seguridad.entidades, seguridad.cuentas, seguridad.sesiones, seguridad.passkeys,
+                revision.eventos, revision.estado_vigente,
                 auditoria.bitacora, auditoria.sellos_diarios to prisma_api;
-grant select on seguridad.sesiones to prisma_api;
-grant update (verificado_en, segundo_factor) on seguridad.sesiones to prisma_api;
-grant select, insert on seguridad.passkeys to prisma_api;
-grant update (contador, usada_en) on seguridad.passkeys to prisma_api;
--- Las políticas de Row Level Security llaman estas funciones con los permisos de quien consulta.
+-- Las tres primeras las llaman las políticas de Row Level Security con los permisos de quien consulta.
 grant execute on function
   seguridad.cuenta_actual(),
   seguridad.entidad_actual(),
@@ -778,14 +963,19 @@ grant execute on function
   seguridad.cuenta_para_inicio(text, text, text, boolean),
   seguridad.abrir_sesion(bytea, text, boolean),
   seguridad.cerrar_sesion(bytea),
+  seguridad.registrar_passkey(bytea, bytea, bigint, text[], text),
+  seguridad.registrar_uso_de_passkey(bytea, uuid, bigint),
   seguridad.registrar_cuenta(text, text, text, text),
   seguridad.actualizar_cuenta(uuid, text, text, boolean),
   revision.registrar_decision(text, text, text),
   revision.registrar_asignacion(text, text, text, uuid),
   revision.importar(jsonb),
-  auditoria.registrar(text, text, text, jsonb),
-  auditoria.verificar(text)
+  revision.registrar_exportacion(integer),
+  auditoria.registrar_verificacion()
 to prisma_api;
+-- Sin permiso para la API (uso interno u operación de la base): auditoria.registrar,
+-- auditoria.bloquear_cadena, auditoria.verificar, revision.insertar_evento, seguridad.exigir_cuenta,
+-- seguridad.habilitar_entidad y seguridad.designar_administrador_de_emergencia.
 
 grant usage on schema datos to prisma_carga;
 grant select, insert, update, delete on all tables in schema datos to prisma_carga;

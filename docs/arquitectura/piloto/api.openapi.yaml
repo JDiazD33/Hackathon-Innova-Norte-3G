@@ -184,6 +184,7 @@ paths:
       tags: [sesion]
       operationId: finishPasskeyVerification
       summary: Verifica la firma y renueva `verificado_en` de la sesión
+      description: Si el contador de la passkey no sube, podría estar clonada y se rechaza con `passkey_rechazada`.
       security:
         - sesion: []
           csrf: []
@@ -390,8 +391,9 @@ paths:
       operationId: listReviews
       summary: Historial de revisiones de la entidad de la sesión
       description: |
-        Orden cronológico. Con `despues_de`, devuelve solo las entradas nuevas, para refrescar
-        la copia en memoria de `ApiReviewStore`.
+        Orden de la bitácora. Con `despues_de`, devuelve solo las entradas nuevas, para refrescar
+        la copia en memoria de `ApiReviewStore`. El estado vigente de un proceso es su última
+        decisión con `origen: prisma`; las entradas importadas nunca lo definen.
       parameters:
         - name: ocid
           in: query
@@ -493,7 +495,10 @@ paths:
       tags: [revisiones]
       operationId: exportReviews
       summary: Exporta las revisiones de la entidad con el sello de la bitácora
-      description: Roles analista, jefatura y auditor. La exportación queda registrada en la bitácora.
+      description: |
+        Roles analista, jefatura y auditor. La exportación queda registrada en la bitácora, y esa
+        fila es el sello del archivo. La API registra la exportación antes de leer las entradas,
+        en la misma transacción, para que el archivo coincida exactamente con el sello.
       responses:
         '200':
           description: Archivo de revisiones, versión 2
@@ -519,7 +524,9 @@ paths:
         Roles analista y jefatura; exige identidad verificada en los últimos 15 minutos.
         Valida el archivo completo antes de guardar. Fusiona por `id` y rechaza conflictos sin
         modificar nada, como `LocalReviewStore`. Las entradas quedan con `origen: importado`,
-        `autor: null` e `importado_por` con la cuenta de la sesión.
+        `autor: null` e `importado_por` con la cuenta de la sesión. Se ven en el historial como
+        antecedente, pero nunca cambian el estado vigente de un proceso. Se rechaza el archivo
+        completo si alguna entrada tiene una fecha futura.
       security:
         - sesion: []
           csrf: []
@@ -618,7 +625,10 @@ paths:
       tags: [bitacora]
       operationId: verifyAuditLog
       summary: Recalcula la cadena de hashes de la entidad
-      description: Roles auditor y administrador. La verificación también queda registrada en la bitácora.
+      description: |
+        Roles auditor y administrador. Verifica solo la cadena de la entidad de la sesión, y la
+        verificación también queda registrada en la bitácora. Además de los hashes, comprueba que
+        cada decisión tenga su fila en la bitácora y que cada fila de decisión tenga su decisión.
       security:
         - sesion: []
           csrf: []
@@ -792,7 +802,8 @@ components:
     NoAutenticado:
       description: |
         Sin sesión, sesión vencida o revocada (`sesion_requerida`), o acción sensible sin
-        verificación reciente de identidad (`reautenticacion_requerida`).
+        verificación reciente de identidad (`reautenticacion_requerida`). En ese caso, la web pide
+        la passkey o, si el segundo factor lo pide el proveedor de identidad, vuelve a iniciar sesión.
       content:
         application/problem+json:
           schema:
@@ -855,6 +866,7 @@ components:
             - datos_invalidos
             - conflicto_de_importacion
             - cuenta_duplicada
+            - passkey_rechazada
 
     Persona:
       description: Quién hizo la acción. Sin DNI ni otros datos personales.
@@ -934,6 +946,7 @@ components:
             - $ref: '#/components/schemas/Persona'
             - type: 'null'
         origen:
+          description: '`importado`: entrada de la demostración. Se ve en el historial como antecedente y nunca define el estado vigente.'
           type: string
           enum: [prisma, importado]
         importado_por:
@@ -1065,7 +1078,7 @@ components:
           items:
             $ref: '#/components/schemas/EntradaRevision'
         sello:
-          description: Última fila de la bitácora al exportar. Permite comprobar después que el archivo coincide con la cadena.
+          description: Fila de la bitácora que registró esta exportación. Permite comprobar después que el archivo coincide con la cadena.
           type: object
           required: [secuencia, hash]
           properties:
@@ -1082,6 +1095,7 @@ components:
     AccionBitacora:
       type: string
       enum:
+        - entidad_habilitada
         - sesion_iniciada
         - sesion_rechazada
         - sesion_cerrada
@@ -1115,7 +1129,7 @@ components:
           $ref: '#/components/schemas/AccionBitacora'
         objeto_tipo:
           type: [string, 'null']
-          enum: [proceso, cuenta, archivo, sesion, bitacora, null]
+          enum: [entidad, proceso, cuenta, archivo, sesion, bitacora, null]
         objeto_id:
           type: [string, 'null']
         datos:

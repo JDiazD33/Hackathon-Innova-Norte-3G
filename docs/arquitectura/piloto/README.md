@@ -68,7 +68,7 @@ En una web, Face ID y la huella se usan mediante **passkeys (WebAuthn)**. El nav
 
 - **Si el proveedor de identidad ya exige un segundo factor**, Prisma lo comprueba en el `id_token` (claim `amr`) y no pide otro.
 - **Si no lo exige**, Prisma registra una passkey propia como segundo factor (tabla `seguridad.passkeys`).
-- **Acciones sensibles**, como decidir "requiere atención", importar revisiones o cambiar roles, exigen haber verificado la identidad en los últimos 15 minutos. Si pasó más tiempo, la API responde `401` con el código `reautenticacion_requerida` y la web pide la passkey de nuevo.
+- **Acciones sensibles**, como decidir "requiere atención", importar revisiones o cambiar roles, exigen haber verificado la identidad en los últimos 15 minutos. Si pasó más tiempo, la API responde `401` con el código `reautenticacion_requerida`. La web pide la passkey de nuevo o, si el segundo factor lo pide el proveedor de identidad, hace que la persona vuelva a iniciar sesión en él.
 
 ### Por qué no RENIEC ni el DNI
 
@@ -79,10 +79,12 @@ En una web, Face ID y la huella se usan mediante **passkeys (WebAuthn)**. El nav
 
 ### Cuentas
 
-1. El administrador de la entidad registra a cada persona con su correo institucional, su cargo y su rol.
-2. En el primer inicio de sesión, la API enlaza la cuenta si el correo del `id_token` está verificado y coincide. Desde entonces la reconoce por emisor y sujeto, aunque el correo cambie.
-3. Si la cuenta no existe o está desactivada, la API responde `403` y la web muestra "Tu cuenta no tiene acceso a Prisma. Pide acceso al administrador de tu entidad."
-4. Las sesiones viven en la base (`seguridad.sesiones`) y duran 8 horas. Cerrar sesión o desactivar la cuenta las revoca al instante.
+1. Quien opera la base habilita la entidad con los proveedores de identidad que acepta y su primera cuenta de administración (`seguridad.habilitar_entidad`).
+2. El administrador de la entidad registra a cada persona con su correo institucional, su cargo y su rol.
+3. En el primer inicio de sesión, la API enlaza la cuenta si el proveedor es uno de los que acepta su entidad y el correo del `id_token` está verificado. Desde entonces la reconoce por emisor y sujeto, aunque el correo cambie. Así, una cuenta de otro proveedor con el mismo correo no puede entrar: confiar solo en el correo del token es un error conocido, como el caso nOAuth con Microsoft Entra.
+4. Si la cuenta no existe o está desactivada, la API no crea la sesión y redirige a `/sin-acceso`, que muestra "Tu cuenta no tiene acceso a Prisma. Pide acceso al administrador de tu entidad."
+5. Las sesiones viven en la base (`seguridad.sesiones`) y duran 8 horas. Cerrar sesión o desactivar la cuenta las revoca al instante.
+6. Conviene que cada entidad tenga dos administradores. Si se queda sin ninguno que pueda actuar, quien opera la base designa otro con una función de emergencia que exige un motivo y queda en la bitácora.
 
 **Datos personales que se guardan:** nombre, correo institucional, cargo, entidad y rol. Nada más: ni DNI, ni foto, ni datos biométricos.
 
@@ -107,14 +109,14 @@ El rol viene de la cuenta, nunca de un parámetro que envíe el navegador. El se
 
 Es la respuesta concreta a la pregunta "¿quién hizo qué?". Está definida en [`esquema.sql`](esquema.sql).
 
-**Qué se registra:** inicio y cierre de sesión, intentos de una cuenta desactivada, verificaciones con passkey, decisiones, asignaciones, exportaciones, importaciones, registro y desactivación de cuentas, cambios de rol y cada verificación de la cadena. No se registra cada lectura de una ficha, para no vigilar a las personas más de lo necesario.
+**Qué se registra:** habilitación de la entidad, inicio y cierre de sesión, intentos de una cuenta desactivada, verificaciones con passkey, decisiones, asignaciones, exportaciones, importaciones, registro y desactivación de cuentas, cambios de rol y cada verificación de la cadena. No se registra cada lectura de una ficha, para no vigilar a las personas más de lo necesario.
 
 **Cómo funciona:**
 
-1. Solo se escribe mediante la función `auditoria.registrar(...)`, que bloquea la cadena de la entidad, lee el hash de la última fila, calcula `hash = SHA-256(hash_anterior ‖ contenido)` e inserta la fila nueva. Las filas de una entidad forman una cadena numerada (`secuencia` 1, 2, 3…).
+1. Solo la escriben funciones de la base. Cada función que cambia algo (decidir, asignar, importar, exportar, abrir o cerrar sesión, verificar la identidad, registrar una passkey, cambiar una cuenta o verificar la cadena) agrega su fila con `auditoria.registrar(...)`. Esa función bloquea la cadena de la entidad, lee el hash de la última fila, calcula `hash = SHA-256(hash_anterior ‖ contenido)` e inserta la fila nueva. Las filas de una entidad forman una cadena numerada (`secuencia` 1, 2, 3…).
 2. La decisión o la asignación y su fila de bitácora se insertan **en la misma transacción**: si una falla, no queda ninguna. La fila guarda la huella SHA-256 del evento, así que la cadena también protege los comentarios y las notas.
-3. La API no tiene permiso de `UPDATE` ni `DELETE` sobre la bitácora ni sobre las revisiones: las lee y escribe solo mediante funciones de la base. Además, un trigger rechaza cualquier `UPDATE`, `DELETE` o `TRUNCATE` en esas tablas, venga de quien venga.
-4. `auditoria.verificar(entidad)` recalcula toda la cadena y devuelve la primera fila que no coincide. El auditor la ejecuta desde `POST /api/v1/bitacora/verificaciones`, y la propia verificación queda registrada.
+3. La API no escribe directamente en ninguna tabla ni puede ejecutar `auditoria.registrar`: solo lee y llama la función de cada acción. Así no puede dejar en la bitácora una acción que no ocurrió. Además, un trigger rechaza cualquier `UPDATE`, `DELETE` o `TRUNCATE` sobre la bitácora y las revisiones, venga de quien venga.
+4. `auditoria.verificar(entidad)` recalcula toda la cadena, comprueba que cada decisión tenga su fila y que cada fila de decisión tenga su decisión, y devuelve la primera falla. El auditor la ejecuta desde `POST /api/v1/bitacora/verificaciones`, solo sobre la cadena de su entidad, y la propia verificación queda registrada.
 
 **Límite honesto:** quien administre el servidor de base de datos con permisos totales podría reescribir la cadena completa y recalcular todos los hashes. Para detectarlo, el **sello diario** (el hash de la última fila de cada día) sale de la base: se imprime en el reporte de trazabilidad y lo guarda el auditor. Si la cadena cambia después, ya no coincidirá con los sellos anteriores. En una fase posterior, el sello se puede firmar digitalmente.
 
@@ -134,19 +136,19 @@ Hoy la interfaz es síncrona porque lee `localStorage`. `ApiReviewStore` mantien
 
 | Método de hoy | En `ApiReviewStore` |
 |---|---|
-| `listReviews`, `getState`, `listAssignedTo`, `listAssignedBy`, `listDecided`, `getSnapshot` | Leen la copia en memoria, cargada con `GET /api/v1/revisiones` |
+| `listReviews`, `getState`, `listAssignedTo`, `listAssignedBy`, `listDecided`, `getSnapshot` | Leen la copia en memoria, cargada con `GET /api/v1/revisiones`. `getState` y `listDecided` solo cuentan las decisiones tomadas en Prisma, no las importadas |
 | `saveDecision` | `POST /api/v1/procesos/{ocid}/decisiones`. Devuelve una promesa |
 | `assign` | `POST /api/v1/procesos/{ocid}/asignaciones`. Devuelve una promesa |
 | `exportReviews` | `GET /api/v1/revisiones/exportacion`, formato versión 2 |
-| `importReviews` | `POST /api/v1/revisiones/importaciones`. Las entradas quedan marcadas como importadas, con quién las importó |
+| `importReviews` | `POST /api/v1/revisiones/importaciones`. Las entradas quedan marcadas como importadas, con quién las importó, y nunca cambian el estado vigente. Se rechazan las fechas futuras |
 | `resetDemo` | No existe: en el piloto nada se borra. Lanza un error |
 | `syncFromStorage` | Vuelve a consultar la API. La copia también se refresca al volver a la pestaña y cada 60 segundos |
 | `subscribe`, `getServerSnapshot` | Sin cambios |
 
-- **El parámetro `role` se ignora**, porque el servidor usa el rol de la sesión. Se conserva en la firma para no tocar a quienes la llaman.
-- **Cada entrada suma un campo `autor`** (`{ id, nombre, cargo }`). En las entradas importadas, `autor` es `null` y `importado_por` dice quién las cargó.
+- **En las escrituras (`saveDecision`, `assign` e `importReviews`), el parámetro `role` se ignora**, porque el servidor usa el rol de la sesión. Se conserva en la firma para no tocar a quienes la llaman. En `listAssignedTo` y `listAssignedBy` sigue siendo el filtro de la consulta.
+- **Cada entrada suma un campo `autor`** (`{ id, nombre, cargo }`). En las entradas importadas, `autor` es `null`, `importado_por` dice quién las cargó y la interfaz las muestra como "Importada de la demostración".
 - **Qué hacer desde ya:** llamar `saveDecision` y `assign` con `await`, como permite el [README del Lote D](../../../web/src/features/revision/README.md). Así, el cambio a promesas no toca las pantallas.
-- **Formato de exportación versión 2:** `{ version: 2, entidad_id, exportado_en, exportado_por, entradas: [...], sello: { secuencia, hash } }`. El sello permite comprobar después que el archivo coincide con la bitácora.
+- **Formato de exportación versión 2:** `{ version: 2, entidad_id, exportado_en, exportado_por, entradas: [...], sello: { secuencia, hash } }`. El sello es la fila de la bitácora que registró la exportación, y permite comprobar después que el archivo coincide con la cadena.
 
 ## Seguridad
 
@@ -159,7 +161,7 @@ Hoy la interfaz es síncrona porque lee `localStorage`. `ApiReviewStore` mantien
 | CORS | Cerrado: la web y la API comparten origen |
 | Fuerza bruta | Límite de peticiones en el inicio de sesión y en las escrituras, por cuenta y por IP |
 | Validación | Pydantic en todas las entradas. Los comentarios se guardan como texto plano y la web nunca los interpreta como HTML |
-| Base de datos | Tres usuarios: `prisma_migraciones` (dueño del esquema), `prisma_api` (lee y escribe solo por funciones) y `prisma_carga` (solo el esquema `datos`). Row Level Security por entidad |
+| Base de datos | Tres usuarios: `prisma_migraciones` (dueño del esquema), `prisma_api` (lee tablas y ejecuta funciones; no escribe directamente en ninguna tabla) y `prisma_carga` (solo el esquema `datos`). Row Level Security por entidad |
 | Secretos | Variables de entorno, documentadas en un `.env.example` sin valores. Nada en el repositorio |
 | Registros técnicos | Sin datos personales ni comentarios de revisión. Lo personal solo va en la bitácora |
 | Respaldos | Diarios y cifrados, con una prueba de restauración al mes |
@@ -197,9 +199,14 @@ Para cuando empiece el piloto, con una parte por rama, como en el MVP:
 
 ## Decisiones abiertas
 
-| Tema | Depende de |
-|---|---|
-| Dónde se aloja (nube o centro de datos de la entidad) | La entidad del piloto y su área de TI |
-| Qué proveedor de identidad se usa | El directorio que ya tenga la entidad y si usa ID GOB.PE |
-| Si la jefatura también ve la bitácora completa | El flujo de control interno de la entidad |
-| Plazo de conservación de la bitácora | La normativa de archivo de la entidad |
+| Tema | Por ahora | Depende de |
+|---|---|---|
+| Dónde se aloja (nube o centro de datos de la entidad) | Por definir | La entidad del piloto y su área de TI |
+| Costo mensual del servidor, la base y los respaldos | Por estimar | Dónde se aloje: en la nube se paga cada mes; en el centro de datos de la entidad, lo cubre la entidad |
+| Qué proveedor de identidad se usa | Por definir | El directorio que ya tenga la entidad y si usa ID GOB.PE |
+| Si se importan las revisiones de la demostración | Sí, solo como antecedente | El equipo |
+| Quién ve el nombre de quien decidió | Todos los roles de la entidad | El equipo y la entidad |
+| Si se puede asignar un caso a alguien del mismo rol | No, como en el MVP | El equipo |
+| Si pedir la identidad otra vez cada 15 minutos para acciones sensibles es demasiada fricción | Se pide | Pruebas con personas de la entidad |
+| Si la jefatura también ve la bitácora completa | No | El flujo de control interno de la entidad |
+| Plazo de conservación de la bitácora | Nada se borra durante el piloto | La normativa de archivo de la entidad |
