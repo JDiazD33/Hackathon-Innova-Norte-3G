@@ -10,8 +10,8 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 
 | | |
 |---|---|
-| Fase | Cierre de la Fase 0: la parte de código de los cuatro lotes ya está en `main` y la web está publicada. La Fase 1 (dom 15 – jue 19) trae el rediseño Prisma con las guías de Apple, las pantallas de C y D y los datos reales ([qué hace cada uno](docs/plan/fase-1/README.md)) |
-| Demo en línea | [hackathon-innova-norte-3g.vercel.app](https://hackathon-innova-norte-3g.vercel.app), con datos de prueba (fixture) hasta que esté el paquete con datos reales. Se actualiza con cada push a `main` ([despliegue](CONTRIBUTING.md#despliegue)) |
+| Fase | Fase 1 (dom 15 – jue 19, [qué hace cada uno](docs/plan/fase-1/README.md)). En `main` ya están el rediseño Prisma, el panel, la bandeja, las fichas del proceso y del proveedor y los datos reales. Las pantallas de Revisión, Metodología y Reporte del Lote D esperan aprobación en el [PR #29](https://github.com/JDiazD33/Hackathon-Innova-Norte-3G/pull/29). La verificación manual de señales en el SEACE es del miércoles 18 al viernes 20 |
+| Demo en línea | [hackathon-innova-norte-3g.vercel.app](https://hackathon-innova-norte-3g.vercel.app), con el paquete público de La Libertad: 5 036 procesos convocados en 2025–2026, datos al 4 de octubre de 2026 y reglas `2026.11.2`. Se actualiza con cada push a `main` ([despliegue](CONTRIBUTING.md#despliegue)) |
 | Desafío | **Por confirmar.** Recomendado: 2 · Integridad institucional y compliance. Alternativa: 1 · Contrataciones públicas y ejecución de obras ([encaje](docs/producto/vision-y-encaje.md#encaje-con-los-desafíos)) |
 | Próximo hito | Entrega del Stage-Gate 1: **miércoles 25 de noviembre de 2026, 11:59 p. m.** (meta interna: 6:00 p. m.) |
 | Equipo y lotes | A · Datos y señales: Stefano · B · Base web, panel y bandeja: Joaquín (líder) · C · Fichas y explicación: Sebastián · D · Revisión y transparencia: André ([fases y lotes](docs/plan/cronograma-y-lotes.md)) |
@@ -32,18 +32,18 @@ Proyecto para la Hackathon Innova Norte 3G (UNT · Red Universitaria de Innovaci
 | Fases, lotes y quién hace qué | [docs/plan/cronograma-y-lotes.md](docs/plan/cronograma-y-lotes.md) |
 | Tu lote en OpenSpec (propuesta, specs, diseño y tareas) | [`lote-a`](openspec/changes/lote-a-datos-y-senales/) · [`lote-b`](openspec/changes/lote-b-base-web-panel-y-bandeja/) · [`lote-c`](openspec/changes/lote-c-fichas-y-explicacion/) · [`lote-d`](openspec/changes/lote-d-revision-y-transparencia/) |
 | Plantillas de los entregables | [docs/entregables/](docs/entregables/README.md) |
-| Reglas para personas y agentes | [CONTRIBUTING.md](CONTRIBUTING.md) · [AGENTS.md](AGENTS.md) |
+| Reglas para contribuir | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 ## Estructura
 
 | Carpeta | Contenido | Estado |
 |---|---|---|
 | `docs/` | Bases, producto, datos, arquitectura, ADR, diseño, plan y entregables | Listo |
-| `openspec/` | Un change por lote (OpenSpec, en español) y skills de OpenSpec para Claude Code y Codex | Listo |
-| `contracts/` | JSON Schema del paquete de datos | Listo (contrato v1) |
-| `pipeline/` | Descarga, normalización y cálculo de señales (Python + DuckDB) | En marcha (Lote A): de la descarga al paquete de datos ([pasos](pipeline/README.md#pasos)) |
-| `web/` | Aplicación web (Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui) | Panel y bandeja listos y [publicados](https://hackathon-innova-norte-3g.vercel.app); la lógica de C y D ya está integrada. Faltan sus pantallas |
-| `data/` | Datos crudos y derivados; no se suben al repositorio | Por crear (Lote A) |
+| `openspec/` | Un change por lote (OpenSpec, en español) | Listo |
+| `contracts/` | JSON Schema del paquete de datos | Listo (contrato 1.1) |
+| `pipeline/` | Descarga, normalización y cálculo de señales (Python + DuckDB) | Listo (Lote A): de la descarga al paquete de datos ([pasos](pipeline/README.md#pasos)). Falta la verificación manual en el SEACE y decidir los umbrales de S04 |
+| `web/` | Aplicación web (Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui) | [Publicada](https://hackathon-innova-norte-3g.vercel.app) con el paquete público en `web/data/publico/`: panel, bandeja y fichas. Revisión, Metodología y Reporte, en el [PR #29](https://github.com/JDiazD33/Hackathon-Innova-Norte-3G/pull/29) |
+| `data/` | Datos crudos y derivados que genera el pipeline; no se suben al repositorio | Se genera en local |
 
 ## Datos y licencias
 
