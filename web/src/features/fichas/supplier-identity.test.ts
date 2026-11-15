@@ -15,32 +15,40 @@ const supplier: Proveedor = {
 describe("Identidad visible del proveedor", () => {
   it.each(["persona_juridica", "persona_natural", "desconocido"] as const)("en público solo expone el seudónimo de %s", (type) => {
     const identity = getSupplierIdentity({ ...supplier, tipo: type }, "publico");
-    expect(identity).toEqual({ displayName: "Proveedor 0003", taxId: null, profileUrl: null });
+    expect(identity).toEqual({ displayName: "Proveedor 0003", taxId: null, profileUrl: null, pseudonymized: true });
     expect(JSON.stringify(identity)).not.toContain(supplier.nombre);
     expect(JSON.stringify(identity)).not.toContain(supplier.ruc);
   });
 
   it("en local muestra el nombre, RUC y enlace de una persona jurídica", () => {
     expect(getSupplierIdentity(supplier, "local")).toEqual({
-      displayName: supplier.nombre, taxId: supplier.ruc, profileUrl: supplier.url_ficha_unica,
+      displayName: supplier.nombre, taxId: supplier.ruc, profileUrl: supplier.url_ficha_unica, pseudonymized: false,
     });
   });
 
-  it("una persona natural nunca muestra su nombre, aunque esté presente en el paquete local", () => {
-    const natural = { ...supplier, tipo: "persona_natural", nombre: "Persona de prueba" } satisfies Proveedor;
-    expect(getSupplierIdentity(natural, "local")).toEqual({
-      displayName: natural.alias, taxId: natural.ruc, profileUrl: natural.url_ficha_unica,
-    });
+  it("una persona natural en local no expone nombre, RUC ni enlace a la Ficha Única", () => {
+    const natural = {
+      ...supplier, tipo: "persona_natural", nombre: "Persona de prueba", ruc: "10456789012",
+      url_ficha_unica: "https://apps.oece.gob.pe/perfilprov-ui/ficha/10456789012",
+    } satisfies Proveedor;
+    const identity = getSupplierIdentity(natural, "local");
+    expect(identity).toEqual({ displayName: natural.alias, taxId: null, profileUrl: null, pseudonymized: true });
+    // El RUC 10 contiene el DNI (45678901): no debe aparecer en ninguna parte.
+    expect(JSON.stringify(identity)).not.toContain("45678901");
+    expect(JSON.stringify(identity)).not.toContain(natural.nombre);
   });
 
-  it("un RUC de persona natural o tipo desconocido tampoco revela el nombre", () => {
-    expect(getSupplierIdentity({ ...supplier, ruc: "10999999999" }, "local").displayName).toBe(supplier.alias);
-    expect(getSupplierIdentity({ ...supplier, tipo: "desconocido" }, "local").displayName).toBe(supplier.alias);
+  it.each([
+    ["un RUC 10 marcado como persona jurídica", { ruc: "10999999999" }],
+    ["un tipo desconocido", { tipo: "desconocido" as const }],
+  ])("%s queda solo con el seudónimo en local", (_, cambio) => {
+    expect(getSupplierIdentity({ ...supplier, ...cambio }, "local"))
+      .toEqual({ displayName: supplier.alias, taxId: null, profileUrl: null, pseudonymized: true });
   });
 
   it("con datos ausentes usa el seudónimo sin fabricar un RUC o enlace", () => {
     expect(getSupplierIdentity({ ...supplier, nombre: null, ruc: null, url_ficha_unica: null }, "local"))
-      .toEqual({ displayName: supplier.alias, taxId: null, profileUrl: null });
+      .toEqual({ displayName: supplier.alias, taxId: null, profileUrl: null, pseudonymized: false });
   });
 
   it.each(["javascript:alert(1)", "no-es-un-enlace", "https://usuario:clave@ejemplo.gob.pe"])("no entrega un enlace no apto para la ficha: %s", (url) => {
@@ -57,7 +65,7 @@ describe("Identidad visible del proveedor", () => {
     const source = new StaticDataSource(fileURLToPath(new URL("../../../data/fixture", import.meta.url)));
     const manifest = await source.getManifest();
     for (const entry of await source.listSuppliers()) {
-      expect(getSupplierIdentity(entry, manifest.modo)).toEqual({ displayName: entry.alias, taxId: null, profileUrl: null });
+      expect(getSupplierIdentity(entry, manifest.modo)).toEqual({ displayName: entry.alias, taxId: null, profileUrl: null, pseudonymized: true });
     }
   });
 });

@@ -17,9 +17,9 @@ import {
 import { buscar, type EntradaBusqueda } from "@/features/bandeja/busqueda";
 import { elegirEntidad, PARAM_ENTIDAD, type EntidadResumen } from "@/lib/entidad";
 
-/* Cápsula con lupa en la barra (HIG · Search fields); en el celular se abre con un ícono. */
+/* Campo de búsqueda de la barra superior: se ve como un campo y abre la paleta; en el celular es solo el ícono. */
 const CLASE_BOTON =
-  "w-9 justify-center gap-2 px-0 text-muted-foreground pointer-coarse:w-11 md:w-44 md:justify-between md:px-3.5 md:pointer-coarse:w-44 lg:w-56 xl:w-64";
+  "w-9 justify-center gap-2 px-0 font-normal text-muted-foreground pointer-coarse:w-11 md:w-44 md:justify-between md:ps-3 md:pe-2 md:pointer-coarse:w-44 lg:w-56 xl:w-64";
 
 /**
  * Buscador global (Ctrl o Cmd + K). Busca en la entidad seleccionada: procesos por descripción
@@ -89,7 +89,7 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
 
   return (
     <>
-      <Button variant="secondary" className={CLASE_BOTON} onClick={() => setAbierto(true)} aria-label="Buscar">
+      <Button variant="outline" className={CLASE_BOTON} onClick={() => setAbierto(true)} aria-label="Buscar">
         <span className="flex items-center gap-2">
           <Search aria-hidden="true" className="size-4" />
           <span className="hidden md:inline">Buscar</span>
@@ -110,7 +110,7 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
               <CommandGroup heading="Procesos">
                 {procesos.map((r) => (
                   <CommandItem key={r.id} value={`proceso-${r.id}`} onSelect={() => ir(r.href)}>
-                    <FileText aria-hidden="true" className="size-4 text-primary" />
+                    <FileText aria-hidden="true" className="size-4 text-muted-foreground" />
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate">{r.titulo}</span>
                       <span className="truncate text-xs text-muted-foreground">
@@ -125,7 +125,7 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
               <CommandGroup heading="Proveedores">
                 {proveedores.map((r) => (
                   <CommandItem key={r.id} value={`proveedor-${r.id}`} onSelect={() => ir(r.href)}>
-                    <Building2 aria-hidden="true" className="size-4 text-primary" />
+                    <Building2 aria-hidden="true" className="size-4 text-muted-foreground" />
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate">{r.titulo}</span>
                       <span className="truncate text-xs text-muted-foreground">{r.detalle}</span>
@@ -143,7 +143,7 @@ export function Buscador({ entidades }: { entidades: EntidadResumen[] }) {
 
 export function BuscadorCargando() {
   return (
-    <Button variant="secondary" className={CLASE_BOTON} disabled aria-label="Buscar">
+    <Button variant="outline" className={CLASE_BOTON} disabled aria-label="Buscar">
       <span className="flex items-center gap-2">
         <Search aria-hidden="true" className="size-4" />
         <span className="hidden md:inline">Buscar</span>
@@ -160,7 +160,7 @@ function Atajo() {
     () => false,
   );
   return (
-    <kbd className="hidden rounded-md bg-card px-1.5 font-sans text-leyenda font-medium text-muted-foreground md:inline">
+    <kbd className="hidden rounded-sm border border-border bg-muted px-1 font-sans text-leyenda font-medium text-muted-foreground md:inline">
       {esMac ? "⌘K" : "Ctrl K"}
     </kbd>
   );

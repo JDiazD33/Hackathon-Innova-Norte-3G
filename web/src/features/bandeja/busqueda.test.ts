@@ -51,6 +51,19 @@ describe("buscar", () => {
     expect(buscar(indice, "ocds-fixture-e1-010")[0].id).toBe("ocds-fixture-e1-010");
   });
 
+  it("sus enlaces conservan la entidad del índice, para abrir la ficha en esa entidad", async () => {
+    const indice = construirIndice(
+      await fuente.listProcesses("entidad-0002"),
+      await fuente.listSuppliers(),
+      "publico",
+      "entidad-0002",
+    );
+    const proveedor = indice.find((e) => e.tipo === "proveedor");
+    const proceso = indice.find((e) => e.tipo === "proceso");
+    expect(proveedor?.href).toMatch(/^\/proveedores\/P\d+\?entidad=entidad-0002$/);
+    expect(proceso?.href).toMatch(/^\/procesos\/[^?]+\?entidad=entidad-0002$/);
+  });
+
   it("encuentra proveedores por su seudónimo", async () => {
     const indice = await indiceDe("entidad-0001");
     const [primero] = buscar(indice, "proveedor 0003");
@@ -72,6 +85,9 @@ describe("buscar", () => {
     const local = await indiceDe("entidad-0001", "local", proveedores);
     expect(buscar(local, "empresa demostrativa")[0]).toMatchObject({ id: "P0003", titulo: "Empresa Demostrativa SAC" });
     expect(buscar(local, "persona natural")).toEqual([]);
+    // El RUC 10 contiene el DNI: tampoco sirve para encontrar a la persona natural.
+    expect(buscar(local, "10999999991")).toEqual([]);
+    expect(buscar(local, "20999999991")[0]).toMatchObject({ id: "P0003" });
     const publico = await indiceDe("entidad-0001", "publico", proveedores);
     expect(buscar(publico, "empresa demostrativa")).toEqual([]);
     expect(buscar(publico, "20999999991")).toEqual([]);

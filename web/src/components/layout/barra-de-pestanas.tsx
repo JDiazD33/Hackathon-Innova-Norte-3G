@@ -10,8 +10,9 @@ import { cn } from "@/lib/utils";
 import { esRutaActiva, NAVEGACION } from "./navegacion";
 
 /**
- * Barra de pestañas del celular (< 768 px), flotante y en vidrio, en lugar del menú lateral. Respeta el
- * área segura del dispositivo y cada pestaña mide al menos 44 px de alto (HIG · Tab bars y Accessibility).
+ * Barra de pestañas del celular (< 768 px), pegada al borde inferior, en lugar del menú lateral. Respeta
+ * el área segura del dispositivo y cada pestaña mide al menos 44 px de alto. La pestaña activa se marca
+ * con el color de acento y una línea arriba, no solo con el color.
  */
 export function BarraDePestanas() {
   return (
@@ -31,9 +32,9 @@ function Pestanas({ entidad }: { entidad: string | null }) {
   return (
     <nav
       aria-label="Secciones"
-      className="fixed inset-x-3 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-40 rounded-full p-1 material-barra md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden contrast-more:border-borde-contraste"
     >
-      <ul className="grid grid-cols-4 gap-1">
+      <ul className="grid grid-cols-4">
         {NAVEGACION.map(({ href, etiqueta, icono: Icono }) => {
           const activa = esRutaActiva(pathname, href);
           return (
@@ -42,11 +43,13 @@ function Pestanas({ entidad }: { entidad: string | null }) {
                 href={conEntidad(href, entidad)}
                 aria-current={activa ? "page" : undefined}
                 className={cn(
-                  "flex h-14 flex-col items-center justify-center gap-0.5 rounded-full text-leyenda font-medium outline-none transition-colors duration-150 ease-prisma focus-visible:ring-2 focus-visible:ring-ring",
-                  activa ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                  "relative flex h-14 flex-col items-center justify-center gap-0.5 text-leyenda font-medium outline-none transition-colors duration-150 ease-prisma focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                  activa
+                    ? "font-semibold text-primary before:absolute before:inset-x-5 before:top-0 before:h-0.5 before:bg-primary"
+                    : "text-muted-foreground",
                 )}
               >
-                <Icono aria-hidden="true" className="size-[1.375rem]" strokeWidth={activa ? 2.25 : 1.75} />
+                <Icono aria-hidden="true" className="size-5" strokeWidth={activa ? 2 : 1.75} />
                 {etiqueta}
               </Link>
             </li>

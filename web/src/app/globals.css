@@ -5,23 +5,24 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Tema Prisma (docs/diseno/sistema-de-diseno.md · ADR 0008). Dueño: Lote B.
- * Inspirado en las guías públicas de Apple (HIG), sin usar sus fuentes, símbolos ni recursos.
+ * Tema Prisma (docs/diseno/sistema-de-diseno.md). Dueño: Lote B.
+ * Lenguaje sobrio de herramienta de trabajo: superficies sólidas, bordes finos, esquinas apenas
+ * redondeadas y tipografía IBM Plex. Sin vidrio, sin cápsulas y sin sombras decorativas.
  *
- * - Color: un solo acento (--primary; azul en claro, blanco en oscuro). Los demás colores tienen significado fijo.
+ * - Color: un solo acento (--primary; el azul marino del logo en claro, blanco en oscuro). Los demás
+ *   colores tienen significado fijo.
  * - Modo oscuro: negro total (#000000) en todas las superficies, sin azules.
  * - Prioridad: la asigna el sistema; ámbar y neutros, nunca rojo.
  * - Estado de revisión: lo decide una persona; el rojo solo existe en "requiere atención" (ADR 0007).
- * - src/app/theme-contrast.test.ts lee los hexadecimales de :root y .dark y exige 4,5:1 en texto,
- *   3:1 en el foco y en las series de los gráficos. Los materiales usan color-mix y se comprueban
- *   contra su base sólida, que es el peor caso.
+ * - src/app/theme-contrast.test.ts lee los hexadecimales de :root y .dark y exige 4,5:1 en texto y
+ *   3:1 en el foco, en el borde de los campos y en las series de los gráficos.
  */
 
 @theme inline {
-  /* Tipografía: la del sistema primero (en Apple se ve SF Pro sin descargarla) y luego Inter (SIL OFL). */
-  --font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Segoe UI", Roboto, sans-serif;
+  /* Tipografía: IBM Plex Sans y Mono (SIL OFL), incluidas en el build por next/font. Igual en todos los equipos. */
+  --font-sans: var(--font-plex-sans), "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
   --font-heading: var(--font-sans);
-  --font-mono: ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -72,7 +73,7 @@
   --color-estado-requiere-atencion: var(--estado-requiere-atencion);
   --color-estado-requiere-atencion-foreground: var(--estado-requiere-atencion-foreground);
 
-  /* Radios: esquinas concéntricas (radio interior = radio exterior − margen). Cápsulas: rounded-full. */
+  /* Radios: esquinas apenas redondeadas. Controles 4 px, tarjetas y menús 6 px, diálogos 8 px. */
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
@@ -80,56 +81,58 @@
   --radius-2xl: calc(var(--radius) * 1.5);
   --radius-3xl: calc(var(--radius) * 2);
   --radius-4xl: calc(var(--radius) * 2.5);
-  --radius-item: 0.75rem;
-  --radius-menu: 0.875rem;
-  --radius-tarjeta: 1.25rem;
-  --radius-barra: 1.5rem;
-  --radius-hoja: 1.75rem;
+  --radius-control: 0.25rem;
+  --radius-item: 0.25rem;
+  --radius-menu: 0.375rem;
+  --radius-tarjeta: 0.375rem;
+  --radius-barra: 0.375rem;
+  --radius-hoja: 0.5rem;
 
-  /* Profundidad: en claro, sombras mínimas; en oscuro, grises más claros y sin sombra. */
+  /* Profundidad: las superficies se separan con bordes finos. Solo lo que flota (menús, diálogos) lleva sombra. */
   --shadow-tarjeta: var(--sombra-tarjeta);
   --shadow-material: var(--sombra-material);
+  --shadow-hoja: var(--sombra-hoja);
 
   /* Movimiento: breve y con propósito. */
   --ease-prisma: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* Anchos: el contenido general y las páginas de lectura (metodología). */
-  --container-contenido: 75rem;
+  --container-contenido: 90rem;
   --container-lectura: 45rem;
 
-  /* Marca: degradado del ícono de Prisma (sin rojo). */
-  --color-marca-inicio: var(--marca-inicio);
-  --color-marca-fin: var(--marca-fin);
+  /* Marca: las tres caras del triángulo de Prisma (sin rojo). Las esquinas son tonos fijos del logo. */
+  --color-marca-izquierda: var(--marca-izquierda);
+  --color-marca-base: var(--marca-base);
+  --color-marca-derecha: var(--marca-derecha);
 }
 
 /*
- * Escala tipográfica (estilos de texto de Apple en su tamaño por defecto, en rem para que crezca con el zoom).
- * Nombres propios para escribir pantallas nuevas y, debajo, la escala de Tailwind reasignada para que el
- * código existente (text-sm, text-xs…) siga la misma escala.
+ * Escala tipográfica: compacta, de herramienta de trabajo (tablas a 14 px, notas a 13 px), en rem para que
+ * crezca con el zoom. Nombres propios para escribir pantallas nuevas y, debajo, la escala de Tailwind
+ * reasignada para que el código existente (text-sm, text-xs…) siga la misma escala.
  */
 @theme {
-  --text-titulo-grande: 2.125rem;
-  --text-titulo-grande--line-height: 2.5625rem;
-  --text-titulo-grande--font-weight: 700;
-  --text-titulo-grande--letter-spacing: -0.02em;
-  --text-titulo-1: 1.75rem;
-  --text-titulo-1--line-height: 2.125rem;
-  --text-titulo-1--font-weight: 700;
-  --text-titulo-1--letter-spacing: -0.02em;
-  --text-titulo-2: 1.375rem;
-  --text-titulo-2--line-height: 1.75rem;
-  --text-titulo-2--font-weight: 700;
-  --text-titulo-2--letter-spacing: -0.01em;
-  --text-titulo-3: 1.25rem;
-  --text-titulo-3--line-height: 1.5625rem;
+  --text-titulo-grande: 1.75rem;
+  --text-titulo-grande--line-height: 2.125rem;
+  --text-titulo-grande--font-weight: 600;
+  --text-titulo-grande--letter-spacing: -0.015em;
+  --text-titulo-1: 1.5rem;
+  --text-titulo-1--line-height: 1.875rem;
+  --text-titulo-1--font-weight: 600;
+  --text-titulo-1--letter-spacing: -0.01em;
+  --text-titulo-2: 1.25rem;
+  --text-titulo-2--line-height: 1.625rem;
+  --text-titulo-2--font-weight: 600;
+  --text-titulo-2--letter-spacing: -0.005em;
+  --text-titulo-3: 1rem;
+  --text-titulo-3--line-height: 1.375rem;
   --text-titulo-3--font-weight: 600;
-  --text-titulo-3--letter-spacing: -0.01em;
-  --text-encabezado: 1.0625rem;
-  --text-encabezado--line-height: 1.375rem;
+  --text-encabezado: 0.9375rem;
+  --text-encabezado--line-height: 1.25rem;
   --text-encabezado--font-weight: 600;
-  --text-cuerpo: 1.0625rem;
+  --text-cuerpo: 0.9375rem;
   --text-cuerpo--line-height: 1.375rem;
-  --text-subtitulo: 0.9375rem;
+  --text-subtitulo: 0.875rem;
   --text-subtitulo--line-height: 1.25rem;
   --text-nota: 0.8125rem;
   --text-nota--line-height: 1.125rem;
@@ -138,75 +141,78 @@
 
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.125rem;
-  --text-sm: 0.9375rem;
+  --text-sm: 0.875rem;
   --text-sm--line-height: 1.25rem;
-  --text-base: 1.0625rem;
+  --text-base: 0.9375rem;
   --text-base--line-height: 1.375rem;
-  --text-lg: 1.25rem;
-  --text-lg--line-height: 1.5625rem;
-  --text-xl: 1.375rem;
-  --text-xl--line-height: 1.75rem;
-  --text-2xl: 1.75rem;
-  --text-2xl--line-height: 2.125rem;
-  --text-3xl: 2.125rem;
-  --text-3xl--line-height: 2.5625rem;
+  --text-lg: 1rem;
+  --text-lg--line-height: 1.375rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.625rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.875rem;
+  --text-3xl: 1.75rem;
+  --text-3xl--line-height: 2.125rem;
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: #f2f2f7;
-  --foreground: #1d1d1f;
+  --radius: 0.375rem;
+  --background: #f4f5f7;
+  --foreground: #17202e;
   --card: #ffffff;
-  --card-foreground: #1d1d1f;
+  --card-foreground: #17202e;
   --popover: #ffffff;
-  --popover-foreground: #1d1d1f;
-  --primary: #0066cc;
+  --popover-foreground: #17202e;
+  --primary: #1c355e;
   --primary-foreground: #ffffff;
-  --secondary: #e5e5ea;
-  --secondary-foreground: #1d1d1f;
-  --muted: #ebebf0;
-  --muted-foreground: #636366;
-  --accent: #e5effa;
-  --accent-foreground: #0058b0;
-  --destructive: #c1121c;
-  --border: #d8d8dc;
-  --separador: #e3e3e8;
-  --borde-contraste: #6c6c70;
-  --input: #c7c7cc;
-  --segmento: #ffffff;
-  --marca-inicio: #0a6fd6;
-  --marca-fin: #3d3aa8;
-  --ring: #0071e3;
-  --chart-1: #0066cc;
-  --chart-2: #5e5ce6;
+  --secondary: #e9ecf0;
+  --secondary-foreground: #17202e;
+  --muted: #eef0f3;
+  --muted-foreground: #566173;
+  --accent: #e6edf6;
+  --accent-foreground: #1c355e;
+  --destructive: #b3141d;
+  --border: #d5dae1;
+  --separador: #e4e7ec;
+  --borde-contraste: #5f6877;
+  --input: #7d8796;
+  --segmento: #e6edf6;
+  --marca-izquierda: #1c355e;
+  --marca-base: #3a6aa5;
+  --marca-derecha: #7bbde6;
+  --ring: #2f6fca;
+  --chart-1: #2c5d9f;
+  --chart-2: #6f8fc3;
   --chart-3: #b25000;
-  --chart-4: #8e8e93;
-  --chart-5: #00749c;
-  --sidebar: #f7f7fa;
-  --sidebar-foreground: #1d1d1f;
-  --sidebar-primary: #0066cc;
+  --chart-4: #8590a0;
+  --chart-5: #1b7f8c;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #17202e;
+  --sidebar-primary: #1c355e;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e5effa;
-  --sidebar-accent-foreground: #0058b0;
-  --sidebar-border: #d8d8dc;
-  --sidebar-ring: #0071e3;
-  --prioridad-alta: #fff0d9;
-  --prioridad-alta-foreground: #9a4500;
-  --prioridad-media: #fff8db;
-  --prioridad-media-foreground: #765300;
-  --prioridad-baja: #eeeef2;
-  --prioridad-baja-foreground: #55555a;
-  --estado-sin-revisar: #eeeef2;
-  --estado-sin-revisar-foreground: #55555a;
-  --estado-en-revision: #e5effa;
-  --estado-en-revision-foreground: #0058b0;
-  --estado-justificada: #e4f5e9;
-  --estado-justificada-foreground: #1a7333;
-  --estado-requiere-atencion: #fdecec;
-  --estado-requiere-atencion-foreground: #c1121c;
-  --sombra-tarjeta: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 1px rgb(0 0 0 / 0.02);
-  --sombra-material: 0 8px 32px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
-  --velo: rgb(0 0 0 / 0.18);
+  --sidebar-accent: #e9eef5;
+  --sidebar-accent-foreground: #1c355e;
+  --sidebar-border: #d5dae1;
+  --sidebar-ring: #2f6fca;
+  --prioridad-alta: #fdefd8;
+  --prioridad-alta-foreground: #8f3f00;
+  --prioridad-media: #fbf4d2;
+  --prioridad-media-foreground: #6d4f00;
+  --prioridad-baja: #eceef2;
+  --prioridad-baja-foreground: #4f5866;
+  --estado-sin-revisar: #eceef2;
+  --estado-sin-revisar-foreground: #4f5866;
+  --estado-en-revision: #e3ecf8;
+  --estado-en-revision-foreground: #1c4f96;
+  --estado-justificada: #e2f3e7;
+  --estado-justificada-foreground: #19692f;
+  --estado-requiere-atencion: #fbe9e9;
+  --estado-requiere-atencion-foreground: #b3141d;
+  /* "Sombra" de tarjeta: en realidad un filete de 1 px, para que cualquier superficie con shadow-tarjeta quede delimitada. */
+  --sombra-tarjeta: 0 0 0 1px var(--border);
+  --sombra-material: 0 8px 24px rgb(16 24 40 / 0.12), 0 1px 2px rgb(16 24 40 / 0.06);
+  --sombra-hoja: 0 20px 48px rgb(16 24 40 / 0.2);
+  --velo: rgb(16 24 40 / 0.35);
 }
 
 .dark {
@@ -230,8 +236,11 @@
   --border: #2c2c2c;
   --separador: #1f1f1f;
   --borde-contraste: #8e8e93;
-  --input: #3a3a3a;
-  --segmento: #3a3a3c;
+  --input: #5e5e63;
+  --segmento: #2c2c2e;
+  --marca-izquierda: #40609f;
+  --marca-base: #4f83c2;
+  --marca-derecha: #8cc8ee;
   --ring: #ffffff;
   --chart-1: #f5f5f7;
   --chart-2: #a1a1a6;
@@ -261,16 +270,18 @@
   --estado-requiere-atencion: #2e0e10;
   --estado-requiere-atencion-foreground: #ff6961;
   --sombra-tarjeta: 0 0 #0000; /* sin sombra; "none" anularía el borde (ring) en la lista de box-shadow */
-  --sombra-material: 0 8px 32px rgb(0 0 0 / 0.6);
-  --velo: rgb(0 0 0 / 0.6);
+  --sombra-material: 0 8px 24px rgb(0 0 0 / 0.7);
+  --sombra-hoja: 0 20px 48px rgb(0 0 0 / 0.8);
+  --velo: rgb(0 0 0 / 0.65);
 }
 
-/* Aumentar el contraste: texto secundario y bordes más marcados (HIG · Color y Accesibilidad). */
+/* Aumentar el contraste: texto secundario y bordes más marcados. */
 @media (prefers-contrast: more) {
   html {
-    --muted-foreground: #48484a;
-    --border: #8e8e93;
-    --separador: #aeaeb2;
+    --muted-foreground: #3d4654;
+    --border: #7d8796;
+    --separador: #a3acb8;
+    --input: #5f6877;
   }
   html.dark {
     --muted-foreground: #d1d1d6;
@@ -280,100 +291,47 @@
 }
 
 /*
- * Materiales: vidrio solo en la capa de controles y navegación (HIG · Materials). El contenido va en
- * superficies sólidas. Cada utilidad trae sus alternativas: fondo sólido si no hay backdrop-filter, si
- * se pide reducir la transparencia o aumentar el contraste (con borde visible en este último caso).
+ * Superficies de la capa de navegación y controles. Conservan el nombre "material-*" para no romper el
+ * código que ya las usa, pero son sólidas: un fondo, un borde fino y sombra solo en lo que flota. Los
+ * bordes son reales (no sombras) para que también se vean con colores forzados (alto contraste de Windows).
  */
 @utility material-barra {
-  background-color: color-mix(in srgb, var(--sidebar) 72%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
-  box-shadow: var(--sombra-material);
+  background-color: var(--sidebar);
+  border: 1px solid var(--border);
 
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background-color: var(--sidebar);
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    background-color: var(--sidebar);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
   @media (prefers-contrast: more) {
-    background-color: var(--sidebar);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
     border-color: var(--borde-contraste);
   }
 }
 
-/* Barra superior: el mismo vidrio, pegado arriba y con un solo separador abajo. */
+/* Barra superior: pegada arriba, con un solo borde abajo. */
 @utility material-cabecera {
-  background-color: color-mix(in srgb, var(--background) 72%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  background-color: var(--sidebar);
+  border-bottom: 1px solid var(--border);
 
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background-color: var(--background);
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    background-color: var(--background);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
   @media (prefers-contrast: more) {
-    background-color: var(--background);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
     border-bottom-color: var(--borde-contraste);
   }
 }
 
-/* Menús, popovers y la paleta del buscador: más opacos que las barras, porque llevan mucho texto. */
+/* Menús, popovers y la paleta del buscador. */
 @utility material-menu {
-  background-color: color-mix(in srgb, var(--popover) 82%, transparent);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  background-color: var(--popover);
+  border: 1px solid var(--border);
   box-shadow: var(--sombra-material);
 
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background-color: var(--popover);
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    background-color: var(--popover);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
   @media (prefers-contrast: more) {
-    background-color: var(--popover);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
     border-color: var(--borde-contraste);
   }
 }
 
-/* Hojas (diálogos): el vidrio más denso, para que el formulario se lea sobre cualquier contenido. */
+/* Hojas y diálogos. */
 @utility material-hoja {
-  background-color: color-mix(in srgb, var(--popover) 90%, transparent);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
-  box-shadow: 0 24px 64px rgb(0 0 0 / 0.18);
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: var(--sombra-hoja);
 
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background-color: var(--popover);
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    background-color: var(--popover);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
   @media (prefers-contrast: more) {
-    background-color: var(--popover);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
     border-color: var(--borde-contraste);
   }
 }
@@ -389,12 +347,27 @@
   }
   html {
     @apply font-sans;
+    /* Altos de las barras fijas; los reemplaza la medición real (components/layout/alto-en-variable.ts). */
+    --alto-cabecera: 3.5rem;
+    --alto-filtros: 3.25rem;
     -webkit-text-size-adjust: 100%;
     font-synthesis-weight: none;
+    /* Los controles nativos (fecha, barras de desplazamiento) siguen el tema y el acento. */
+    color-scheme: light;
+    accent-color: var(--primary);
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground;
     text-rendering: optimizeLegibility;
+  }
+  /* Títulos cortos con líneas parejas; no se aplica a todo porque el cálculo tiene costo. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -407,7 +380,7 @@
 }
 
 /*
- * Reducir movimiento (HIG · Motion y Accessibility): sin desplazamientos ni escalas, solo cambios de
+ * Reducir movimiento: sin desplazamientos ni escalas, solo cambios de
  * opacidad. Neutraliza las variables de tw-animate-css que usan los menús, hojas y diálogos.
  */
 @media (prefers-reduced-motion: reduce) {

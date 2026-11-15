@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { CLASE_PISTA, CLASE_SEGMENTO } from "./control-segmentado"
 
 /*
- * Pestañas con aspecto de control segmentado (HIG · Segmented controls), por ejemplo las de Revisión o
+ * Pestañas con aspecto de control segmentado, por ejemplo las de Revisión o
  * las secciones de una ficha. Misma API que las Tabs de shadcn/ui (Radix).
  */
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
@@ -38,7 +38,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
       className={cn(
         CLASE_SEGMENTO,
         // Igual que CLASE_SEGMENTO_ACTIVO, con el prefijo de estado (Tailwind necesita las clases literales).
-        "data-[state=active]:bg-segmento data-[state=active]:text-foreground data-[state=active]:shadow-[0_1px_3px_rgb(0_0_0/0.12),0_1px_1px_rgb(0_0_0/0.04)] contrast-more:data-[state=active]:ring-1 contrast-more:data-[state=active]:ring-borde-contraste",
+        "data-[state=active]:bg-segmento data-[state=active]:font-semibold data-[state=active]:text-accent-foreground contrast-more:data-[state=active]:ring-1 contrast-more:data-[state=active]:ring-borde-contraste",
         className
       )}
       {...props}
