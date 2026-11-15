@@ -6,7 +6,6 @@ import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -46,8 +45,8 @@ const configTendencia = {
 const hrefProveedor = (id: string) => `/proveedores/${encodeURIComponent(id)}`;
 
 /**
- * Panel de la entidad (Lote B · parte 6): título grande, cifras como widgets, la señal de la entidad
- * como aviso, gráficos cuyo título dice la conclusión y proveedores en una lista agrupada.
+ * Panel de la entidad (Lote B): título grande, cifras en un bloque agrupado, la señal de la entidad como
+ * aviso, gráficos cuyo título dice la conclusión y proveedores como un ranking sobrio.
  */
 export function PanelVista({ datos }: { datos: DatosPanel }) {
   const { estadoDe } = useRevisiones();
@@ -64,7 +63,11 @@ export function PanelVista({ datos }: { datos: DatosPanel }) {
         descripcion="Panorama de las contrataciones de la entidad y de los procesos que ameritan revisión."
       />
 
-      <section aria-label="Cifras clave" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <Card className="gap-0 py-0">
+        <section
+          aria-label="Cifras clave"
+          className="grid gap-px bg-separador sm:grid-cols-2 xl:grid-cols-4"
+        >
         <Cifra titulo="Procesos" valor={formatEntero(datos.procesos)} detalle="En el periodo del paquete de datos" />
         <Cifra titulo="Monto total" valor={formatSoles(datos.montoTotal)} detalle="Según el resumen de la entidad" />
         <Cifra
@@ -81,7 +84,8 @@ export function PanelVista({ datos }: { datos: DatosPanel }) {
           href={conEntidad("/revision", datos.entidad.id)}
           enlace="Ir a revisión"
         />
-      </section>
+        </section>
+      </Card>
 
       {datos.senalesEntidad.map((senal) => (
         <SenalDeEntidad key={senal.id} senal={senal} />
@@ -105,7 +109,7 @@ export function PanelVista({ datos }: { datos: DatosPanel }) {
                 <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} />
                 <YAxis type="category" dataKey="etiqueta" width={118} tickLine={false} axisLine={false} />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                <Bar dataKey="cantidad" fill="var(--color-cantidad)" radius={[0, 6, 6, 0]} maxBarSize={22} />
+                <Bar dataKey="cantidad" fill="var(--color-cantidad)" radius={[0, 4, 4, 0]} maxBarSize={16} />
               </BarChart>
             </ChartContainer>
           )}
@@ -137,52 +141,66 @@ export function PanelVista({ datos }: { datos: DatosPanel }) {
         </TarjetaGrafico>
       </div>
 
-      <Card className="gap-0 pb-2">
+      <Card className="gap-0 pb-1">
         <CardHeader className="pb-3">
           <p className="text-xs font-semibold text-muted-foreground">Proveedores con mayor participación</p>
           <CardTitle>{titularProveedores(datos.topProveedores)}</CardTitle>
-          <CardDescription>{describirTopProveedores(datos.topProveedores)}</CardDescription>
+          <CardDescription className="sr-only">{describirTopProveedores(datos.topProveedores)}</CardDescription>
         </CardHeader>
-        <ol className="flex flex-col">
-          {datos.topProveedores.map((p) => (
-            <li key={p.proveedorId} className="border-t border-separador first:border-t-0">
-              <div className="flex flex-col gap-2 px-5 py-3">
-                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-                  <Link
-                    href={hrefProveedor(p.proveedorId)}
-                    className="group/enlace inline-flex min-w-0 items-center gap-1 rounded-md text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <span className="truncate group-hover/enlace:underline">{p.nombre}</span>
-                    <ChevronRight aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
-                  </Link>
-                  <span className="flex flex-wrap items-center gap-2 text-sm tabular-nums text-muted-foreground">
+        <table className="w-full text-sm tabular-nums">
+          <caption className="sr-only">Proveedores con mayor participación en la entidad</caption>
+          <thead>
+            <tr className="border-y border-separador text-left text-xs text-muted-foreground">
+              <th scope="col" className="w-10 py-2 ps-5 font-medium">#</th>
+              <th scope="col" className="py-2 font-medium">Proveedor</th>
+              <th scope="col" className="hidden w-48 py-2 font-medium sm:table-cell">Participación</th>
+              <th scope="col" className="w-16 py-2 text-right font-medium sm:hidden">%</th>
+              <th scope="col" className="w-24 py-2 pe-5 text-right font-medium">Procesos</th>
+            </tr>
+          </thead>
+          <tbody>
+            {datos.topProveedores.map((p, indice) => (
+              <tr key={p.proveedorId} className="border-b border-separador last:border-b-0">
+                <td className="py-3 ps-5 text-muted-foreground">{indice + 1}</td>
+                <td className="py-3 pe-3">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <Link
+                      href={hrefProveedor(p.proveedorId)}
+                      className="rounded-md font-medium outline-none underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      {p.nombre}
+                    </Link>
                     {p.recurrenteAtipico && (
-                      <Badge className="bg-prioridad-alta text-prioridad-alta-foreground">
+                      <span className="inline-flex items-center gap-1 text-xs text-prioridad-alta-foreground">
+                        <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
                         S03 · {SIGNAL_METHODOLOGY.S03.name.toLowerCase()}
-                      </Badge>
+                      </span>
                     )}
-                    <span>
-                      <span className="font-semibold text-foreground">{formatPorcentaje(p.participacion, 1)}</span> ·{" "}
-                      {formatEntero(p.adjudicaciones)} {p.adjudicaciones === 1 ? "proceso" : "procesos"}
+                  </div>
+                </td>
+                <td className="hidden py-3 sm:table-cell">
+                  <div className="flex items-center gap-3">
+                    <span className="w-12 text-right">{formatPorcentaje(p.participacion, 1)}</span>
+                    <span className="h-1 flex-1 rounded-full bg-muted" aria-hidden="true">
+                      <span
+                        className="block h-1 rounded-full bg-muted-foreground"
+                        style={{ width: `${Math.min(100, Math.max(0, p.participacion * 100))}%` }}
+                      />
                     </span>
-                  </span>
-                </div>
-                <div className="h-1.5 rounded-full bg-muted" aria-hidden="true">
-                  <div
-                    className="h-1.5 rounded-full bg-chart-1"
-                    style={{ width: `${Math.min(100, Math.max(0, p.participacion * 100))}%` }}
-                  />
-                </div>
-              </div>
-            </li>
-          ))}
-        </ol>
+                  </div>
+                </td>
+                <td className="py-3 text-right sm:hidden">{formatPorcentaje(p.participacion, 1)}</td>
+                <td className="py-3 pe-5 text-right">{formatEntero(p.adjudicaciones)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </Card>
     </div>
   );
 }
 
-/** Cifra clave como widget: etiqueta, número grande, detalle y, si corresponde, un enlace. */
+/** Cifra clave dentro del bloque agrupado: etiqueta, número grande, detalle y, si corresponde, un enlace. */
 function Cifra({
   titulo,
   valor,
@@ -197,26 +215,24 @@ function Cifra({
   enlace?: string;
 }) {
   return (
-    <Card size="sm">
-      <CardContent className="flex h-full flex-col gap-1">
-        <p className="text-sm font-medium text-muted-foreground">{titulo}</p>
-        <p className="text-titulo-1 tabular-nums text-card-foreground">{valor}</p>
-        {detalle && <p className="text-xs text-muted-foreground">{detalle}</p>}
-        {href && enlace && (
-          <Link
-            href={href}
-            className="mt-auto inline-flex w-fit items-center gap-0.5 rounded-md pt-2 text-sm font-medium text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {enlace}
-            <ChevronRight aria-hidden="true" className="size-4" />
-          </Link>
-        )}
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-1 bg-card px-5 py-4">
+      <p className="text-sm text-muted-foreground">{titulo}</p>
+      <p className="text-titulo-1 tabular-nums text-card-foreground">{valor}</p>
+      {detalle && <p className="text-xs text-muted-foreground">{detalle}</p>}
+      {href && enlace && (
+        <Link
+          href={href}
+          className="mt-auto inline-flex w-fit items-center gap-0.5 rounded-md pt-1.5 text-sm text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {enlace}
+          <ChevronRight aria-hidden="true" className="size-3.5" />
+        </Link>
+      )}
+    </div>
   );
 }
 
-/** Tarjeta de gráfico: la sección arriba, el título con la conclusión y el resumen en texto. */
+/** Tarjeta de gráfico: la sección arriba, el título con la conclusión y el resumen en texto como nota al pie. */
 function TarjetaGrafico({
   seccion,
   titulo,
@@ -233,9 +249,11 @@ function TarjetaGrafico({
       <CardHeader>
         <p className="text-xs font-semibold text-muted-foreground">{seccion}</p>
         <CardTitle>{titulo}</CardTitle>
-        <CardDescription className="text-xs">{resumen}</CardDescription>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="flex flex-col gap-3">
+        {children}
+        <p className="text-xs text-muted-foreground">{resumen}</p>
+      </CardContent>
     </Card>
   );
 }
