@@ -14,7 +14,7 @@ export const SIGNAL_METHODOLOGY = {
 
 /** Referentes y forma de uso según docs/producto/referentes-internacionales.md. */
 export const METHODOLOGY_REFERENCES = [
-  { name: "Cardinal", url: "https://github.com/open-contracting/cardinal-rs", license: "MIT", use: "Dependencia prevista del pipeline y contraste de indicadores; su disponibilidad para estos datos se confirma en el trabajo de datos." },
+  { name: "Cardinal", url: "https://github.com/open-contracting/cardinal-rs", license: "MIT", use: "Dependencia del pipeline para preparar datos, calcular indicadores y contrastar las señales propias. La cobertura de cada indicador depende de los campos publicados." },
   { name: "Guía de banderas rojas de OCP", url: "https://www.open-contracting.org/resources/red-flags-in-public-procurement-a-guide-to-using-data-to-detect-and-mitigate-risks/", license: "CC BY 4.0 en el sitio de OCP; pendiente confirmar la licencia específica del PDF", use: "Definiciones metodológicas, adaptadas con código y textos propios." },
   { name: "Arachne", url: "https://antifraud-knowledge-centre.ec.europa.eu/useful-tools/what-arachne_en", license: "Software propietario", use: "Inspiración para categorías, prioridad y confirmación humana. No se usa su código ni sus bases externas." },
   { name: "Serenata de Amor", url: "https://github.com/okfn-brasil/serenata-de-amor", license: "MIT", use: "Lección de diseño: señalar casos para que una persona los verifique, sin decidir por ella." },
@@ -25,9 +25,14 @@ export const SOFTWARE_ACKNOWLEDGEMENTS = [
   { name: "React", license: "MIT", use: "Interfaz web" },
   { name: "Tailwind CSS", license: "MIT", use: "Estilos de la web" },
   { name: "TypeScript", license: "Apache-2.0", use: "Tipos del código web" },
-  { name: "Python", license: "PSF-2.0", use: "Pipeline previsto, todavía por implementar" },
-  { name: "DuckDB", license: "MIT", use: "Consultas del pipeline previsto" },
-  { name: "uv", license: "MIT o Apache-2.0", use: "Gestión del entorno del pipeline previsto" },
+  { name: "Python", license: "PSF-2.0", use: "Descarga, normalización y cálculo de señales" },
+  { name: "DuckDB", license: "MIT", use: "Consultas y procesamiento del paquete" },
+  { name: "uv", license: "MIT o Apache-2.0", use: "Gestión del entorno del pipeline" },
+  { name: "shadcn/ui y Radix UI", license: "MIT", use: "Componentes accesibles de la interfaz" },
+  { name: "Recharts", license: "MIT", use: "Gráficos y comparaciones" },
+  { name: "lucide-react", license: "ISC", use: "Íconos de la interfaz" },
+  { name: "next-themes", license: "MIT", use: "Preferencia de tema claro y oscuro" },
+  { name: "Inter", license: "SIL Open Font License 1.1", use: "Fuente alternativa incluida en la construcción de la aplicación" },
 ] as const;
 
 export const METHODOLOGY_LIMITS = [
