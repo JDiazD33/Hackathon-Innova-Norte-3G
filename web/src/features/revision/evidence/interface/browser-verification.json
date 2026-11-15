@@ -1,0 +1,27 @@
+{
+  "browser": "Microsoft Edge headless / Playwright",
+  "base": "http://127.0.0.1:3004",
+  "viewports": [
+    375,
+    768,
+    1280
+  ],
+  "checks": [
+    "Rol persistido tras recarga; auditor solo lectura y exportación",
+    "Requiere atención vacío se rechaza con foco en el comentario; decisión e historial persistidos sin edición",
+    "Asignación exige nota y aparece en las pestañas de emisor, destinatario y casos decididos",
+    "Exportación real, cancelación y confirmación de reinicio, importación doble sin duplicados y persistencia tras recarga",
+    "Las listas de revisión respetan la entidad seleccionada",
+    "Diálogo operable con teclado, foco contenido y cierre con Escape",
+    "Metodología publica catálogo, datos del manifiesto, referentes y límites en claro y oscuro",
+    "Reporte contiene los seis bloques, datos simulados, historial y atribución; impresión sin navegación, fondo blanco y texto negro",
+    "Revisión, metodología y reporte sin desbordamiento horizontal en 375, 768 y 1280 px",
+    "Proceso inexistente muestra notFound y noindex",
+    "Almacenamiento bloqueado: aviso visible y decisiones disponibles en memoria",
+    "Sin errores de JavaScript ni solicitudes a dominios externos durante el recorrido"
+  ],
+  "requestOrigins": [
+    "http://127.0.0.1:3004"
+  ],
+  "pageErrors": []
+}

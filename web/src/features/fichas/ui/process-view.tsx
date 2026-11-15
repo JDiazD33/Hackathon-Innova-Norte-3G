@@ -5,9 +5,9 @@ import { PrioridadBadge } from "@/components/estado/prioridad-badge";
 import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SimulatedDataBadge } from "@/features/etica";
 import { describePriority } from "@/features/explicacion";
 import { SignalCard } from "@/features/explicacion/ui/signal-card";
-import { SimulatedDataBadge } from "@/features/explicacion/ui/simulated-data-badge";
 import { conEntidad } from "@/lib/entidad";
 import { formatEntero, formatFecha, SIN_DATO } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,8 @@ export function ProcessView({ detail }: { detail: ProcessDetail }) {
   const { process, entity, manifest, signals, timeline } = detail;
   const summary = [
     ["Entidad", entity?.nombre ?? SIN_DATO],
+    // Contrato 1.1: es el código con el que se busca el proceso en el SEACE.
+    ["Nomenclatura en el SEACE", process.nomenclatura || SIN_DATO],
     ["Método", process.metodo || SIN_DATO],
     ["Objeto", OBJECT_LABELS[process.objeto]],
     [
@@ -237,7 +239,10 @@ export function ProcessView({ detail }: { detail: ProcessDetail }) {
           )}
         </CardContent>
       </Card>
-      <ProcessHistory ocid={process.ocid} />
+      <ProcessHistory
+        ocid={process.ocid}
+        description={process.descripcion || SIN_DATO}
+      />
     </div>
   );
 }
