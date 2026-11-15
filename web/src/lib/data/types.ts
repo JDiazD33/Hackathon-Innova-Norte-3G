@@ -169,6 +169,12 @@ export interface Indice {
 /** Identificadores aceptados en rutas y nombres de archivo (evita recorrer carpetas). */
 export const PATRON_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
+/**
+ * Largo máximo de un id. Los más largos (ocid y señales) rondan los 40 caracteres; sin límite, un id
+ * enorme hacía fallar la lectura del archivo con un error 500 (prueba de seguridad, parte 9).
+ */
+export const LARGO_MAXIMO_ID = 128;
+
 export function esIdSeguro(id: string): boolean {
-  return PATRON_ID.test(id) && !id.includes("..");
+  return id.length <= LARGO_MAXIMO_ID && PATRON_ID.test(id) && !id.includes("..");
 }

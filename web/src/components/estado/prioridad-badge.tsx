@@ -14,9 +14,13 @@ const ESTILOS: Record<NivelPrioridad, string> = {
 
 const PUNTOS: Record<NivelPrioridad, number> = { alta: 3, media: 2, baja: 1 };
 
+/** Altura de cada barra del medidor: crecen de izquierda a derecha, como un indicador de nivel. */
+const ALTURAS = ["h-1.5", "h-2", "h-2.5"] as const;
+
 /**
- * Prioridad asignada por el sistema: cápsula con tinte, indicador de tres puntos, texto y desglose
- * (visible con el mouse y con el teclado). Nunca usa rojo: el rojo es solo para la decisión humana
+ * Prioridad asignada por el sistema: etiqueta rectangular con tinte, medidor de tres barras, texto y
+ * desglose (visible con el mouse y con el teclado). El nivel se lee por el texto y por cuántas barras
+ * están llenas, no solo por el color. Nunca usa rojo: el rojo es solo para la decisión humana
  * "requiere atención".
  */
 export function PrioridadBadge({ prioridad, className }: { prioridad: Prioridad; className?: string }) {
@@ -29,17 +33,14 @@ export function PrioridadBadge({ prioridad, className }: { prioridad: Prioridad;
           type="button"
           aria-label={`Prioridad de revisión: ${desglose}`}
           className={cn(
-            "inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background contrast-more:ring-1 contrast-more:ring-current",
+            "inline-flex min-h-[1.375rem] items-center gap-1.5 rounded-sm px-1.5 text-xs font-semibold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background contrast-more:ring-1 contrast-more:ring-current",
             ESTILOS[prioridad.nivel],
             className,
           )}
         >
-          <span aria-hidden="true" className="flex items-center gap-0.5">
+          <span aria-hidden="true" className="flex items-end gap-px">
             {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className={cn("size-1.5 rounded-full border border-current", i < puntos && "bg-current")}
-              />
+              <span key={i} className={cn("w-[3px] bg-current", ALTURAS[i], i >= puntos && "opacity-30")} />
             ))}
           </span>
           {NIVEL_PRIORIDAD_LABELS[prioridad.nivel]}

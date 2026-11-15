@@ -1,8 +1,8 @@
 import type { Senal } from "@/lib/data/types";
-import { formatEntero, formatPorcentaje } from "@/lib/format";
+import { formatEntero, formatFecha, formatPorcentaje, SIN_DATO } from "@/lib/format";
 
 import type { ExplanationContext } from "../types";
-import { comparisonText, completeExplanation, inputNumber, isNumber, sentences } from "./common";
+import { comparisonText, completeExplanation, inputNumber, inputText, isNumber, sentences } from "./common";
 
 export function explainS03(signal: Senal, context?: ExplanationContext) {
   const share = signal.valor;
@@ -10,6 +10,8 @@ export function explainS03(signal: Senal, context?: ExplanationContext) {
   const count = inputNumber(signal, "procesos_ganados");
   const total = inputNumber(signal, "procesos_entidad");
   const fence = signal.comparacion?.valla_superior;
+  const start = formatFecha(inputText(signal, "ventana_inicio"));
+  const end = formatFecha(inputText(signal, "ventana_fin"));
   return completeExplanation(signal, {
     finding: sentences(
       isNumber(share) ? `El proveedor registra una participación de ${formatPorcentaje(share, 1)} en la entidad (${signal.unidad}).` : null,
@@ -25,6 +27,7 @@ export function explainS03(signal: Senal, context?: ExplanationContext) {
       isNumber(share) ? `Participación del proveedor: ${formatPorcentaje(share, 1)} (${signal.unidad}).` : null,
       count !== null ? `Procesos ganados por el proveedor: ${formatEntero(count)}.` : null,
       total !== null ? `Procesos adjudicados por la entidad: ${formatEntero(total)}.` : null,
+      start !== SIN_DATO && end !== SIN_DATO ? `Periodo de la señal: del ${start} al ${end}.` : null,
     ],
   }, context);
 }

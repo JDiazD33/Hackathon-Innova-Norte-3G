@@ -288,3 +288,22 @@ def test_s05_without_minimum_share_flags_a_zero_fence(tmp_path: Path) -> None:
     assert signal["entidad_id"] == "PE-CONSUCODE-19"
     assert signal["valor"] == 0.04
     assert signal["entradas"]["proporcion_minima"] == 0.0
+
+
+def without_reference_amounts(releases: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for data in releases:
+        data["tender"]["value"] = {"amount": None, "currency": "PEN", "amount_PEN": None}
+    return releases
+
+
+def test_s05_minimum_share_with_missing_amounts(tmp_path: Path) -> None:
+    """Without reference amounts only the share of processes counts, with the same minimum."""
+    _, rows = run_signals(tmp_path, without_reference_amounts(few_direct()), signals_text=S05_SMALL)
+    assert by_code(rows, "S05") == []
+    folder = tmp_path / "sin-minimo"
+    folder.mkdir()
+    text = S05_SMALL.replace("proporcion_minima = 0.05", "proporcion_minima = 0.0")
+    _, rows = run_signals(folder, without_reference_amounts(few_direct()), signals_text=text)
+    (signal,) = by_code(rows, "S05")
+    assert signal["entradas"]["medida"] == "procesos"
+    assert signal["calidad"] == ["hay procesos sin monto referencial en soles: no suman al monto"]

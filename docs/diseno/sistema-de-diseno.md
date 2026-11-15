@@ -43,7 +43,8 @@ Los tokens se definen en `web/src/app/globals.css` (`:root` y `.dark`) y se usan
 | `--muted-foreground` | `#636366` | `#A1A1A6` | Texto secundario |
 | `--primary` / `--primary-foreground` | `#0066CC` / `#FFFFFF` | `#FFFFFF` / `#000000` | Acento: botón prominente, enlaces, selección |
 | `--secondary` | `#E5E5EA` | `#1C1C1C` | Relleno de controles (campos, botones neutros, control segmentado) |
-| `--accent` / `--accent-foreground` | `#E5EFFA` / `#0058B0` | `#1F1F1F` / `#FFFFFF` | Tinte de acento: ítem activo, botón `tinted`, insignias |
+| `--accent` / `--accent-foreground` | `#E5EFFA` / `#0058B0` | `#1F1F1F` / `#FFFFFF` | Tinte de acento: botón `tinted`, insignias y resultado elegido del buscador |
+| `--sidebar-accent` | `#E3E3E8` | `#1F1F1F` | Selección neutra del ítem activo en la barra lateral |
 | `--sidebar` | `#F7F7FA` | `#000000` | Base sólida del vidrio de las barras |
 | `--segmento` | `#FFFFFF` | `#3A3A3C` | Segmento activo del control segmentado |
 | `--border` / `--separador` | `#D8D8DC` / `#E3E3E8` | `#2C2C2C` / `#1F1F1F` | Bordes finos y separadores de listas |
@@ -135,10 +136,10 @@ El texto sobre vidrio se comprueba contra la base sólida, que es el peor caso: 
 
 | Zona | Cómo es | Componente |
 |---|---|---|
-| Barra lateral (≥ 1024 px) | Flota en vidrio a 12 px de los bordes. Marca arriba y grupos con título: "Revisar" (Panel, Señales y Revisión) e "Información" (Metodología). Íconos con el color de acento; el ítem activo, con fondo de acento suave. Se oculta con un botón y la preferencia se recuerda en el navegador | `BarraLateral` (`components/layout/armazon.tsx`) |
+| Barra lateral (≥ 1024 px) | Flota en vidrio a 12 px de los bordes. Marca arriba y grupos con título: "Revisar" (Panel, Señales y Revisión) e "Información" (Metodología). El ítem activo se marca con un gris neutro y su ícono con el acento; los demás íconos van en gris, para que el color quede para las acciones. Se oculta con un botón y la preferencia se recuerda en el navegador | `BarraLateral` (`components/layout/armazon.tsx`) |
 | Tablet (768–1023 px) | La barra lateral se abre con un botón como hoja flotante | `MenuMovil` |
 | Celular (< 768 px) | Barra de pestañas inferior en vidrio (Panel, Señales, Revisión y Metodología) que respeta `env(safe-area-inset-bottom)`. El buscador se abre con un ícono | `BarraDePestanas` |
-| Barra superior | Vidrio y fija. Selector de entidad (botón emergente), buscador en cápsula con "⌘K" o "Ctrl K", fecha de corte ("Datos al 4 oct 2026"), "Modo demostración", el espacio para el selector de rol (Lote D) y el tema. En celular y tablet, la fecha y el modo van en una segunda línea | `app/(app)/layout.tsx` |
+| Barra superior | Vidrio y fija. En la primera línea: entidad (botón emergente), buscador en cápsula con "⌘K" o "Ctrl K", el selector de rol del Lote D (desde tablet) y el tema. La fecha de corte ("Datos al 4 oct 2026") y "Modo demostración" entran en esa línea solo si la cabecera mide 72rem o más (*container query* `@6xl/cabecera`, que ya descuenta la barra lateral); si no, van en una segunda línea. Publica su alto real en `--alto-cabecera`, y todo lo que se fija debajo (barra de filtros, cabeceras de tabla) usa `top: var(--alto-cabecera)` | `CabeceraFija` y `app/(app)/layout.tsx` |
 | Título grande | Cada página abre con su título y una frase que explica qué se ve; las acciones a la derecha | `TituloDePagina` |
 | Contenido | Ancho máximo de 1 200 px (`max-w-contenido`); las páginas de lectura, 720 px (`max-w-lectura`) | — |
 | Pie | Discreto: atribución (CC BY 4.0), versión de las reglas y enlace a la metodología | `Pie` |
@@ -186,7 +187,7 @@ Es la pieza más importante del producto, porque concentra la explicación. Su e
    - los cinco proveedores con mayor participación.
 2. **Bandeja de señales:**
    - tabla priorizada con filtros por prioridad, categoría, método, fecha y estado de la revisión;
-   - una fila por proceso, con chips de señales.
+   - una fila por proceso, con sus señales como lista de texto (código en monoespaciada y nombre), sin cápsulas.
 3. **Ficha del proceso:**
    - cabecera con objeto, entidad, método, monto y estado;
    - línea de tiempo: convocatoria, presentación, adjudicación, contrato y culminación;

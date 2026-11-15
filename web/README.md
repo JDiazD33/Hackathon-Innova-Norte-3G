@@ -53,6 +53,7 @@ Prisma sigue el lenguaje visual descrito en [`docs/diseno/sistema-de-diseno.md`]
    - formas: `rounded-tarjeta`, `rounded-item`, `rounded-full`, `shadow-tarjeta`;
    - vidrio: `material-barra`, `material-menu` o `material-hoja`, **solo** en controles y navegación;
    - movimiento: `duration-200 ease-prisma`, y `motion-safe:` para cualquier escala o desplazamiento.
+   - algo fijo debajo de la cabecera: `sticky top-[calc(var(--alto-cabecera)+0.75rem)]`. La cabecera publica su alto real, así que no queda tapado aunque crezca (ver `useAltoEnVariable` en `src/components/layout/alto-en-variable.ts`).
 8. Une clases con `cn` de `@/lib/utils`, que conoce la escala de Prisma.
 9. Revisa la pantalla en claro y oscuro, a 375, 768 y 1280 px y solo con el teclado.
 

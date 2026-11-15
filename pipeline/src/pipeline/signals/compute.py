@@ -167,10 +167,7 @@ def compute_signals(
             row[0]
             for row in con.execute(
                 "SELECT DISTINCT metodo FROM casos_region "
-                "WHERE competitivo IS NULL AND metodo IS NOT NULL "
-                "AND NOT list_contains(CAST($doubtful AS VARCHAR[]), metodo_base) "
-                "ORDER BY metodo",
-                {"doubtful": list(settings.methods.doubtful)},
+                "WHERE competitivo IS NULL AND metodo IS NOT NULL ORDER BY metodo"
             ).fetchall()
         ]
     finally:

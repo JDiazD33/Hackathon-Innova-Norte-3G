@@ -376,3 +376,16 @@ def test_package_files_have_no_indentation(package_data, tmp_path: Path) -> None
     export(config, settings, data_dir, "publico", tmp_path / "publico", SECRET)
     text = (tmp_path / "publico" / "manifest.json").read_text(encoding="utf-8")
     assert "\n " not in text and text.endswith("}\n")
+
+
+def test_process_without_title_has_no_nomenclatura(tmp_path: Path) -> None:
+    data = release("ocds-t-0001", tenderers=tenderers(2))
+    del data["tender"]["title"]
+    config, data_dir = prepare_data(tmp_path, [data], [])
+    settings = load_signals_config(write_signals_config(tmp_path))
+    compute_signals(config, settings, data_dir)
+    files = build_package(config, settings, data_dir, "publico", SECRET)
+    validate_package(files)
+    (process,) = files["procesos/PE-CONSUCODE-1.json"]
+    assert process["nomenclatura"] is None
+    assert process["descripcion"] == "PROCESO DE PRUEBA ocds-t-0001"

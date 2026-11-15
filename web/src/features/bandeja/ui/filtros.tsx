@@ -1,8 +1,9 @@
 "use client";
 
 import { CalendarDays, ChevronDown } from "lucide-react";
-import { useId } from "react";
+import { useId, useRef, type ReactNode } from "react";
 
+import { useAltoEnVariable } from "@/components/layout/alto-en-variable";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ControlSegmentado } from "@/components/ui/control-segmentado";
@@ -13,6 +14,7 @@ import { STATE_LABELS, type ReviewState } from "@/features/revision";
 import type { NivelPrioridad } from "@/lib/data/types";
 import { NIVEL_PRIORIDAD_LABELS } from "@/lib/etiquetas";
 import { formatFecha } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 import { FILTROS_VACIOS, hayFiltrosActivos, type FiltrosBandeja, type OpcionesFiltro } from "../bandeja";
 
@@ -21,31 +23,39 @@ const ESTADOS: ReviewState[] = ["sin_revisar", "en_revision", "justificada", "re
 type OpcionPrioridad = NivelPrioridad | "todas";
 
 /**
- * Barra de filtros de la bandeja (HIG · Toolbars y Segmented controls): fija bajo la barra superior y en
- * vidrio. Prioridad con un control segmentado; categoría, método y revisión con botones emergentes; las
- * fechas en un popover; "Limpiar filtros" como botón plano. En el celular se desliza en horizontal.
+ * Barra de filtros de la bandeja: es la primera fila del panel de procesos y queda fija bajo la barra
+ * superior. Prioridad con un control segmentado; categoría, método y revisión con botones emergentes; las
+ * fechas en un popover; "Limpiar filtros" como botón plano. A la derecha va el conteo de resultados
+ * (`resumen`); en el celular los controles se deslizan en horizontal y el conteo pasa a una segunda línea.
  */
 export function FiltrosDeBandeja({
   opciones,
   filtros,
   onChange,
+  resumen,
 }: {
   opciones: OpcionesFiltro;
   filtros: FiltrosBandeja;
   onChange: (filtros: FiltrosBandeja) => void;
+  /** Conteo de resultados, a la derecha de la barra. */
+  resumen?: ReactNode;
 }) {
+  // Fija justo debajo de la cabecera (mida lo que mida) y publica su alto para la cabecera de la tabla.
+  const ref = useRef<HTMLElement>(null);
+  useAltoEnVariable(ref, "--alto-filtros");
   const cambiar = (cambios: Partial<FiltrosBandeja>) => onChange({ ...filtros, ...cambios });
   const prioridad: OpcionPrioridad = filtros.prioridades.length === 1 ? filtros.prioridades[0] : "todas";
 
   return (
     <section
+      ref={ref}
       aria-label="Filtros"
-      className="sticky top-[5.75rem] z-20 -mx-1 rounded-barra material-barra lg:top-[4.25rem]"
+      className="sticky top-(--alto-cabecera) z-20 flex flex-col border-b border-border bg-card @2xl/bandeja:flex-row @2xl/bandeja:items-center"
     >
-      <div className="flex items-center gap-2 overflow-x-auto p-2 [scrollbar-width:none] md:flex-wrap md:overflow-visible">
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto p-2 [scrollbar-width:none] @2xl/bandeja:flex-wrap @2xl/bandeja:overflow-visible">
         <ControlSegmentado<OpcionPrioridad>
           etiqueta="Prioridad"
-          className="shrink-0"
+          className="h-8 shrink-0"
           valor={prioridad}
           onChange={(valor) => cambiar({ prioridades: valor === "todas" ? [] : [valor] })}
           opciones={[
@@ -53,7 +63,7 @@ export function FiltrosDeBandeja({
             ...opciones.prioridades.map((nivel) => ({ valor: nivel, etiqueta: NIVEL_PRIORIDAD_LABELS[nivel] })),
           ]}
         />
-        <span aria-hidden="true" className="mx-1 h-6 w-px shrink-0 bg-separador" />
+        <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-border" />
         <SeleccionMultiple
           etiqueta="Categoría"
           opciones={opciones.categorias.map((c) => ({ valor: c.categoria, texto: c.etiqueta }))}
@@ -83,11 +93,18 @@ export function FiltrosDeBandeja({
           </Button>
         )}
       </div>
+      {resumen && (
+        <div className="shrink-0 border-t border-separador px-3 py-1.5 text-xs text-muted-foreground tabular-nums @2xl/bandeja:border-t-0 @2xl/bandeja:py-0 @2xl/bandeja:ps-2 @2xl/bandeja:pe-4">
+          {resumen}
+        </div>
+      )}
     </section>
   );
 }
 
 /** Botón emergente con casillas. Con algo elegido, toma el tinte de acento y muestra cuántos. */
+const CLASE_FILTRO_ACTIVO = "border-[color-mix(in_srgb,var(--primary)_35%,transparent)]";
+
 function SeleccionMultiple<T extends string>({
   etiqueta,
   opciones,
@@ -106,14 +123,14 @@ function SeleccionMultiple<T extends string>({
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={activos > 0 ? "tinted" : "secondary"}
+          variant={activos > 0 ? "tinted" : "outline"}
           size="sm"
-          className="shrink-0"
+          className={cn("shrink-0", activos > 0 && CLASE_FILTRO_ACTIVO)}
           aria-label={activos > 0 ? `${etiqueta}: ${activos} ${activos === 1 ? "elegida" : "elegidas"}` : etiqueta}
         >
           {etiqueta}
           {activos > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-leyenda font-semibold text-primary-foreground tabular-nums">
+            <span className="flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-sm bg-primary px-1 text-leyenda font-semibold text-primary-foreground tabular-nums">
               {activos}
             </span>
           )}
@@ -128,7 +145,7 @@ function SeleccionMultiple<T extends string>({
             return (
               <div
                 key={opcion.valor}
-                className="flex items-center gap-2.5 rounded-[calc(var(--radius-menu)-0.375rem)] px-2.5 py-2 hover:bg-[color-mix(in_srgb,var(--foreground)_6%,transparent)]"
+                className="flex items-center gap-2.5 rounded-sm px-2.5 py-2 hover:bg-muted"
               >
                 <Checkbox
                   id={`${id}-${indice}`}
@@ -172,7 +189,12 @@ function RangoDeFechas({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant={activo ? "tinted" : "secondary"} size="sm" className="shrink-0" aria-label={`Convocatoria: ${resumen}`}>
+        <Button
+          variant={activo ? "tinted" : "outline"}
+          size="sm"
+          className={cn("shrink-0", activo && CLASE_FILTRO_ACTIVO)}
+          aria-label={`Convocatoria: ${resumen}`}
+        >
           <CalendarDays aria-hidden="true" className="size-4" />
           {resumen}
           <ChevronDown aria-hidden="true" className="size-4 opacity-70" />

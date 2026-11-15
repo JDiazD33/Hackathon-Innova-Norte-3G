@@ -2,9 +2,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 /*
- * Tarjeta Prisma: superficie sólida del contenido (nunca vidrio), radio de 20 px, sin borde y con una
- * sombra mínima en claro. En oscuro la separación la da el gris de la tarjeta sobre el fondo negro.
- * Con "aumentar contraste" gana un borde visible.
+ * Tarjeta Prisma: panel sólido con borde fino y radio de 6 px, sin sombra. El borde es real (no una
+ * sombra) para que también se vea con colores forzados. Con "aumentar contraste" el borde se marca más.
  */
 function Card({
   className,
@@ -16,7 +15,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-tarjeta bg-card py-(--card-spacing) text-sm text-card-foreground shadow-tarjeta [--card-spacing:--spacing(5)] dark:ring-1 dark:ring-border contrast-more:ring-1 contrast-more:ring-borde-contraste has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-tarjeta *:[img:last-child]:rounded-b-tarjeta",
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-tarjeta border border-border bg-card py-(--card-spacing) text-sm text-card-foreground [--card-spacing:--spacing(5)] contrast-more:border-borde-contraste has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-tarjeta *:[img:last-child]:rounded-b-tarjeta",
         className
       )}
       {...props}
