@@ -1,6 +1,6 @@
 # Ficha técnica
 
-> **Estado:** versión 0 (15 de noviembre), con las versiones y los datos del Lote A. La versión 1 es para el H3 (martes 24). Las bases piden (p. 14): el nombre de la propuesta, cómo se usa, qué herramientas empleamos y el enlace o archivo del prototipo.
+> **Estado:** versión 1 en curso (15 de noviembre): versiones, datos y fuentes del Lote A. Se cierra para el H3 (martes 24), con las pantallas finales de los lotes B, C y D. Las bases piden (p. 14): el nombre de la propuesta, cómo se usa, qué herramientas empleamos y el enlace o archivo del prototipo.
 
 ## Nombre de la propuesta
 
@@ -58,7 +58,7 @@ Versiones exactas de `web/package-lock.json` y `pipeline/uv.lock` al 15 de novie
 
 Datos: OECE – Contrataciones Abiertas (SEACE), vía OCP Data Registry, licencia CC BY 4.0. Datos filtrados y transformados por el equipo para calcular señales de revisión.
 
-**Datos del prototipo** (paquete público del PR #26, pendiente de fusionar):
+**Datos del prototipo** (paquete público del PR #30, pendiente de fusionar):
 
 | Dato | Valor |
 |---|---|
@@ -71,9 +71,21 @@ Datos: OECE – Contrataciones Abiertas (SEACE), vía OCP Data Registry, licenci
 | Reproducibilidad | Con los mismos archivos, la misma configuración y el mismo secreto, dos ejecuciones dan huellas SHA-256 idénticas |
 | Privacidad | El paquete público no tiene nombres ni RUC de proveedores |
 
+## Fuentes
+
+| Qué | Fuente | Cómo la usamos |
+|---|---|---|
+| Datos de contrataciones | [OCP Data Registry, publicación 135](https://data.open-contracting.org/en/publication/135): OECE – Contrataciones Abiertas (SEACE), formato OCDS, licencia CC BY 4.0 | Descarga de los archivos anuales con `uv run pipeline download`, solo desde direcciones permitidas. Sin scraping ni APIs con credenciales |
+| Metodología de las señales | Guía *Red Flags in Public Procurement* de Open Contracting Partnership | Definiciones de las señales, citadas en el [catálogo](../datos/catalogo-de-senales.md) |
+| Indicadores de contraste | [Cardinal](https://github.com/open-contracting/cardinal-rs) de Open Contracting Partnership (MIT) | El indicador R018 se ejecuta como herramienta externa y se compara con S01 |
+| Umbrales de los métodos (S04) | Artículo 14 de las leyes de presupuesto 2025 (Ley 32185) y 2026 (Ley 32513), en los textos consolidados del portal de leyes del Congreso | Montos desde los que corresponde la licitación o el concurso público; S04 sigue desactivada hasta confirmarlos |
+| Principios de revisión | Arachne (Comisión Europea) y el [ADR 0007](../adr/0007-senales-no-acusaciones.md) | Señales, no acusaciones: puntaje para priorizar y decisión siempre humana |
+
+Las dependencias de software y sus licencias también están en [referentes internacionales](../producto/referentes-internacionales.md).
+
 ## Enlace al prototipo
 
-- Prototipo: <https://hackathon-innova-norte-3g.vercel.app> *[hoy con datos de prueba; pasa a datos reales cuando se fusione el PR #26 y se active `PAQUETE_DATOS=publico` en Vercel]*
+- Prototipo: <https://hackathon-innova-norte-3g.vercel.app> *[hoy con datos de prueba; pasa a datos reales cuando se fusione el PR #30 y se active `PAQUETE_DATOS=publico` en Vercel]*
 - Repositorio: <https://github.com/JDiazD33/Hackathon-Innova-Norte-3G>
 
 ## Limitaciones conocidas
