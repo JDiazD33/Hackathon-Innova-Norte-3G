@@ -29,7 +29,11 @@ const cases = [
   {
     ocid: "proceso-1",
     description: "Compra de prueba",
+    nomenclatura: "AS-SM-1-2026-PRUEBA-1",
+    estado: "CONVOCADO",
     date: "2026-10-01",
+    signals: 1,
+    priority: 3,
     simulated: false,
   },
 ];

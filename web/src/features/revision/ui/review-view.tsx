@@ -13,17 +13,19 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SimulatedDataBadge } from "@/features/etica";
 import { conEntidad } from "@/lib/entidad";
-import { formatFecha } from "@/lib/format";
 import { useRevisiones } from "@/lib/revisiones";
 
 import { formatReviewDate } from "../format-date";
+import { reviewCaseLabels, type ReviewCase } from "../review-cases";
 import { assignedBy, assignedTo, decidedCases } from "../selectors";
 import {
   ROLE_LABELS,
@@ -36,15 +38,13 @@ import { ReviewFiles } from "./review-files";
 import { ReviewHistory } from "./review-history";
 import { ReviewRoleProvider, useReviewRole } from "./review-role";
 
-export interface ReviewCase {
-  ocid: string;
-  description: string;
-  date: string | null;
-  simulated: boolean;
-}
+export type { ReviewCase };
+
 interface ReviewViewProps {
   entity: { id: string; nombre: string };
   cases: ReviewCase[];
+  /** Proceso elegido al abrir; si falta, el primero (los casos llegan con los de señales primero). */
+  initialOcid?: string;
 }
 
 export function ReviewView(props: ReviewViewProps) {
@@ -55,10 +55,13 @@ export function ReviewView(props: ReviewViewProps) {
   );
 }
 
-function ReviewContent({ entity, cases }: ReviewViewProps) {
+function ReviewContent({ entity, cases, initialOcid }: ReviewViewProps) {
   const { role } = useReviewRole();
   const { snapshot, estadoDe } = useRevisiones();
-  const [selected, setSelected] = useState(cases[0]?.ocid ?? "");
+  const [selected, setSelected] = useState(initialOcid || cases[0]?.ocid || "");
+  const withSignals = cases.filter((process) => process.signals > 0);
+  const withoutSignals = cases.filter((process) => process.signals === 0);
+  const labels = reviewCaseLabels(cases);
   const selectedCase = cases.find((process) => process.ocid === selected);
   const byId = new Map(cases.map((process) => [process.ocid, process]));
   const tabs = [
@@ -178,13 +181,25 @@ function ReviewContent({ entity, cases }: ReviewViewProps) {
                     position="popper"
                     className="max-w-(--radix-select-trigger-width)"
                   >
-                    {cases.map((process) => (
-                      <SelectItem key={process.ocid} value={process.ocid}>
-                        <span className="truncate">
-                          {process.description} · {formatFecha(process.date)}
-                        </span>
-                      </SelectItem>
-                    ))}
+                    {[
+                      { label: "Con señales", items: withSignals },
+                      { label: "Sin señales", items: withoutSignals },
+                    ]
+                      .filter((group) => group.items.length > 0)
+                      .map((group) => (
+                        <SelectGroup key={group.label}>
+                          <SelectLabel>
+                            {group.label} ({group.items.length})
+                          </SelectLabel>
+                          {group.items.map((process) => (
+                            <SelectItem key={process.ocid} value={process.ocid}>
+                              <span className="truncate">
+                                {labels.get(process.ocid)}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
