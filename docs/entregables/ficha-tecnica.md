@@ -15,9 +15,9 @@ Una plataforma web que prioriza qué contrataciones públicas conviene revisar, 
 1. Elegir la entidad en la cabecera.
 2. Revisar el panel: procesos, señales y revisiones pendientes.
 3. Abrir la bandeja de señales y filtrar por prioridad.
-4. Abrir un proceso: leer las tarjetas "Por qué aparece" y revisar los documentos en el SEACE.
+4. Abrir un proceso: leer la explicación de cada señal (qué encontramos, con qué se comparó, qué revisar y qué no significa) y buscarlo en el SEACE con su nomenclatura.
 5. Registrar la revisión: justificada, en revisión o requiere atención, con un comentario y una asignación.
-6. Generar el reporte de trazabilidad.
+6. Abrir el reporte de trazabilidad e imprimirlo o guardarlo en PDF.
 
 ## Cómo funciona
 
@@ -58,7 +58,7 @@ Versiones exactas de `web/package-lock.json` y `pipeline/uv.lock` al 15 de novie
 
 Datos: OECE – Contrataciones Abiertas (SEACE), vía OCP Data Registry, licencia CC BY 4.0. Datos filtrados y transformados por el equipo para calcular señales de revisión.
 
-**Datos del prototipo** (paquete público del PR #30, pendiente de fusionar):
+**Datos del prototipo** (paquete público del PR #30, en `main` y publicado en Vercel):
 
 | Dato | Valor |
 |---|---|
@@ -85,13 +85,14 @@ Las dependencias de software y sus licencias también están en [referentes inte
 
 ## Enlace al prototipo
 
-- Prototipo: <https://hackathon-innova-norte-3g.vercel.app> *[hoy con datos de prueba; pasa a datos reales cuando se fusione el PR #30 y se active `PAQUETE_DATOS=publico` en Vercel]*
+- Prototipo: <https://hackathon-innova-norte-3g.vercel.app>, con el paquete público de La Libertad (reglas `2026.11.2`, datos al 4 de octubre de 2026)
 - Repositorio: <https://github.com/JDiazD33/Hackathon-Innova-Norte-3G>
 
 ## Limitaciones conocidas
 
 - No incluye compras menores a 8 UIT, pagos ni modificaciones contractuales, porque la fuente no los publica.
 - La trazabilidad interna (quién solicitó, evaluó o dio conformidad) se demuestra con datos simulados.
+- La fuente publica cada versión de un procedimiento nulo o retrotraído con otro `ocid`. Hoy cada versión se evalúa aparte; la propuesta para dejar de hacerlo se decide con la verificación en el SEACE ([parte 9](../datos/partes-lote-a/parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento)).
 - Las revisiones se guardan en el navegador. En un piloto se guardarían en un servidor con inicio de sesión institucional.
 
 ## Seguridad y ética

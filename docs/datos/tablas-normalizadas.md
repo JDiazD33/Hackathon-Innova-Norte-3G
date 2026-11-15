@@ -12,7 +12,7 @@ Una fila por proceso.
 |---|---|
 | `ocid` | `ocid` |
 | `entidad_id` | `buyer.id` |
-| `nomenclatura` | `tender.title` (con ella se busca el proceso en el SEACE) |
+| `nomenclatura` | `tender.title` (con ella se busca el proceso en el SEACE). No es única: un procedimiento nulo o retrotraído se vuelve a publicar con otro `ocid` y la misma nomenclatura, y entidades distintas pueden usar las mismas siglas ([parte 9](partes-lote-a/parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento)) |
 | `descripcion` | `tender.description` |
 | `metodo` | `tender.procurementMethodDetails` |
 | `metodo_ocds` | `tender.procurementMethod` (falta en los métodos de la Ley 32069) |

@@ -40,6 +40,7 @@ Medida sobre los 5 036 procesos de La Libertad convocados en 2025–2026 (`2025.
   - Se prueba en este orden: región con tipo de objeto, región y país. El mínimo (`minimo_grupo`) es configurable.
   - Cada resultado guarda el grupo usado (`comparacion.descripcion` y `comparacion.ambito`), su tamaño, sus cuartiles y el percentil del caso.
 - **Exclusiones:** procesos cancelados, sin identificador del comprador o del proveedor, o con montos en otra moneda sin tipo de cambio. Cada exclusión se cuenta y se informa.
+  - **Versiones de un mismo procedimiento:** cuando un procedimiento se declara nulo o se retrotrae, la fuente lo vuelve a publicar con otro `ocid` y la misma nomenclatura. Hoy cada versión se evalúa aparte (331 versiones anteriores en La Libertad 2025–2026). La propuesta de no evaluarlas y su efecto en cada señal están en la [parte 9](partes-lote-a/parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento); se decide con la verificación en el SEACE.
 - **Trazabilidad del cálculo:** cada resultado guarda la versión de la regla, los valores de entrada, el grupo de comparación y sus estadísticas. Así, cualquiera puede reproducirlo.
 
 ## Prioridad de revisión
@@ -118,7 +119,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Cuándo hay señal:** con 2 o más procesos cuya suma supera el umbral del método superior. Se conservan solo los grupos que no están contenidos en otro mayor. `valor` es la suma en soles y `ocids` lista los procesos, que heredan la señal.
   - **Umbrales:** cada umbral se carga en `S04.umbrales` con su método, objeto, año, monto, norma y fecha de verificación. Un método sin umbral para ese objeto y año no se evalúa.
 - **Umbrales cargados:** salen del artículo 14 de las leyes de presupuesto 2025 (Ley 32185) y 2026 (Ley 32513): la Licitación Pública y el Concurso Público empiezan en S/ 485 000 para bienes y servicios, y en S/ 5 000 000 para obras. Por debajo corresponden la Adjudicación Simplificada (Ley 30225, procesos de 2025) y las abreviadas (Ley 32069). Comparación de Precios no tiene umbral en esas leyes.
-- **Estado:** desactivada hasta que el equipo confirme los umbrales y elija una calibración. Con la configuración actual marcaría 286 grupos y 841 procesos; con 30 días y productos de 8 dígitos, 202 grupos y 540 procesos ([parte 8](partes-lote-a/parte-8-decisiones-y-paquete-publico.md#detalle-de-s04)). La regla está probada con umbrales de prueba.
+- **Estado:** desactivada hasta que el equipo confirme los umbrales y elija una calibración. Con la configuración actual marcaría 286 grupos y 841 procesos; sin las versiones anteriores de un mismo procedimiento, 241 grupos y 704 procesos ([parte 9](partes-lote-a/parte-9-verificacion-seace.md#versiones-de-un-mismo-procedimiento)); con 30 días y productos de 8 dígitos, 202 grupos y 540 procesos ([parte 8](partes-lote-a/parte-8-decisiones-y-paquete-publico.md#detalle-de-s04)). La regla está probada con umbrales de prueba.
 
 ### S05 · Uso atípico de contratación directa (opcional)
 

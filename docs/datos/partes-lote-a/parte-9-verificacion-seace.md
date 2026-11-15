@@ -53,7 +53,7 @@ Ocids: S01-1: `ocds-dgv273-seacev3-1211219`; S01-2: `ocds-dgv273-seacev3-2026-11
 | S03-4 | MUNICIPALIDAD PROVINCIAL DE PACASMAYO - SAN PEDRO DE LLOC | P1657 | 25.0% de los procesos | 3 de 12 | `SIE-SIE-4-2025-MPP-SPLL/CS-1`; `SIE-SIE-5-2025-MPP/CS-1`; `SIE-SIE-6-2025-MPP/CS-1` |
 | S03-5 | MUNICIPALIDAD PROVINCIAL DE CHEPEN | P0240 | 24.4% del monto | 3 de 19 | `SIE-SIE-4-2025-MPCH-1`; `SIE-SIE-5-2025-MPCH-2`; `DIRECTA-DIRECTA-1-2026-MPCH/DEC-1` |
 
-**Qué verificar:** que el mismo proveedor ganó esos procesos en la entidad, y cuántos procesos adjudicó la entidad en la ventana (del 5 de octubre de 2025 al 4 de octubre de 2026). En S03-2 los tres procesos tienen la misma nomenclatura: confirma si son ítems de un mismo procedimiento.
+**Qué verificar:** que el mismo proveedor ganó esos procesos en la entidad, y cuántos procesos adjudicó la entidad en la ventana (del 5 de octubre de 2025 al 4 de octubre de 2026). En S03-2 los tres procesos tienen la misma nomenclatura y el mismo monto: dos están en estado NULO y uno CONTRATADO. Confirma si son versiones de un mismo procedimiento ([ver abajo](#versiones-de-un-mismo-procedimiento)).
 
 | N.° | ¿Coincide? (sí, no o en parte) | Qué no coincide | Por qué |
 |---|---|---|---|
@@ -73,7 +73,7 @@ Ocids: S01-1: `ocds-dgv273-seacev3-1211219`; S01-2: `ocds-dgv273-seacev3-2026-11
 | S04-4 | GOBIERNO REGIONAL DE LA LIBERTAD Sede Central | Licitación Pública Abreviada, obras (2026) | 721411 | `LP-ABR-1-2026-GRLL - GRCO-1` (2026-02-06); `LP-ABR-1-2026-GRLL - GRCO-1` (2026-02-06); `LP-ABR-1-2026-GRLL - GRCO-2` (2026-03-26) | S/ 114 876 881 | S/ 5 000 000 |
 | S04-5 | MUNICIPALIDAD PROVINCIAL DE TRUJILLO | Adjudicación Simplificada, bienes (2025) | 151015 | `AS-SM-19-2025-MPT/OEC-1` (2025-04-25); `AS-SM-20-2025-MPT/OEC-1` (2025-05-05); `AS-SM-19-2025-MPT/OEC-2` (2025-05-14) | S/ 3 597 335 | S/ 485 000 |
 
-**Qué verificar:** si son compras comparables de la misma necesidad, si son ítems o reconvocatorias de un mismo procedimiento (misma nomenclatura, o la misma con `-1` y `-2`), si cada proceso ya supera el umbral por sí solo, y si la necesidad era previsible.
+**Qué verificar:** si son compras comparables de la misma necesidad, si son ítems o reconvocatorias de un mismo procedimiento (misma nomenclatura, o la misma con `-1` y `-2`), si cada proceso ya supera el umbral por sí solo, y si la necesidad era previsible. En S04-1 y S04-2 los dos `ocid` son versiones de un mismo procedimiento: uno NULO y el otro vigente (CONSENTIDO o CONTRATADO). S04-3 y S04-4 también repiten una nomenclatura.
 
 | N.° | ¿Coincide? (sí, no o en parte) | Qué no coincide | Por qué |
 |---|---|---|---|
@@ -85,20 +85,49 @@ Ocids: S01-1: `ocds-dgv273-seacev3-1211219`; S01-2: `ocds-dgv273-seacev3-2026-11
 
 ## Hallazgos al elegir los casos
 
-- **Nomenclaturas repetidas:** 540 nomenclaturas aparecen en más de un `ocid` (1 333 procesos). Si se quita el número final de convocatoria, son 878 (2 209 procesos). Pueden ser ítems de un mismo procedimiento o reconvocatorias, y afectan los conteos de S01 y S03 y los grupos de S04.
+- **Nomenclaturas repetidas:** 540 nomenclaturas aparecen en más de un `ocid` (1 333 procesos). Si se quita el número final de convocatoria, son 878 (2 209 procesos). La mayoría son versiones de un mismo procedimiento y otras son de entidades distintas con las mismas siglas ([ver abajo](#versiones-de-un-mismo-procedimiento)). Afectan los conteos de S03 y S05 y los grupos de S04.
 - **Grupos de S04:** de los 286 de la estimación:
   - 43 tienen un proceso que ya supera el umbral por sí solo, así que no es una división para quedar por debajo;
   - 100 repiten una nomenclatura;
   - 90 son de una sola convocatoria.
   - Si se exige que cada proceso esté bajo el umbral y que haya al menos dos procedimientos distintos, quedarían 162 grupos.
 - **Propuesta para decidir con la verificación:**
+  - no evaluar las versiones anteriores de un procedimiento (ver abajo);
   - S04 cuenta procedimientos (la nomenclatura sin el número de convocatoria), no `ocid`, y solo procesos bajo el umbral;
   - S03 también cuenta procedimientos.
+
+### Versiones de un mismo procedimiento
+
+Análisis del 15 de noviembre, con las tablas de la parte 10 (5 036 procesos).
+
+- **Entre entidades:** 134 de las 540 nomenclaturas repetidas son de entidades distintas que usan las mismas siglas. Son procedimientos distintos, así que cualquier agrupación va por entidad y nomenclatura.
+- **En una misma entidad:** 475 nomenclaturas tienen más de un `ocid` (1 055 procesos).
+  - 325 comparten la fecha de convocatoria (704 procesos): 313 con la misma descripción y 217 con el mismo monto.
+  - 150 tienen fechas distintas (351 procesos).
+  - En 463 de las 475 los `ocid` tienen estados distintos, y 337 incluyen uno en estado NULO o RETROTRAIDO_POR_RESOLUCION.
+- **Lectura, por confirmar en el SEACE:** no parecen ítems, porque un mismo `ocid` ya agrupa sus ítems (hay estados combinados, como "CONTRATADO, DESIERTO"). Parecen versiones: cuando un procedimiento se declara nulo o se retrotrae por resolución, la fuente lo vuelve a publicar con otro `ocid` y la misma nomenclatura, y solo la última versión tiene el estado vigente. Por ejemplo:
+  - `CP-ABR-3-2025-MDM/ C-1`, de la Municipalidad Distrital de Marcabal: cuatro `ocid` con el mismo monto, tres en estado NULO (convocados el 19 de septiembre, el 9 de octubre y el 26 de noviembre de 2025) y el último CONTRATADO;
+  - `LP-SM-5-2025-MPT-1`, de la Municipalidad Provincial de Trujillo: cuatro `ocid` del 9 de mayo de 2025, uno DESIERTO y NULO, dos RETROTRAIDO_POR_RESOLUCION y el último CONTRATADO. El monto baja de S/ 1 465 413 a S/ 1 171 707 cuando queda un solo ítem;
+  - `LP-SM-1-2026-IRO/COMITE-1`, del Instituto Regional de Oftalmología: un `ocid` CONVOCADO sin monto y otro CONSENTIDO con S/ 668 000. En la pantalla de revisión del PR #29 aparecen como dos opciones con el mismo texto.
+- **Hoy:** solo se excluye el estado CANCELADO (`comun.estados_excluidos`), así que cada versión se evalúa como un proceso aparte. En el paquete público, 4 señales S03 y 5 señales S05 incluyen versiones anteriores, y 5 procesos de la bandeja son versiones anteriores que heredan la señal S03. S01 no tiene duplicados: sus 33 señales son 33 procedimientos distintos.
+- **Efecto medido:** se recalcularon las señales sobre una copia de las tablas, sin tocar el paquete, con S04 activada para contar sus grupos. Las versiones anteriores son 331 procesos (258 NULO y 73 RETROTRAIDO_POR_RESOLUCION) que tienen otro `ocid` posterior de la misma entidad y nomenclatura.
+
+| Señal | Hoy | Sin las versiones anteriores | Sin los estados NULO ni RETROTRAIDO_POR_RESOLUCION |
+|---|---:|---:|---:|
+| S01 | 33 | 33 | 32 |
+| S03 | 30 | 28 | 28 |
+| S05 | 7 | 5 | 4 |
+| S04 (desactivada) | 286 grupos (841 procesos) | 241 grupos (704 procesos) | 224 grupos (662 procesos) |
+
+- **Propuesta:** no evaluar las versiones anteriores. Un proceso NULO o RETROTRAIDO_POR_RESOLUCION con un `ocid` posterior de la misma entidad y nomenclatura se cuenta como excluido, con el motivo "versión anterior del mismo procedimiento". Iría como parámetro en `pipeline/config/senales.toml`, con su lista de estados, y después se vuelve a generar el paquete. Es la columna del medio; la última también deja fuera los procesos nulos que no se volvieron a publicar.
+- **Lo que no cubre:** 249 `ocid` que tampoco son la última versión, pero están en otro estado: 137 CONVOCADO (123 con la misma fecha que la última, como el de `LP-SM-1-2026-IRO/COMITE-1`), 73 CONTRATADO y 39 en otros estados. Los CONVOCADO parecen copias que la fuente no actualizó, y los CONTRATADO pueden ser ítems o procedimientos distintos: conviene mirar algunos en la verificación. Mientras tanto, ayuda que la web muestre la nomenclatura y el estado en los selectores.
+- **Qué confirmar en el SEACE:** que `CP-ABR-3-2025-MDM/ C-1` y `LP-SM-5-2025-MPT-1` son un solo procedimiento con nulidades o retrotracciones en su historial, y no procedimientos distintos.
 
 ## Al terminar
 
 - Anotar los resultados en las tablas de esta ficha y en el PR.
 - Actualizar el catálogo con las reglas finales (4.5) y, si la verificación lo confirma, proponer el ajuste de S03 y S04.
+- Si se confirman las versiones, implementar la exclusión de las versiones anteriores, volver a generar el paquete y repetir las huellas.
 - Marcar 3.4 y 4.5 en `tasks.md`.
 
 ## Archivos

@@ -6,7 +6,7 @@
 
 ## Tarea
 
-- [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local. *El paquete está generado y validado. Falta que se fusione este PR y que Joaquín active `PAQUETE_DATOS=publico` en Vercel y confirme que la web lo carga.*
+- [x] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local. *Cerrada el 15 de noviembre: este PR (#30) está en `main` y la web publicada en Vercel carga el paquete público. Muestra "Reglas 2026.11.2", "Datos al 4 oct 2026" y las entidades de La Libertad; con el fixture diría `fixture-1`. `git status` no muestra `web/data/local/` ([parte 11](parte-11-cierre-lote-a.md)).*
 
 ## Qué agrega a la parte 8
 
@@ -55,8 +55,8 @@ Las demás decisiones están aplicadas como dice la [tabla de la parte 8](parte-
 
 ## Pendiente
 
-- **Joaquín:** fusionar este PR, activar `PAQUETE_DATOS=publico` en Vercel y confirmar que la web carga el paquete (cierra la 5.4). También confirmar los umbrales de S04.
-- **Sebastián:** el texto de S01, que todavía dice "Oferta única", y mostrar la `nomenclatura` en la ficha del proceso.
+- **Joaquín:** confirmar los umbrales de S04. El PR ya está fusionado y Vercel usa el paquete público.
+- **Texto de S01 y nomenclatura en la ficha:** ya están en el PR #29 (Lote B, parte 15), que falta aprobar y fusionar.
 
 ## Archivos
 
