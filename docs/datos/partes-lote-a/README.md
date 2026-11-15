@@ -58,7 +58,7 @@ Lo que queda del Lote A depende de decisiones del equipo, de las pantallas de lo
 | Qué falta | Por qué no se hizo | Qué hace falta | Quién |
 |---|---|---|---|
 | 5.4 · Paquete público en la web | El paquete ya está aplicado y validado; falta fusionarlo | Fusionar su PR; Joaquín activa `PAQUETE_DATOS=publico` en Vercel y confirma que la web lo carga | Joaquín |
-| Umbrales de S04 | Están cargados con su norma (art. 14 de las leyes 32185 y 32513), pero S04 marcaría de 542 a 843 procesos según la calibración | Confirmar los montos y decidir si se activa y con qué calibración | Joaquín y el equipo |
+| Umbrales de S04 | Están cargados con su norma (art. 14 de las leyes 32185 y 32513), pero S04 marcaría de 540 a 841 procesos según la calibración | Confirmar los montos y decidir si se activa y con qué calibración | Joaquín y el equipo |
 | Texto de S01 | Depende de la decisión 1 | Que diga "participantes registrados" en lugar de "ofertas" | Sebastián |
 
 ### Bloqueado por las pantallas de los otros lotes

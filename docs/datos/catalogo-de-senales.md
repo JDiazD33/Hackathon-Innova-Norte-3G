@@ -118,7 +118,7 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Cuándo hay señal:** con 2 o más procesos cuya suma supera el umbral del método superior. Se conservan solo los grupos que no están contenidos en otro mayor. `valor` es la suma en soles y `ocids` lista los procesos, que heredan la señal.
   - **Umbrales:** cada umbral se carga en `S04.umbrales` con su método, objeto, año, monto, norma y fecha de verificación. Un método sin umbral para ese objeto y año no se evalúa.
 - **Umbrales cargados:** salen del artículo 14 de las leyes de presupuesto 2025 (Ley 32185) y 2026 (Ley 32513): la Licitación Pública y el Concurso Público empiezan en S/ 485 000 para bienes y servicios, y en S/ 5 000 000 para obras. Por debajo corresponden la Adjudicación Simplificada (Ley 30225, procesos de 2025) y las abreviadas (Ley 32069). Comparación de Precios no tiene umbral en esas leyes.
-- **Estado:** desactivada hasta que el equipo confirme los umbrales y elija una calibración. Con la configuración actual marcaría 287 grupos y 843 procesos; con 30 días y productos de 8 dígitos, 203 grupos y 542 procesos ([parte 8](partes-lote-a/parte-8-decisiones-y-paquete-publico.md#detalle-de-s04)). La regla está probada con umbrales de prueba.
+- **Estado:** desactivada hasta que el equipo confirme los umbrales y elija una calibración. Con la configuración actual marcaría 286 grupos y 841 procesos; con 30 días y productos de 8 dígitos, 202 grupos y 540 procesos ([parte 8](partes-lote-a/parte-8-decisiones-y-paquete-publico.md#detalle-de-s04)). La regla está probada con umbrales de prueba.
 
 ### S05 · Uso atípico de contratación directa (opcional)
 

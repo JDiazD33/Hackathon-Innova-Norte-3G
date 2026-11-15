@@ -53,16 +53,16 @@ Están cargados en `S04.umbrales` con su norma y la fecha de lectura, y S04 sigu
 | Concurso Público Abreviado | Servicios | Monto desde el que corresponde el Concurso Público |
 | Adjudicación Simplificada (Ley 30225, procesos de 2025) | Bienes, servicios y obras | Monto desde el que corresponde la Licitación Pública o el Concurso Público |
 
-**Estimación del volumen.** Con esos montos, calculada en una copia aparte de las tablas (sin tocar las salidas reales):
+**Estimación del volumen.** Con esos montos, calculada en una copia aparte de las tablas (sin tocar las salidas reales). La estimación del 14 de noviembre daba un grupo más (287) porque también usaba umbrales de Adjudicación Simplificada para 2026, que la Ley 32513 no fija.
 
 | Calibración | Grupos S04 | Procesos marcados |
 |---|---:|---:|
-| Ventana de 60 días, clase de 6 dígitos (configuración actual) | 287 | 843 |
-| Ventana de 30 días, clase de 6 dígitos | 225 | 634 |
-| Ventana de 60 días, producto de 8 dígitos | 257 | 736 |
-| Ventana de 30 días, producto de 8 dígitos | 203 | 542 |
+| Ventana de 60 días, clase de 6 dígitos (configuración actual) | 286 | 841 |
+| Ventana de 30 días, clase de 6 dígitos | 224 | 632 |
+| Ventana de 60 días, producto de 8 dígitos | 256 | 734 |
+| Ventana de 30 días, producto de 8 dígitos | 202 | 540 |
 
-Con la configuración actual, 145 de los 287 grupos son de concursos abreviados de servicios. Son demasiados para la bandeja: con las reglas aprobadas hay 154 procesos con señales.
+Con la configuración actual, 145 de los 286 grupos son de concursos abreviados de servicios. Son demasiados para la bandeja: con las reglas aprobadas hay 154 procesos con señales.
 
 ### Clasificación de métodos
 
