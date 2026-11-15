@@ -16,6 +16,7 @@ from typing import Any
 import duckdb
 
 from pipeline.signals.context import RuleContext
+from pipeline.signals.format import percent
 from pipeline.signals.settings import SignalsConfig
 
 CODE = "S03"
@@ -124,12 +125,17 @@ def compute(
             WHERE p.procesos >= $minimum
         )
         SELECT *,
-               coalesce(part_monto > valla_monto, false) AS por_monto,
-               part_procesos > valla_procesos AS por_procesos
+               coalesce(part_monto > valla_monto AND part_monto >= $share, false) AS por_monto,
+               part_procesos > valla_procesos AND part_procesos >= $share AS por_procesos
         FROM marcados
-        WHERE coalesce(part_monto > valla_monto, false) OR part_procesos > valla_procesos
+        WHERE coalesce(part_monto > valla_monto AND part_monto >= $share, false)
+           OR (part_procesos > valla_procesos AND part_procesos >= $share)
         """,
-        {"factor": settings.tukey_factor, "minimum": settings.s03.minimum_awards},
+        {
+            "factor": settings.tukey_factor,
+            "minimum": settings.s03.minimum_awards,
+            "share": settings.s03.minimum_share,
+        },
     )
     con.execute(
         """
@@ -179,7 +185,8 @@ def compute(
                         'participacion_monto': round(part_monto, 4),
                         'medida': CASE WHEN por_monto THEN 'monto' ELSE 'procesos' END,
                         'ventana_inicio': strftime($start, '%Y-%m-%d'),
-                        'ventana_fin': strftime($end, '%Y-%m-%d')}) AS entradas,
+                        'ventana_fin': strftime($end, '%Y-%m-%d'),
+                        'participacion_minima': $share}) AS entradas,
                CASE WHEN sin_monto > 0
                     THEN ['hay adjudicaciones sin monto en soles: no suman al monto']
                     ELSE CAST([] AS VARCHAR[]) END AS calidad,
@@ -188,8 +195,10 @@ def compute(
         """,
         {
             "threshold": f"valla superior de Tukey (Q3 + {settings.tukey_factor:g} × RIC) "
-            "de los proveedores de la entidad",
+            "de los proveedores de la entidad; participación mínima: "
+            f"{percent(settings.s03.minimum_share)}",
             "version": settings.s03.switch.rule_version,
+            "share": settings.s03.minimum_share,
             "start": start,
             "end": end,
         },

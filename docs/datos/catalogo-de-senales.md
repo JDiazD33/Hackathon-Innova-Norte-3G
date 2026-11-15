@@ -2,18 +2,18 @@
 
 Una **señal** indica que un proceso, un proveedor o una entidad tiene una característica que **amerita revisión**. No prueba ninguna irregularidad ([ADR 0007](../adr/0007-senales-no-acusaciones.md)). Cada señal tiene un código propio, un referente internacional, una regla versionada, parámetros configurables y una explicación para la persona usuaria.
 
-> **Estado:** versión 1 (borrador). La viabilidad de cada señal se confirma con el [spike de datos](fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a). Las preguntas del spike se citan como Q1–Q8.
+> **Estado:** reglas `2026.11.2`, con las decisiones que aprobó el equipo el 14 de noviembre ([parte 8](partes-lote-a/parte-8-decisiones-y-paquete-publico.md#propuesta-de-decisiones-tarea-16)). La viabilidad de cada señal sale del [spike de datos](fuente-de-datos.md#spike-de-datos-primer-paso-del-lote-a). Las preguntas del spike se citan como Q1–Q8.
 
 ## Resumen
 
 | Código | Señal | Categoría | Nivel | Referente | Desafío | MVP |
 |---|---|---|---|---|---|---|
-| S01 | Oferta única | Competencia | Proceso | Cardinal R018 · guía OCP | 2 y 1 | Núcleo |
-| S02 | Plazo corto para presentar ofertas | Tiempos | Proceso | Cardinal R003 · guía OCP | 2 y 1 | Núcleo |
+| S01 | Un solo participante registrado | Competencia | Proceso | Cardinal R018 · guía OCP | 2 y 1 | Núcleo |
+| S02 | Plazo corto para presentar ofertas | Tiempos | Proceso | Cardinal R003 · guía OCP | 2 y 1 | Desactivada: la fuente no trae el plazo |
 | S03 | Proveedor recurrente atípico en una entidad | Concentración | Proveedor-entidad | Guía OCP · categoría de concentración de Arachne | 2 | Núcleo |
-| S04 | Compras similares cercanas en el tiempo (posible fraccionamiento) | Fraccionamiento | Grupo de procesos | Guía OCP · texto del desafío 2 | 2 | Núcleo |
-| S05 | Uso atípico de contratación directa | Competencia | Entidad | Guía OCP | 2 y 1 | Opcional |
-| S06 | Monto final mayor que el contratado | Ejecución | Contrato | Guía OCP | 1 y 2 | Opcional |
+| S04 | Compras similares cercanas en el tiempo (posible fraccionamiento) | Fraccionamiento | Grupo de procesos | Guía OCP · texto del desafío 2 | 2 | Núcleo (desactivada hasta confirmar umbrales y calibración) |
+| S05 | Uso atípico de contratación directa | Competencia | Entidad | Guía OCP | 2 y 1 | Núcleo (reemplaza a S02) |
+| S06 | Monto final mayor que el contratado | Ejecución | Contrato | Guía OCP | 1 y 2 | Desactivada: poca cobertura del monto final |
 | S07 | Proveedor con sanción vigente adjudicado | Reputacional | Proveedor | Categoría reputacional de Arachne · desafío 1 | 1 y 2 | Fase 2 (falta la fuente) |
 | S08 | Conformidad o pago sin sustento, o funciones incompatibles | Trazabilidad interna | Expediente | Texto del desafío 2 | 2 | Datos sintéticos |
 
@@ -50,26 +50,27 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Niveles:** alta (5 o más), media (3 o 4) y baja (1 o 2).
 - **Configuración:** los pesos y los cortes están en `pipeline/config/senales.toml`, junto con los parámetros y la versión de cada señal.
 - **Transparencia:** la interfaz siempre muestra el desglose ("alta: S01 + S03 = 6").
-- **Implementación:** `priority()` en `pipeline/src/pipeline/export.py`. El desglose lleva una entrada por cada señal que cita al proceso (heredadas de S03 incluidas), y un proceso sin señales con peso tiene `prioridad: null`. Los pesos y cortes usados viajan en `manifest.prioridad`. En La Libertad 2025–2026 hay 247 procesos con señales: 1 alta y 246 media (ver la [parte 5](partes-lote-a/parte-5-prioridad-y-paquete.md#resultado-13-de-noviembre)).
+- **Implementación:** `priority()` en `pipeline/src/pipeline/export.py`. El desglose lleva una entrada por cada señal que cita al proceso (heredadas de S03 incluidas), y un proceso sin señales con peso tiene `prioridad: null`. `manifest.prioridad` publica los cortes y solo los pesos de las señales activas.
+- **La Libertad 2025–2026 (reglas `2026.11.2`):** 154 procesos con señales, 1 en prioridad alta y 153 en media.
 
 ## Fichas de las señales
 
-### S01 · Oferta única
+### S01 · Un solo participante registrado
 
 - **Pregunta:** ¿hubo competencia real?
-- **Datos:** número de postores (`tender.numberOfTenderers`, `tender.tenderers` o `bids.details`) y método (`tender.procurementMethodDetails`). Q3 y Q5.
-- **Regla v1:** procedimiento competitivo (todos menos la contratación directa) con exactamente un postor.
+- **Datos:** número de participantes registrados (`tender.numberOfTenderers`; la fuente no trae `bids`), método (`tender.procurementMethodDetails`) y adjudicaciones. Q3 y Q5.
+- **Regla v2:** procedimiento competitivo con exactamente un participante registrado y al menos una adjudicación. Quedan fuera la contratación directa, los métodos dudosos y los procesos desiertos, que no tienen contrato que revisar.
 - **Agregado por entidad:** porcentaje de procesos con oferta única. Si es atípico frente a entidades similares, se muestra en el panel.
 - **Qué revisar:** requisitos de calificación restrictivos, plazos, difusión de la convocatoria y especificaciones técnicas que favorezcan a un proveedor.
 - **Qué no significa:** en mercados pequeños o con bienes muy especializados puede haber un solo proveedor capaz.
 - **Spike:** no hay `bids` y `tender.numberOfTenderers` cuenta participantes registrados. Un solo participante implica a lo sumo una oferta, así que la señal no da falsos positivos de oferta única, pero no ve los procesos con varios registrados y una sola oferta. En la muestra de La Libertad de `2026.jsonl.gz`, Cardinal R018 marca los mismos 57 procesos que nuestra consulta con su regla, pero no ve las licitaciones y concursos abreviados porque no traen `tender.procurementMethod`.
-- **Implementación (S01@1):** `uv run pipeline signals`.
-  - **Métodos competitivos:** salen de la tabla de métodos de `senales.toml`, por nombre de `procurementMethodDetails`. La Contratación Internacional, el Régimen Especial y los convenios se tratan como no competitivos hasta que el equipo decida.
-  - **Procesos que no se evalúan, y se cuentan:** los de métodos sin clasificar, los de estados excluidos (`CANCELADO`), los que no tienen comprador y los que no tienen dato de postores.
-  - **Comparación:** `proporcion_referencia` es la parte del grupo con 2 o más postores, y `percentil_del_caso`, la parte con 1.
-  - **La Libertad 2025–2026:** 69 señales (35 licitaciones públicas abreviadas, 24 subastas inversas, 7 concursos abreviados y 3 de otros métodos). Además, 504 procesos no se evaluaron por falta de dato de postores y 46 por estar cancelados.
-- **Decisión pendiente:** 33 de esas 69 señales son de procesos que terminaron desiertos. Hay que decidir si S01 se limita a procesos con adjudicación, lo que dejaría 36.
-- **Contraste con Cardinal (`uv run pipeline cardinal`):** R018 se ejecutó sobre los 5 036 procesos, con `tender.procurementMethod` completado desde la tabla de métodos. Marca los mismos 69 procesos que S01 (100 % de coincidencia) y 2 más, que son procesos cancelados que S01 no evalúa. El informe queda en `data/derived/senales/contraste-cardinal.json`.
+- **Implementación (S01@2):** `uv run pipeline signals`.
+  - **Métodos competitivos:** salen de la tabla de métodos de `senales.toml`, por nombre de `procurementMethodDetails`. Los 6 métodos dudosos (`metodos.dudosos`: Régimen Especial, Convenio, Contratación Internacional y otros tres) quedan sin señal.
+  - **Solo con adjudicación:** `solo_con_adjudicacion = true`. La comparación con el grupo usa todos los procesos con dato de participantes, porque la tabla nacional no trae adjudicaciones.
+  - **Procesos que no se evalúan, y se cuentan:** los de estados excluidos (`CANCELADO`), sin comprador, de métodos dudosos o sin clasificar, sin dato de participantes y sin adjudicación.
+  - **Comparación:** `proporcion_referencia` es la parte del grupo con 2 o más participantes, y `percentil_del_caso`, la parte con 1.
+  - **La Libertad 2025–2026:** 33 señales, todas de procesos adjudicados. No se evaluaron 892 procesos sin adjudicación, 504 sin dato de participantes, 175 de métodos dudosos y 46 cancelados.
+- **Contraste con Cardinal (`uv run pipeline cardinal`):** R018 se ejecutó sobre los 5 036 procesos, con `tender.procurementMethod` completado desde la tabla de métodos. Marca los mismos 33 procesos que S01 (100 % de coincidencia) y 38 más, con su motivo: 36 sin adjudicación y 2 cancelados. El informe queda en `data/derived/senales/contraste-cardinal.json`.
 
 ### S02 · Plazo corto para presentar ofertas
 
@@ -78,7 +79,8 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
 - **Regla v1:** la duración en días calendario está por debajo del percentil 10 de su grupo de comparación. El percentil es configurable. Si se verifica el mínimo legal de cada método en el reglamento vigente, se muestra como referencia.
 - **Qué revisar:** si hubo prórrogas, si el plazo cumple la norma y cuántos postores participaron.
 - **Qué no significa:** procesos simples o situaciones de urgencia pueden justificar plazos cortos.
-- **Spike:** con esta fuente la regla no se puede calcular. `tender.tenderPeriod` trae como inicio y fin la fecha de la convocatoria en el 99,99 % de los procesos, y Cardinal R003 marca por eso a casi todos. Decisión pendiente: desactivar S02 o redefinirla con el plazo de consultas (`tender.enquiryPeriod`).
+- **Spike:** con esta fuente la regla no se puede calcular. `tender.tenderPeriod` trae como inicio y fin la fecha de la convocatoria en el 99,99 % de los procesos, y Cardinal R003 marca por eso a casi todos.
+- **Decisión (14 de noviembre):** queda desactivada con su motivo, y S05 pasa al núcleo.
 - **Implementación (S02@1):** la regla está programada y probada con datos sintéticos.
   - **Parámetros:** el percentil (`percentil`, 10) y las columnas del plazo (`plazo_inicio` y `plazo_fin`) se configuran en `senales.toml`. El grupo es por método y año, con respaldo nacional.
   - **Estado actual:** sale con `activa = false` y su motivo en el manifiesto, porque la fuente no trae el plazo de presentación.
@@ -98,8 +100,8 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Medidas:** se calculan dos participaciones por proveedor en cada entidad, la de los procesos adjudicados y la del monto adjudicado en soles. Los montos en otra moneda se convierten con la tasa del proceso.
   - **Cuándo hay señal:** si una de las dos supera la valla de Tukey de los proveedores de esa entidad y el proveedor ganó al menos 3 procesos. `valor` es la participación que superó la valla y `ocids` lista los procesos ganados, que heredan la señal.
   - **No se evalúan, y se cuentan:** las adjudicaciones sin proveedor, sin fecha o fuera de la ventana, y las de procesos cancelados.
-- **La Libertad 2025–2026:** 46 señales; 15 por monto y 31 por número de procesos.
-- **Calibración pendiente:** cuando casi todos los proveedores de una entidad ganan un solo proceso, el rango intercuartílico es cero y la valla queda muy baja. Por eso hay señales con participaciones de 1 % a 3 %. Con una participación mínima quedarían 29 señales (5 %), 20 (10 %) u 8 (20 %). Se propone agregar `participacion_minima` a `senales.toml` si el equipo lo aprueba.
+- **Participación mínima (S03@2):** cuando casi todos los proveedores de una entidad ganan un solo proceso, el rango intercuartílico es cero y la valla queda muy baja. Por eso la participación que supera la valla también debe llegar a `participacion_minima` (5 %).
+- **La Libertad 2025–2026:** 30 señales (antes, sin el mínimo, 46).
 
 ### S04 · Compras similares cercanas en el tiempo (posible fraccionamiento)
 
@@ -115,7 +117,8 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Agrupación:** procesos de la misma entidad, la misma clase UNSPSC (`digitos_clasificacion` = 6), el mismo método y el mismo objeto, convocados dentro de `ventana_dias` (60) desde el primero del grupo.
   - **Cuándo hay señal:** con 2 o más procesos cuya suma supera el umbral del método superior. Se conservan solo los grupos que no están contenidos en otro mayor. `valor` es la suma en soles y `ocids` lista los procesos, que heredan la señal.
   - **Umbrales:** cada umbral se carga en `S04.umbrales` con su método, objeto, año, monto, norma y fecha de verificación. Un método sin umbral para ese objeto y año no se evalúa.
-- **Estado:** desactivada hasta que se carguen los umbrales vigentes de la Ley 32069 y su reglamento, verificados con la norma. La regla está probada con umbrales de prueba (dentro y fuera de la ventana, y cambio de ventana con nueva versión).
+- **Umbrales cargados:** salen del artículo 14 de las leyes de presupuesto 2025 (Ley 32185) y 2026 (Ley 32513): la Licitación Pública y el Concurso Público empiezan en S/ 485 000 para bienes y servicios, y en S/ 5 000 000 para obras. Por debajo corresponden la Adjudicación Simplificada (Ley 30225, procesos de 2025) y las abreviadas (Ley 32069). Comparación de Precios no tiene umbral en esas leyes.
+- **Estado:** desactivada hasta que el equipo confirme los umbrales y elija una calibración. Con la configuración actual marcaría 287 grupos y 843 procesos; con 30 días y productos de 8 dígitos, 203 grupos y 542 procesos ([parte 8](partes-lote-a/parte-8-decisiones-y-paquete-publico.md#detalle-de-s04)). La regla está probada con umbrales de prueba.
 
 ### S05 · Uso atípico de contratación directa (opcional)
 
@@ -131,10 +134,10 @@ La prioridad ordena la bandeja. **No es una probabilidad de corrupción.**
   - **Cuándo hay señal:** si una de las dos proporciones supera la valla de Tukey de su grupo y la entidad hizo al menos `minimo_directas` contrataciones directas (hoy 3). El mínimo evita marcar a una entidad por una sola compra directa cuando la mayoría de su grupo no hace ninguna y la valla queda casi en cero.
   - **Resultado:** `valor` es la proporción que superó la valla, y `ocids` lista las contrataciones directas de la entidad. La señal es de nivel `entidad`: se muestra en su panel (`senales_entidad`) y no suma a la prioridad de ningún proceso.
   - **No se evalúan, y se cuentan:** los procesos cancelados, sin comprador o sin método, y las entidades con menos de `minimo_procesos` procesos.
-- **La Libertad 2025–2026:** 9 señales.
+- **Proporción mínima (S05@2):** la proporción que supera la valla también debe llegar a `proporcion_minima` (5 %).
+- **La Libertad 2025–2026:** 7 señales (antes, sin el mínimo, 9).
   - **Unidades del gobierno regional** (comparadas con las 327 de todo el país; valla del monto: 25,8 %): Instituto Regional de Oftalmología (61,7 % del monto, 29 de 78 procesos), Instituto Regional de Enfermedades Neoplásicas (30,3 %, 25 de 53) y Hospital Regional Docente (28,9 %, 28 de 76).
-  - **Municipalidades** (comparadas con las 72 de La Libertad): Pacasmayo y Huaranchal por procesos (14,8 % y 13,0 %; valla 11,5 %); Quiruvilca, Sartimbamba, Marcabal y Chilia por monto (13,0 %, 12,4 %, 2,3 % y 1,3 %; valla 0,9 %).
-- **Calibración pendiente:** 56 de las 84 municipalidades de La Libertad no tienen contrataciones directas, así que la valla del monto queda en 0,9 %. Con una proporción mínima de 5 % saldrían Marcabal y Chilia y quedarían 7 señales. Se propone agregar `proporcion_minima` a `senales.toml` si el equipo lo aprueba.
+  - **Municipalidades** (comparadas con las 72 de La Libertad): Pacasmayo y Huaranchal por procesos (14,8 % y 13,0 %; valla 11,5 %); Quiruvilca y Sartimbamba por monto (13,0 % y 12,4 %; valla 0,9 %). Marcabal y Chilia quedaron fuera con el mínimo de 5 %.
 
 ### S06 · Monto final mayor que el contratado (opcional)
 
@@ -186,9 +189,9 @@ Cada señal se muestra con esta estructura ([diseño de la tarjeta](../diseno/si
 
 | Bloque | Ejemplo para S01 |
 |---|---|
-| Qué encontramos | Este proceso recibió **1 oferta**. |
-| Con qué lo comparamos | En La Libertad, el 62 % de las adjudicaciones simplificadas de 2025 recibió 2 o más ofertas. *(Cifra ilustrativa.)* |
-| Por qué importa | Con una sola oferta, la entidad no puede comparar precios ni calidad. Es un indicador internacional de baja competencia (OCP; Cardinal R018). |
+| Qué encontramos | Este proceso tuvo **1 participante registrado**. |
+| Con qué lo comparamos | En La Libertad, el 62 % de las adjudicaciones simplificadas de 2025 tuvo 2 o más participantes registrados. *(Cifra ilustrativa.)* |
+| Por qué importa | Con un solo participante, la entidad no puede comparar precios ni calidad. Es un indicador internacional de baja competencia (OCP; Cardinal R018). |
 | Qué revisar | Requisitos de calificación, plazo y difusión de la convocatoria, especificaciones técnicas. |
 | Qué no significa | No prueba una irregularidad: hay mercados con pocos proveedores. |
 | Datos usados | `tender.numberOfTenderers` · fuente OECE vía OCP (CC BY 4.0) · corte: 4 de octubre de 2026 · [ver en el SEACE] |
