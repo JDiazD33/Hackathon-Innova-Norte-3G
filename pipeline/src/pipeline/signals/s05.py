@@ -17,6 +17,7 @@ import duckdb
 
 from pipeline.entities import GROUP_LABELS, entity_type_sql
 from pipeline.signals.context import RuleContext
+from pipeline.signals.format import percent
 from pipeline.signals.settings import SignalsConfig
 
 CODE = "S05"
@@ -118,17 +119,19 @@ def compute(
             JOIN s05_grupos g ON g.origen = c.ambito AND g.tipo = c.tipo
         )
         SELECT *,
-               coalesce(part_monto > valla_monto, false) AS por_monto,
-               part_procesos > valla_procesos AS por_procesos
+               coalesce(part_monto > valla_monto AND part_monto >= $share, false) AS por_monto,
+               part_procesos > valla_procesos AND part_procesos >= $share AS por_procesos
         FROM con_grupo
         WHERE directas >= $minimum_direct
-          AND (coalesce(part_monto > valla_monto, false) OR part_procesos > valla_procesos)
+          AND (coalesce(part_monto > valla_monto AND part_monto >= $share, false)
+               OR (part_procesos > valla_procesos AND part_procesos >= $share))
         """,
         {
             "minimum_group": settings.minimum_group,
             "minimum": s05.minimum_processes,
             "minimum_direct": s05.minimum_direct,
             "factor": settings.tukey_factor,
+            "share": s05.minimum_share,
         },
     )
     con.execute(
@@ -180,7 +183,8 @@ def compute(
                          'proporcion_procesos': round(part_procesos, 4),
                          'proporcion_monto': round(part_monto, 4),
                          'medida': CASE WHEN por_monto THEN 'monto' ELSE 'procesos' END,
-                         'metodos_directos': CAST($direct AS VARCHAR[])}}) AS entradas,
+                         'metodos_directos': CAST($direct AS VARCHAR[]),
+                         'proporcion_minima': $share}}) AS entradas,
                CASE WHEN sin_monto > 0
                     THEN ['hay procesos sin monto referencial en soles: no suman al monto']
                     ELSE CAST([] AS VARCHAR[]) END AS calidad,
@@ -189,7 +193,8 @@ def compute(
         """,
         {
             "threshold": f"valla superior de Tukey (Q3 + {settings.tukey_factor:g} × RIC) "
-            "de las entidades del mismo tipo",
+            f"de las entidades del mismo tipo; proporción mínima: {percent(s05.minimum_share)}",
+            "share": s05.minimum_share,
             "region": context.region_label,
             "minimum": s05.minimum_processes,
             "version": s05.switch.rule_version,

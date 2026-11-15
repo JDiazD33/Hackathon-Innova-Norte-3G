@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -32,7 +33,9 @@ THRESHOLD = (
     '{ metodo = "Adjudicación Simplificada", objeto = "bienes", anio = 2026, '
     'umbral_pen = 150000.0, norma = "Norma de prueba", verificado = "2026-11-14" }'
 )
-S04_ACTIVE = SIGNALS_TOML.replace("[S04]\nactiva = false", "[S04]\nactiva = true").replace(
+# The test thresholds replace the real ones (budget laws), so the cases do not depend on them.
+WITHOUT_THRESHOLDS = re.sub(r"umbrales = \[.*?\n\]", "umbrales = []", SIGNALS_TOML, flags=re.S)
+S04_ACTIVE = WITHOUT_THRESHOLDS.replace("[S04]\nactiva = false", "[S04]\nactiva = true").replace(
     "umbrales = []", f"umbrales = [\n  {THRESHOLD},\n]"
 )
 
@@ -85,7 +88,7 @@ def test_s03_flags_an_atypical_share_and_lists_the_processes(tmp_path: Path) -> 
     assert signal["entradas"]["procesos_ganados"] == 9
     assert signal["entradas"]["procesos_entidad"] == 12
     assert signal["entradas"]["ventana_inicio"] == "2025-10-05"
-    assert signal["version_regla"] == "S03@1"
+    assert signal["version_regla"] == "S03@2"
     assert manifest["parametros"]["S03"]["ventana_fin"] == "2026-10-04"
 
 
@@ -184,7 +187,7 @@ def test_s04_counts_processes_without_classification(tmp_path: Path) -> None:
 
 
 def test_s04_needs_thresholds_when_active(tmp_path: Path) -> None:
-    text = SIGNALS_TOML.replace("[S04]\nactiva = false", "[S04]\nactiva = true")
+    text = WITHOUT_THRESHOLDS.replace("[S04]\nactiva = false", "[S04]\nactiva = true")
     with pytest.raises(ConfigError, match="no tiene umbrales"):
         load_signals_config(write_signals_config(tmp_path, text))
     bad = S04_ACTIVE.replace('objeto = "bienes"', 'objeto = "otros"')
@@ -247,3 +250,44 @@ def test_s08_uses_the_chosen_processes(tmp_path: Path) -> None:
         compute_signals(
             config, load_signals_config(write_signals_config(tmp_path, missing)), data_dir
         )
+
+
+def few_shares() -> list[dict[str, Any]]:
+    """100 processes: 97 suppliers win one each and supplier 1 wins three (3 %). The quartiles
+    are all 1 %, so the fence is 1 % and 3 % is above it."""
+    repeated = [won(f"ocds-r-{i:04d}", supplier(1)) for i in range(3)]
+    return repeated + [won(f"ocds-u-{i:04d}", supplier(2 + i)) for i in range(97)]
+
+
+def test_s03_needs_the_minimum_share_besides_the_fence(tmp_path: Path) -> None:
+    _, rows = run_signals(tmp_path, few_shares())
+    assert by_code(rows, "S03") == []
+
+
+def test_s03_without_minimum_share_flags_a_low_fence(tmp_path: Path) -> None:
+    text = SIGNALS_TOML.replace("participacion_minima = 0.05", "participacion_minima = 0.0")
+    _, rows = run_signals(tmp_path, few_shares(), signals_text=text)
+    (signal,) = by_code(rows, "S03")
+    assert signal["valor"] == 0.03
+    assert signal["entradas"]["participacion_minima"] == 0.0
+
+
+def without_award_amounts(releases: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for data in releases:
+        for awarded in data.get("awards", []):
+            awarded["value"]["amount"] = None
+    return releases
+
+
+def test_s03_minimum_share_with_missing_amounts(tmp_path: Path) -> None:
+    """Without awarded amounts only the share of processes counts, with the same minimum."""
+    manifest, rows = run_signals(tmp_path, without_award_amounts(few_shares()))
+    assert by_code(rows, "S03") == []
+    assert exclusion(manifest, "S03", "adjudicación sin monto en soles") == 100
+    folder = tmp_path / "sin-minimo"
+    folder.mkdir()
+    text = SIGNALS_TOML.replace("participacion_minima = 0.05", "participacion_minima = 0.0")
+    _, rows = run_signals(folder, without_award_amounts(few_shares()), signals_text=text)
+    (signal,) = by_code(rows, "S03")
+    assert signal["entradas"]["medida"] == "procesos"
+    assert signal["calidad"] == ["hay adjudicaciones sin monto en soles: no suman al monto"]

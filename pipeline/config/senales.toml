@@ -42,13 +42,18 @@ competitivos = [
   "Proceso por Competencia",
   "Adjudicación para Contrato Marco",
 ]
-# Contratación Internacional, Regímen Especial y Convenio: por confirmar con el equipo.
-# Mientras tanto no se tratan como competitivos.
 no_competitivos = [
   "Contratación Directa",
-  "Contratación Internacional",
+]
+# Métodos dudosos (decisión 9 de la parte 8): no se sabe si hubo competencia, así que quedan
+# sin señal. S01 y S04 no los evalúan, y el manifiesto los nombra en metodos_sin_clasificar.
+dudosos = [
   "Regímen Especial",
   "Convenio",
+  "Contratación Internacional",
+  "Adjudicación Abreviada",
+  "Adjudicación Selectiva",
+  "Contratos Estandarizados",
 ]
 
 # Variantes que se comparan con su método base.
@@ -67,11 +72,14 @@ no_competitivos = [
 
 [S01]
 activa = true
-version = 1
-# El spec pide "postores"; el spike indica que la fuente cuenta participantes registrados.
-# Si el equipo cambia el texto, cambiar ambos valores y el spec.
-unidad = "postores"
-descripcion_umbral = "procedimiento competitivo con un solo postor"
+version = 2
+# "Un solo participante registrado" (decisión 1): la fuente no trae ofertas (bids) y
+# numberOfTenderers cuenta a los participantes registrados.
+unidad = "participantes registrados"
+descripcion_umbral = "procedimiento competitivo con un solo participante registrado"
+# Solo procesos con al menos una adjudicación (decisión 2): un proceso desierto no tiene
+# contrato que revisar.
+solo_con_adjudicacion = true
 
 [S02]
 activa = false
@@ -85,33 +93,49 @@ plazo_fin = "fecha_fin_presentacion"
 
 [S03]
 activa = true
-version = 1
+version = 2
 # Ventana: los meses que terminan en la fecha de corte de los datos.
 ventana_meses = 12
 # Procesos que el proveedor debe haber ganado en la entidad, como mínimo.
 minimo_adjudicaciones = 3
+# Participación mínima, además de superar la valla (decisión 7): evita señales de 1 % a 3 %
+# cuando casi todos los proveedores de la entidad ganan un solo proceso.
+participacion_minima = 0.05
 
 [S04]
 activa = false
-motivo = "Faltan los umbrales vigentes de cada método (Ley 32069 y su reglamento), verificados con la norma."
+motivo = "Los umbrales están cargados, pero falta que el equipo los confirme y elija una calibración que dé un volumen que se pueda revisar."
 version = 1
 ventana_dias = 60
 # Dígitos del código UNSPSC que definen "la misma clase de ítem" (6 = clase).
 digitos_clasificacion = 6
 # Umbral desde el que se exige el método superior, por método menos exigente, objeto y año.
-# Cada umbral cita su norma y la fecha en que se verificó. Ejemplo (valores ficticios):
-# { metodo = "Licitación Pública Abreviada", objeto = "bienes", anio = 2026, umbral_pen = 1000000.0, norma = "Reglamento de la Ley 32069, art. X", verificado = "2026-11-14" }
-umbrales = []
+# Salen del artículo 14 de las leyes de presupuesto 2025 (Ley 32185) y 2026 (Ley 32513).
+# Comparación de Precios no tiene umbral en esas leyes, así que no se evalúa.
+umbrales = [
+  { metodo = "Adjudicación Simplificada", objeto = "obras", anio = 2025, umbral_pen = 5000000.0, norma = "Ley 32185 (presupuesto 2025), art. 14.1, márgenes de la Ley 30225", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Adjudicación Simplificada", objeto = "bienes", anio = 2025, umbral_pen = 485000.0, norma = "Ley 32185 (presupuesto 2025), art. 14.1, márgenes de la Ley 30225", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Adjudicación Simplificada", objeto = "servicios", anio = 2025, umbral_pen = 485000.0, norma = "Ley 32185 (presupuesto 2025), art. 14.1, márgenes de la Ley 30225", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Licitación Pública Abreviada", objeto = "obras", anio = 2025, umbral_pen = 5000000.0, norma = "Ley 32185 (presupuesto 2025), art. 14.2, márgenes de la Ley 32069", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Licitación Pública Abreviada", objeto = "bienes", anio = 2025, umbral_pen = 485000.0, norma = "Ley 32185 (presupuesto 2025), art. 14.2, márgenes de la Ley 32069", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Concurso Público Abreviado", objeto = "servicios", anio = 2025, umbral_pen = 485000.0, norma = "Ley 32185 (presupuesto 2025), art. 14.2, márgenes de la Ley 32069", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Licitación Pública Abreviada", objeto = "obras", anio = 2026, umbral_pen = 5000000.0, norma = "Ley 32513 (presupuesto 2026), art. 14, márgenes de la Ley 32069", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Licitación Pública Abreviada", objeto = "bienes", anio = 2026, umbral_pen = 485000.0, norma = "Ley 32513 (presupuesto 2026), art. 14, márgenes de la Ley 32069", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+  { metodo = "Concurso Público Abreviado", objeto = "servicios", anio = 2026, umbral_pen = 485000.0, norma = "Ley 32513 (presupuesto 2026), art. 14, márgenes de la Ley 32069", verificado = "2026-11-15, texto consolidado del Congreso; falta la confirmación del equipo" },
+]
 
 [S05]
 activa = true
-version = 1
+version = 2
 # Métodos base de [metodos] que cuentan como contratación directa.
 metodos_directos = ["Contratación Directa"]
 # Una entidad con menos procesos no se evalúa ni entra en los grupos de comparación.
 minimo_procesos = 10
 # Con menos contrataciones directas no hay señal, aunque la proporción supere la valla.
 minimo_directas = 3
+# Proporción mínima, además de superar la valla (decisión 8): evita señales cuando casi todas
+# las entidades del grupo valen cero y la valla queda cerca de cero.
+proporcion_minima = 0.05
 
 [S06]
 activa = true

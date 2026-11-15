@@ -192,6 +192,11 @@ def compute_signals(
         ),
         "parametros": {
             "factor_tukey": settings.tukey_factor,
+            "metodos_dudosos": list(settings.methods.doubtful),
+            "S01": {
+                "unidad": settings.s01.unit,
+                "solo_con_adjudicacion": settings.s01.awarded_only,
+            },
             "minimo_grupo": settings.minimum_group,
             "estados_excluidos": list(settings.excluded_statuses),
             "S02": {
@@ -204,6 +209,7 @@ def compute_signals(
                 "ventana_inicio": window_start.isoformat(),
                 "ventana_fin": window_end.isoformat(),
                 "minimo_adjudicaciones": settings.s03.minimum_awards,
+                "participacion_minima": settings.s03.minimum_share,
             },
             "S04": {
                 "ventana_dias": settings.s04.window_days,
@@ -224,6 +230,7 @@ def compute_signals(
                 "metodos_directos": list(settings.s05.direct_methods),
                 "minimo_procesos": settings.s05.minimum_processes,
                 "minimo_directas": settings.s05.minimum_direct,
+                "proporcion_minima": settings.s05.minimum_share,
             },
             "S06": {
                 "factor": settings.s06.factor,

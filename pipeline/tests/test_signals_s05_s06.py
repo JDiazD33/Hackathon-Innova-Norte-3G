@@ -246,6 +246,18 @@ def test_s06_flags_a_final_amount_over_the_factor(tmp_path: Path) -> None:
         ("minimo_directas = 3", "minimo_directas = 0", r"S05\.minimo_directas"),
         ("factor = 1.15", "factor = 0.9", r"S06\.factor"),
         ("cobertura_minima = 0.10", "cobertura_minima = 1.5", r"S06\.cobertura_minima"),
+        ("proporcion_minima = 0.05", "proporcion_minima = -0.1", r"S05\.proporcion_minima"),
+        ("participacion_minima = 0.05", "participacion_minima = 1.5", r"S03\.participacion_minima"),
+        (
+            "solo_con_adjudicacion = true",
+            'solo_con_adjudicacion = "si"',
+            "S01.solo_con_adjudicacion",
+        ),
+        (
+            'dudosos = [\n  "Regímen Especial",',
+            'dudosos = [\n  "Contratación Directa",\n  "Regímen Especial",',
+            "dudoso no puede estar también clasificado",
+        ),
     ],
 )
 def test_invalid_s05_or_s06_config_is_rejected(
@@ -255,3 +267,43 @@ def test_invalid_s05_or_s06_config_is_rejected(
     path = write_signals_config(tmp_path, SIGNALS_TOML.replace(old, new))
     with pytest.raises(ConfigError, match=message):
         load_signals_config(path)
+
+
+def few_direct() -> list[dict[str, Any]]:
+    """A municipality with 2 direct contracts of 50 processes (4 %) and four without any: the
+    fence is 0, so 4 % is above it."""
+    others = municipalities(0, 0, 0, 0)
+    return [*entity(19, "MUNICIPALIDAD DISTRITAL DE PRUEBA GRANDE", 2, total=50), *others]
+
+
+def test_s05_needs_the_minimum_share_besides_the_fence(tmp_path: Path) -> None:
+    _, rows = run_signals(tmp_path, few_direct(), signals_text=S05_SMALL)
+    assert by_code(rows, "S05") == []
+
+
+def test_s05_without_minimum_share_flags_a_zero_fence(tmp_path: Path) -> None:
+    text = S05_SMALL.replace("proporcion_minima = 0.05", "proporcion_minima = 0.0")
+    _, rows = run_signals(tmp_path, few_direct(), signals_text=text)
+    (signal,) = by_code(rows, "S05")
+    assert signal["entidad_id"] == "PE-CONSUCODE-19"
+    assert signal["valor"] == 0.04
+    assert signal["entradas"]["proporcion_minima"] == 0.0
+
+
+def without_reference_amounts(releases: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for data in releases:
+        data["tender"]["value"] = {"amount": None, "currency": "PEN", "amount_PEN": None}
+    return releases
+
+
+def test_s05_minimum_share_with_missing_amounts(tmp_path: Path) -> None:
+    """Without reference amounts only the share of processes counts, with the same minimum."""
+    _, rows = run_signals(tmp_path, without_reference_amounts(few_direct()), signals_text=S05_SMALL)
+    assert by_code(rows, "S05") == []
+    folder = tmp_path / "sin-minimo"
+    folder.mkdir()
+    text = S05_SMALL.replace("proporcion_minima = 0.05", "proporcion_minima = 0.0")
+    _, rows = run_signals(folder, without_reference_amounts(few_direct()), signals_text=text)
+    (signal,) = by_code(rows, "S05")
+    assert signal["entradas"]["medida"] == "procesos"
+    assert signal["calidad"] == ["hay procesos sin monto referencial en soles: no suman al monto"]

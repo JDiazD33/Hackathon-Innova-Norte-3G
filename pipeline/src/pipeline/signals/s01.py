@@ -1,8 +1,11 @@
-"""S01 · Oferta única (Cardinal R018; OCP "Single bid received").
+"""S01 · Un solo participante registrado (Cardinal R018; OCP "Single bid received").
 
-A process of a competitive method with exactly one tenderer (``numero_postores = 1``) merits
-review. Direct contracting and other non-competitive methods are left out. A process without
-the number of tenderers is not evaluated and is counted. See docs/datos/catalogo-de-senales.md.
+A process of a competitive method with exactly one registered participant
+(``numero_postores = 1``; the source has no bids) merits review. Direct contracting, other
+non-competitive methods and unclassified methods (the doubtful ones among them) are left out.
+With ``solo_con_adjudicacion``, only processes with at least one award are evaluated, because a
+deserted process has no contract to review. Processes that are not evaluated are counted. See
+docs/datos/catalogo-de-senales.md.
 """
 
 from __future__ import annotations
@@ -23,14 +26,25 @@ def compute(
     con: duckdb.DuckDBPyConnection, settings: SignalsConfig, context: RuleContext
 ) -> list[dict[str, Any]]:
     """Insert the S01 results into ``senales`` and return the counted exclusions."""
-    excluded, no_buyer, unclassified, no_data = con.execute(
+    con.execute(
+        """
+        CREATE OR REPLACE TEMP TABLE s01_casos AS
+        SELECT c.*, c.ocid IN (SELECT ocid FROM adjudicaciones) AS con_adjudicacion
+        FROM casos_region c
+        """
+    )
+    excluded, no_buyer, unclassified, no_data, no_award = con.execute(
         f"""
         SELECT count(*) FILTER (WHERE excluido),
                count(*) FILTER (WHERE NOT excluido AND entidad_id IS NULL),
                count(*) FILTER (WHERE {ELIGIBLE_SQL} AND competitivo IS NULL),
-               count(*) FILTER (WHERE {ELIGIBLE_SQL} AND competitivo AND numero_postores IS NULL)
-        FROM casos_region
-        """
+               count(*) FILTER (WHERE {ELIGIBLE_SQL} AND competitivo AND numero_postores IS NULL),
+               count(*) FILTER (WHERE {ELIGIBLE_SQL} AND competitivo
+                                  AND numero_postores IS NOT NULL
+                                  AND $awarded_only AND NOT con_adjudicacion)
+        FROM s01_casos
+        """,
+        {"awarded_only": settings.s01.awarded_only},
     ).fetchone()
 
     build_comparison(
@@ -61,14 +75,16 @@ def compute(
                to_json({{'numero_postores': c.numero_postores, 'metodo': c.metodo}}) AS entradas,
                CAST([] AS VARCHAR[]) AS calidad,
                false AS simulado
-        FROM casos_region c
+        FROM s01_casos c
         JOIN comparacion_s01 k USING (ocid)
         WHERE {ELIGIBLE_SQL} AND c.competitivo AND c.numero_postores = 1
+          AND (NOT $awarded_only OR c.con_adjudicacion)
         """,
         {
             "unit": settings.s01.unit,
             "threshold": settings.s01.threshold_description,
             "version": settings.s01.switch.rule_version,
+            "awarded_only": settings.s01.awarded_only,
         },
     )
     return [
@@ -76,4 +92,5 @@ def compute(
         {"codigo": CODE, "motivo": "sin comprador", "cantidad": no_buyer},
         {"codigo": CODE, "motivo": "método sin clasificar", "cantidad": unclassified},
         {"codigo": CODE, "motivo": "sin dato de postores", "cantidad": no_data},
+        {"codigo": CODE, "motivo": "proceso sin adjudicación", "cantidad": no_award},
     ]

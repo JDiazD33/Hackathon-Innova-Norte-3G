@@ -35,7 +35,7 @@ from pipeline.signals.compute import (
 from pipeline.signals.s08 import case_files_path
 from pipeline.signals.settings import SignalsConfig
 
-CONTRACT_VERSION = "1.0"
+CONTRACT_VERSION = "1.1"
 SCHEMA_PATH = PROJECT_DIR.parent / "contracts" / "paquete-de-datos.schema.json"
 WEB_DATA_DIR = PROJECT_DIR.parent / "web" / "data"
 MODES = ("publico", "local")
@@ -258,8 +258,9 @@ def _load(con: duckdb.DuckDBPyConnection, tables: Path, data_dir: Path) -> dict[
         "entities": _rows(con, "SELECT * FROM entidades ORDER BY entidad_id"),
         "documents": _rows(
             con,
-            "SELECT ocid, tipo, titulo, url FROM documentos "
-            "ORDER BY ocid, seccion DESC, contrato_id, documento_id",
+            "SELECT ocid, tipo, titulo, url, seccion, fecha_publicacion, contrato_id, "
+            "documento_id FROM documentos "
+            "ORDER BY ocid, tipo, fecha_publicacion DESC NULLS LAST, documento_id DESC",
         ),
         "suppliers": _rows(con, "SELECT * FROM proveedores ORDER BY proveedor_id"),
         "participants": _rows(
@@ -341,10 +342,28 @@ def build_package(
             for ocid in row["ocids"]:
                 cited[ocid].append((row["codigo"], signal["id"]))
 
-    documents: dict[str, list[dict[str, str]]] = defaultdict(list)
+    # Each process shows the most recent documents of each type, up to documentos_por_tipo,
+    # so the public package stays light. They keep the reading order: call first, then contract.
+    shown: dict[tuple[str, str], int] = defaultdict(int)
+    documents: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for document in data["documents"]:
-        if _first_text(document["titulo"]) and is_web_url(document["url"]):
+        key = (document["ocid"], document["tipo"])
+        if (
+            shown[key] < config.package.documents_per_type
+            and _first_text(document["titulo"])
+            and is_web_url(document["url"])
+        ):
+            shown[key] += 1
             documents[document["ocid"]].append(document)
+    for items in documents.values():
+        items.sort(
+            key=lambda d: (
+                d["seccion"] != "tender",
+                str(d["fecha_publicacion"] or "9999"),
+                d["contrato_id"] or "",
+                d["documento_id"] or "",
+            )
+        )
 
     # Free texts hide the names that the package does not show: every supplier in public mode,
     # every supplier but the companies in local mode. They are hidden in the texts of the
@@ -386,6 +405,12 @@ def build_package(
                 "ocid": ocid,
                 "entidad_id": process["entidad_id"],
                 "descripcion": redact(text, *hidden),
+                # The SEACE search key (contract 1.1); RUC-shaped numbers never leave.
+                "nomenclatura": (
+                    RUC_PATTERN.sub(RUC_PLACEHOLDER, process["nomenclatura"].strip())
+                    if _first_text(process["nomenclatura"])
+                    else None
+                ),
                 "metodo": process["metodo"] or "Sin dato",
                 "objeto": (
                     "consultoria_de_obras"
@@ -552,7 +577,15 @@ def build_package(
                 "correcciones": list(tables_manifest["correcciones"]),
                 "senales_activas": signals_manifest["senales_activas"],
                 "senales_desactivadas": signals_manifest["senales_desactivadas"],
-                "prioridad": {"pesos": dict(settings.weights), "cortes": dict(settings.cuts)},
+                # Only the weights that can add up: those of the active signals.
+                "prioridad": {
+                    "pesos": {
+                        code: weight
+                        for code, weight in settings.weights.items()
+                        if code in signals_manifest["senales_activas"]
+                    },
+                    "cortes": dict(settings.cuts),
+                },
             },
         }
     )
@@ -595,14 +628,19 @@ def validate_package(files: dict[str, Any], schema_path: Path = SCHEMA_PATH) -> 
 
 
 def write_package(files: dict[str, Any], out_dir: Path) -> None:
-    """Replace the package in ``out_dir`` with ``files`` (only the package's own JSON files)."""
+    """Replace the package in ``out_dir`` with ``files`` (only the package's own JSON files).
+
+    The JSON has no indentation, to keep the public package light.
+    """
     for folder in ("procesos", "senales"):
         for old in (out_dir / folder).glob("*.json") if (out_dir / folder).exists() else []:
             old.unlink()
     for path, data in files.items():
         target = out_dir / path
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        target.write_text(
+            json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8"
+        )
 
 
 def export(
