@@ -4,8 +4,8 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { TituloDePagina } from "@/components/layout/titulo-de-pagina";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SimulatedDataBadge } from "@/features/etica";
 import { SignalCard } from "@/features/explicacion/ui/signal-card";
-import { SimulatedDataBadge } from "@/features/explicacion/ui/simulated-data-badge";
 import { conEntidad } from "@/lib/entidad";
 import {
   formatEntero,
