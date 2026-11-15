@@ -43,12 +43,12 @@ export function SupplierView({ detail }: { detail: SupplierDetail }) {
         titulo={identity.displayName}
         descripcion={`Participación en ${entity.nombre}, durante el periodo ${manifest.anios.join("–")} del paquete.`}
       />
-      {manifest.modo === "publico" && (
+      {identity.pseudonymized && (
         <p className="text-subtitulo text-muted-foreground">
           La identidad del proveedor se protege con un seudónimo.
         </p>
       )}
-      {manifest.modo === "local" && (
+      {!identity.pseudonymized && (
         <div className="space-y-2 text-subtitulo">
           <p>RUC: {identity.taxId ?? SIN_DATO}</p>
           {identity.profileUrl && (
