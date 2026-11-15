@@ -1,5 +1,6 @@
 import { getSupplierIdentity } from "@/features/fichas";
 import type { ModoPaquete, Proceso, Proveedor } from "@/lib/data/types";
+import { conEntidad } from "@/lib/entidad";
 import { formatFecha } from "@/lib/format";
 
 export interface EntradaBusqueda {
@@ -31,6 +32,8 @@ export function construirIndice(
   procesos: readonly Proceso[],
   proveedores: readonly Proveedor[],
   modo: ModoPaquete,
+  /** Entidad del índice: los enlaces la conservan para que la ficha del proveedor muestre esa entidad. */
+  entidadId?: string,
 ): EntradaBusqueda[] {
   const entradasProcesos = procesos.map((p) => ({
     tipo: "proceso" as const,
@@ -39,7 +42,7 @@ export function construirIndice(
     detalle: [p.nomenclatura, p.metodo, p.fechas.convocatoria ? formatFecha(p.fechas.convocatoria) : null]
       .filter(Boolean)
       .join(" · "),
-    href: `/procesos/${encodeURIComponent(p.ocid)}`,
+    href: conEntidad(`/procesos/${encodeURIComponent(p.ocid)}`, entidadId),
     texto: normalizarTexto(`${p.descripcion} ${p.ocid} ${p.nomenclatura ?? ""}`),
   }));
 
@@ -54,7 +57,7 @@ export function construirIndice(
         id: proveedor.id,
         titulo: identidad.displayName,
         detalle: identidad.taxId ? `Proveedor · RUC ${identidad.taxId}` : "Proveedor",
-        href: `/proveedores/${encodeURIComponent(proveedor.id)}`,
+        href: conEntidad(`/proveedores/${encodeURIComponent(proveedor.id)}`, entidadId),
         texto: normalizarTexto(visible),
       };
     });

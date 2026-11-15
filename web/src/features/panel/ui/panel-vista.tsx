@@ -42,7 +42,8 @@ const configTendencia = {
   conSenales: { label: "Con señales", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
-const hrefProveedor = (id: string) => `/proveedores/${encodeURIComponent(id)}`;
+/** La ficha del proveedor muestra su participación en una entidad: el enlace conserva la del panel. */
+const hrefProveedor = (id: string, entidadId: string) => conEntidad(`/proveedores/${encodeURIComponent(id)}`, entidadId);
 
 /**
  * Panel de la entidad (Lote B): título grande, cifras en un bloque agrupado, la señal de la entidad como
@@ -165,7 +166,7 @@ export function PanelVista({ datos }: { datos: DatosPanel }) {
                 <td className="py-3 pe-3">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <Link
-                      href={hrefProveedor(p.proveedorId)}
+                      href={hrefProveedor(p.proveedorId, datos.entidad.id)}
                       className="rounded-md font-medium outline-none underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {p.nombre}
