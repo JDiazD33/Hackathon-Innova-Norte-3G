@@ -6,17 +6,18 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /*
- * Control segmentado (HIG · Segmented controls): una sola opción entre pocas (hasta 5–7), segmentos del
- * mismo ancho y solo texto o solo íconos. Las pestañas de `tabs.tsx` comparten este aspecto.
+ * Control segmentado: una sola opción entre pocas (hasta 5–7), solo texto o solo íconos. Es un grupo de
+ * botones dentro de un marco con borde; la opción elegida lleva el tinte de acento y más peso. Las
+ * pestañas de `tabs.tsx` comparten este aspecto.
  */
 export const CLASE_PISTA =
-  "inline-flex h-9 w-fit items-center gap-0.5 rounded-full bg-secondary p-0.5 text-sm pointer-coarse:h-11 contrast-more:ring-1 contrast-more:ring-borde-contraste";
+  "inline-flex h-9 w-fit items-stretch gap-0.5 rounded-control border border-input bg-card p-0.5 text-sm pointer-coarse:h-11 contrast-more:border-borde-contraste";
 
 export const CLASE_SEGMENTO =
-  "inline-flex h-full min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full px-3.5 font-medium whitespace-nowrap text-muted-foreground transition-[background-color,color,box-shadow] duration-200 ease-prisma outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-secondary disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4 [&_svg]:shrink-0";
+  "inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[0.125rem] px-3 font-medium whitespace-nowrap text-muted-foreground transition-[background-color,color] duration-150 ease-prisma outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4 [&_svg]:shrink-0";
 
 export const CLASE_SEGMENTO_ACTIVO =
-  "bg-segmento text-foreground shadow-[0_1px_3px_rgb(0_0_0/0.12),0_1px_1px_rgb(0_0_0/0.04)] contrast-more:ring-1 contrast-more:ring-borde-contraste";
+  "bg-segmento font-semibold text-accent-foreground hover:bg-segmento hover:text-accent-foreground contrast-more:ring-1 contrast-more:ring-borde-contraste";
 
 export interface OpcionSegmento<T extends string> {
   valor: T;
