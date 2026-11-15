@@ -1,0 +1,54 @@
+.prisma-report-paper {
+  color-scheme: only light;
+  color: CanvasText;
+  background: Canvas;
+  --background: Canvas;
+  --foreground: CanvasText;
+  --card: Canvas;
+  --card-foreground: CanvasText;
+  --muted: ButtonFace;
+  --muted-foreground: GrayText;
+  --primary: LinkText;
+  --primary-foreground: Canvas;
+  --border: GrayText;
+  --separador: ButtonBorder;
+  --secondary: ButtonFace;
+  --secondary-foreground: ButtonText;
+}
+
+.prisma-report-paper [data-slot="card"] {
+  box-shadow: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: calc(var(--spacing) * 4);
+  }
+
+  html:has(.prisma-report-paper),
+  body:has(.prisma-report-paper) {
+    color-scheme: only light;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .prisma-report-toolbar {
+    display: none;
+  }
+
+  .prisma-report-paper {
+    max-width: none;
+    padding: 0;
+  }
+
+  .prisma-report-paper h2,
+  .prisma-report-paper h3,
+  .prisma-report-paper h4 {
+    break-after: avoid;
+  }
+
+  .prisma-report-paper li {
+    break-inside: avoid;
+  }
+}
