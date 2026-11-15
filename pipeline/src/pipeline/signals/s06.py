@@ -13,15 +13,10 @@ from typing import Any
 import duckdb
 
 from pipeline.signals.context import RuleContext, SignalUnavailable
+from pipeline.signals.format import percent
 from pipeline.signals.settings import SignalsConfig
 
 CODE = "S06"
-
-
-def percent(value: float) -> str:
-    """0.0913 -> '9.1%', in the es-PE format that the web uses for every number."""
-    text = f"{value * 100:.1f}"
-    return (text[:-2] if text.endswith(".0") else text) + "%"
 
 
 def compute(

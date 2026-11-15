@@ -11,7 +11,7 @@ Cada parte tiene su ficha (contexto, diseño propuesto, verificación) y su rama
 - [x] 1.3 Responder Q1–Q4 (departamento, plazo de presentación, postores y clasificación de ítems) con consultas DuckDB. Verificar anotando los campos exactos y las cifras en `docs/datos/fuente-de-datos.md`.
 - [x] 1.4 Responder Q5–Q7 (método, culminación y tamaño de La Libertad en 2025–2026). Verificar con las cifras anotadas en el mismo documento.
 - [x] 1.5 Instalar `ocdscardinal` y ejecutar `coverage` y `prepare` sobre una muestra (Q8). Verificar anotando qué indicadores de Cardinal se pueden calcular con estos datos.
-- [ ] 1.6 Revisar con el Lote B el contrato v1 (`docs/arquitectura/contrato-paquete-de-datos.md`) y ajustarlo a lo que mostró el spike. Verificar con la aprobación de los cuatro integrantes en el PR.
+- [x] 1.6 Revisar con el Lote B el contrato v1 (`docs/arquitectura/contrato-paquete-de-datos.md`) y ajustarlo a lo que mostró el spike. Verificar con la aprobación de los cuatro integrantes en el PR.
 
 ## 2. A2 · Ingesta y normalización
 

@@ -120,18 +120,24 @@ def cardinal_version(binary: Path) -> str | None:
     return result.stdout.strip() or None
 
 
-def _difference_reasons(con: duckdb.DuckDBPyConnection) -> dict[str, str]:
+def _difference_reasons(con: duckdb.DuckDBPyConnection, settings: SignalsConfig) -> dict[str, str]:
     """Why S01 may leave out a process that R018 flags (only for the processes it skips)."""
     rows = con.execute(
         """
+        WITH casos AS (
+            SELECT *, ocid NOT IN (SELECT ocid FROM adjudicaciones) AS sin_adjudicacion
+            FROM casos_region
+        )
         SELECT ocid,
                CASE WHEN excluido THEN 'S01 no evalúa procesos en estado ' || estado
                     WHEN entidad_id IS NULL THEN 'S01 no evalúa procesos sin comprador'
                     WHEN competitivo IS NULL THEN 'S01 no evalúa métodos sin clasificar'
+                    WHEN $awarded_only AND sin_adjudicacion
+                        THEN 'S01 solo evalúa procesos con adjudicación'
                END AS motivo
-        FROM casos_region
-        WHERE excluido OR entidad_id IS NULL OR competitivo IS NULL
-        """
+        FROM casos
+        """,
+        {"awarded_only": settings.s01.awarded_only},
     ).fetchall()
     return {ocid: reason for ocid, reason in rows if reason}
 
@@ -171,7 +177,7 @@ def contrast(
         ).fetchone()
         s01_ocids = _signal_ocids(con, data_dir, "S01")
         s02_ocids = _signal_ocids(con, data_dir, "S02")
-        reasons = _difference_reasons(con)
+        reasons = _difference_reasons(con, settings)
     finally:
         con.close()
     report["entrada"] = {"archivo": str(input_path.name), "procesos": processes}
