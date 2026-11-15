@@ -102,6 +102,7 @@ export function ReportView({
           </h2>
           <dl className="divide-y divide-separador">
             {[
+              ["Nomenclatura en el SEACE", process.nomenclatura || SIN_DATO],
               ["Método", process.metodo || SIN_DATO],
               ["Estado", process.estado ?? SIN_DATO],
               [

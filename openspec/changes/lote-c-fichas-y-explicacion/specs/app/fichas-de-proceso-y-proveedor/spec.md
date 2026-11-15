@@ -7,7 +7,7 @@ Mostrar en una sola vista todo lo que una persona necesita para revisar un proce
 ## ADDED Requirements
 
 ### Requirement: Resumen del proceso
-La ficha del proceso SHALL mostrar la descripción, la entidad, el método, el objeto, los montos (referencial, adjudicado y final), el estado, el número de postores y el enlace al proceso en el SEACE. Cada dato nulo SHALL mostrarse como "Sin dato".
+La ficha del proceso SHALL mostrar la descripción, la entidad, la nomenclatura del SEACE (contrato 1.1), el método, el objeto, los montos (referencial, adjudicado y final), el estado, el número de participantes registrados y el enlace al proceso en el SEACE. Cada dato nulo SHALL mostrarse como "Sin dato".
 
 #### Scenario: Proceso con datos faltantes
 - **WHEN** se abre un proceso cuyo monto final es nulo

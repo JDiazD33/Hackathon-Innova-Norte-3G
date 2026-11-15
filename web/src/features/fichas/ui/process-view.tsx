@@ -28,6 +28,8 @@ export function ProcessView({ detail }: { detail: ProcessDetail }) {
   const { process, entity, manifest, signals, timeline } = detail;
   const summary = [
     ["Entidad", entity?.nombre ?? SIN_DATO],
+    // Contrato 1.1: es el código con el que se busca el proceso en el SEACE.
+    ["Nomenclatura en el SEACE", process.nomenclatura || SIN_DATO],
     ["Método", process.metodo || SIN_DATO],
     ["Objeto", OBJECT_LABELS[process.objeto]],
     [
