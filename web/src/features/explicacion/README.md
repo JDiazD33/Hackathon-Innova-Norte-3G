@@ -25,7 +25,7 @@ La variante `print` expone los seis bloques completos, sin botones ni casillas i
 
 La etiqueta "Dato simulado" es el componente `SimulatedDataBadge` del Lote D, que se importa desde `@/features/etica`. La etiqueta provisional de esta carpeta se retiró al integrar las pantallas del Lote D.
 
-La lectura de comprensión por otra persona del equipo y la decisión del nombre de S01 siguen pendientes. No se cambió la redacción de S01 antes de que el equipo apruebe la propuesta de Stefano.
+La lectura de comprensión por otra persona del equipo sigue pendiente. S01 se llama "Un solo participante registrado" desde la parte 15 del Lote B, con la decisión 1 del Lote A: la fuente no publica las ofertas y `numero_postores` cuenta participantes registrados.
 
 ## API de la parte 3
 
