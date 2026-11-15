@@ -48,8 +48,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <CabeceraFija>
           {/*
            * Primera línea: entidad, buscador, rol y tema. La fecha de corte y el modo entran aquí solo si la
-           * cabecera mide al menos 64rem (@5xl); si no, pasan a la segunda línea. El ancho es el de la propia
-           * cabecera, que ya descuenta la barra lateral.
+           * cabecera mide al menos 72rem (@6xl); si no, pasan a la segunda línea. Con el selector de rol, a
+           * 64rem ya no cabían y empujaban el tema fuera de la pantalla en una laptop de 1280 px. El ancho es
+           * el de la propia cabecera, que ya descuenta la barra lateral.
            */}
           <div className="mx-auto flex h-14 w-full max-w-contenido items-center gap-2 px-4 md:px-6 lg:px-8">
             <BotonMostrarBarraLateral />
@@ -65,9 +66,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
               <Buscador entidades={entidades} />
             </Suspense>
             <div className="ms-auto flex shrink-0 items-center gap-2">
-              <span className="hidden @5xl/cabecera:inline-flex">{fechaCorte}</span>
+              <span className="hidden @6xl/cabecera:inline-flex">{fechaCorte}</span>
               {manifest.modo === "publico" && (
-                <span className="hidden @5xl/cabecera:inline-flex">
+                <span className="hidden @6xl/cabecera:inline-flex">
                   <ModoDemostracion />
                 </span>
               )}
@@ -83,7 +84,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             </div>
           </div>
           {/* Segunda línea: fecha de corte y modo cuando no caben arriba. */}
-          <div className="mx-auto flex min-h-7 w-full max-w-contenido flex-wrap items-center gap-2 px-4 pb-2 md:px-6 lg:px-8 @5xl/cabecera:hidden">
+          <div className="mx-auto flex min-h-7 w-full max-w-contenido flex-wrap items-center gap-2 px-4 pb-2 md:px-6 lg:px-8 @6xl/cabecera:hidden">
             {fechaCorte}
             {manifest.modo === "publico" && <ModoDemostracion />}
           </div>
