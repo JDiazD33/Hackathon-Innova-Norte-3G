@@ -16,13 +16,13 @@ import { PrioridadBadge } from "@/components/estado/prioridad-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SimulatedDataBadge } from "@/features/etica";
 import { SIGNAL_METHODOLOGY } from "@/features/etica/metodologia";
 import type { CategoriaSenal, Prioridad, Senal } from "@/lib/data/types";
 import { formatEntero, SIN_DATO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 import { explainSignal, type ExplanationContext } from "../index";
-import { SimulatedDataBadge } from "./simulated-data-badge";
 import { buildComparisonChart } from "../comparison-chart";
 import { ComparisonChart } from "./comparison-chart";
 

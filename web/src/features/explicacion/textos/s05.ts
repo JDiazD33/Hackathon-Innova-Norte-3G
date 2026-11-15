@@ -9,6 +9,7 @@ export function explainS05(signal: Senal, context?: ExplanationContext) {
   const direct = inputNumber(signal, "procesos_directos");
   const total = inputNumber(signal, "procesos_totales");
   const fence = signal.comparacion?.valla_superior;
+  const minimum = inputNumber(signal, "proporcion_minima");
   return completeExplanation(signal, {
     finding: sentences(
       isNumber(share) ? `La proporción de contratación directa de la entidad es ${formatPorcentaje(share, 1)} (${signal.unidad}).` : null,
@@ -23,6 +24,8 @@ export function explainS05(signal: Senal, context?: ExplanationContext) {
       isNumber(share) ? `Proporción de contratación directa: ${formatPorcentaje(share, 1)} (${signal.unidad}).` : null,
       direct !== null ? `Procesos por contratación directa: ${formatEntero(direct)}.` : null,
       total !== null ? `Procesos de la entidad: ${formatEntero(total)}.` : null,
+      minimum !== null && minimum >= 0 && minimum <= 1
+        ? `Proporción mínima configurada: ${formatPorcentaje(minimum, 1)}.` : null,
     ],
   }, context);
 }

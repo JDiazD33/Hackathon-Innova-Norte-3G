@@ -30,10 +30,12 @@ Lote B · Base web, panel y bandeja · **Joaquín (líder)** · ★★★ · car
 - [x] 4.2 Agregar los filtros (prioridad, categoría, método, fechas y estado de revisión) y el estado vacío con "Limpiar filtros". Verificar cada filtro con pruebas de componente.
   - Parte 4: filtros y estado vacío listos. Cada filtro se verificó con pruebas de la lógica (`bandeja.test.ts`) y a mano en el navegador.
   - Parte 6 del rediseño Prisma: pruebas de componente con Testing Library en `src/features/bandeja/ui/filtros.test.tsx` (prioridad, categoría, método, revisión, fechas y "Limpiar filtros").
-- [ ] 4.3 Mostrar el estado de revisión leyendo el `ReviewStore` del Lote D. Verificar que se ve "Sin revisar" por defecto y el estado nuevo después de registrar una decisión.
+- [x] 4.3 Mostrar el estado de revisión leyendo el `ReviewStore` del Lote D. Verificar que se ve "Sin revisar" por defecto y el estado nuevo después de registrar una decisión.
   - Parte 4: la bandeja muestra "Sin revisar" por defecto con `useRevisiones` (`src/lib/revisiones.ts`). Falta verificar el cambio de estado cuando exista el diálogo de decisión del Lote D.
-- [ ] 4.4 Implementar el buscador global (Ctrl o Cmd + K) por descripción, ocid y seudónimo. Verificar que elegir un resultado abre la ficha correcta.
+  - Parte 15 (integración con el Lote D, 15 de noviembre): con el build de producción se registró "Requiere atención" en `ocds-fixture-e1-007` desde la ficha, y la fila de la bandeja pasó de "Sin revisar" a "Requiere atención". El diálogo escribe en el mismo almacén (`getReviewStore()`) que lee la bandeja.
+- [x] 4.4 Implementar el buscador global (Ctrl o Cmd + K) por descripción, ocid y seudónimo. Verificar que elegir un resultado abre la ficha correcta.
   - Parte 4: el buscador encuentra procesos y proveedores (probado con "mobiliario" y por ocid). Falta verificar que abre la ficha cuando el Lote C cree `/procesos/[ocid]` y `/proveedores/[id]`.
+  - Parte 15 (15 de noviembre): con las fichas del Lote C en `main`, "reactivos" abrió `/procesos/ocds-fixture-e1-001?entidad=entidad-0001` y "Proveedor 0003" (con Cmd + K) abrió `/proveedores/P0003?entidad=entidad-0001`, cada uno con su ficha correcta.
 
 - [x] 4.5 Exportar a CSV los procesos visibles de la bandeja (con filtros), para Excel, Power BI y Google Sheets, sin librerías nuevas y con protección contra fórmulas. Verificar con pruebas de la función y abriendo el archivo.
 

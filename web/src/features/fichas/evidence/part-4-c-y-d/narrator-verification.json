@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-15",
+  "screenReader": "Narrador de Windows",
+  "browser": "Microsoft Edge",
+  "method": "Prueba asistida: la herramienta prepara la ficha y la explicación; Sebastián confirma expresamente la escucha mediante dos respuestas del chat.",
+  "audioRecorded": false,
+  "cases": [
+    {
+      "signal": "S03",
+      "package": "publico",
+      "ocid": "ocds-dgv273-seacev3-1162822",
+      "spokenValuesConfirmed": ["46,3 %", "1,2 %", "3,2 %", "6,8 %"],
+      "clarificationConfirmed": "Las barras de referencia resumen el grupo; no representan proveedores individuales.",
+      "userConfirmation": "Sí, se escucha completo",
+      "status": "confirmed"
+    },
+    {
+      "signal": "S02",
+      "package": "fixture",
+      "ocid": "ocds-fixture-e1-003",
+      "spokenValuesConfirmed": ["percentil 9,7", "9,7 % con plazo igual o menor", "franja central del percentil 25 al 75"],
+      "userConfirmation": "Sí, se escucha completo",
+      "status": "confirmed"
+    }
+  ],
+  "limits": "Verifica la lectura de ambos resúmenes, no la accesibilidad completa de la aplicación ni una validación con usuarios externos."
+}

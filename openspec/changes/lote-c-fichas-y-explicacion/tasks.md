@@ -7,6 +7,7 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 - [ ] 1.1 Bocetar la ficha del proceso y la tarjeta de señal según el sistema de diseño. Verificar con los comentarios del equipo en el PR.
 - [ ] 1.2 Escribir la versión 0 de los textos de S01–S04 y S08 en los seis bloques. Verificar que no usan vocabulario prohibido y que otra persona del equipo los entiende sin explicación.
   - Parte 1: plantillas implementadas para S01–S06 y S08; pruebas de los seis bloques y del vocabulario sobre todas las señales del fixture. Pendiente la lectura de comprensión por otra persona del equipo.
+  - 15 de noviembre (parte 15 del Lote B): con la decisión 1 del Lote A, S01 pasa a "Un solo participante registrado". El texto dice "participantes registrados" y aclara que la fuente no publica las ofertas, y una prueba comprueba que ya no habla de ofertas recibidas. Además, la ficha y el reporte muestran la nomenclatura del SEACE.
 
 ## 2. C1 · Ficha del proceso
 
@@ -16,8 +17,9 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
   - Parte 1: `buildProcessTimeline` combina y ordena fechas, conserva las fechas nulas como "Sin dato" y marca los datos simulados. Pruebas con el fixture, fechas empatadas y zonas horarias. Pendiente la presentación visual.
   - Parte 2: presentación visual y expediente simulado verificados con pruebas de componente; usa una etiqueta provisional hasta que André publique la suya.
 - [x] 2.4 Listar los documentos oficiales con sus enlaces, o el mensaje cuando no hay. Verificar con el fixture.
-- [ ] 2.5 Mostrar el historial del `ReviewStore` y el botón "Registrar revisión", que abre el diálogo del Lote D. Verificar que el botón aparece con el rol analista y no con el auditor.
+- [x] 2.5 Mostrar el historial del `ReviewStore` y el botón "Registrar revisión", que abre el diálogo del Lote D. Verificar que el botón aparece con el rol analista y no con el auditor.
   - Parte 2: historial conectado a `useRevisiones()` y comprobado con una decisión sintética persistida en el navegador. Pendientes el diálogo y el selector de rol del Lote D, que todavía no están en `main`; no se marca como terminada.
+  - Integración con el Lote D (15 de noviembre, rama `lote-b/parte-15-integracion-lote-d`): la tarjeta "Historial de revisión" usa `DecisionDialog`, `AssignmentDialog` y `ReviewHistory` del Lote D y enlaza al reporte. `process-history.test.tsx` comprueba que el analista ve "Registrar revisión" y que el auditor solo ve el historial. En el navegador, con el build de producción, se registró "Requiere atención" desde la ficha y el estado vigente cambió al instante; con el rol auditor no aparecen ni el botón ni la asignación.
 
 ## 3. C2 · Tarjeta de señal
 
@@ -30,7 +32,8 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 
 ## 4. C3 · Comparación visual
 
-- [ ] 4.1 Crear los minigráficos de S01, S02, S03, S04 y S06 con un marcador del caso y una frase equivalente; en el celular se muestra solo la frase. Verificar con el fixture y con un lector de pantalla en S02 y S03.
+- [x] 4.1 Crear los minigráficos de S01, S02, S03, S04 y S06 con un marcador del caso y una frase equivalente; en el celular se muestra solo la frase. Verificar con el fixture y con un lector de pantalla en S02 y S03.
+  - Parte 4 (15 de noviembre): prueba asistida con Narrador y Edge. Sebastián confirmó que S03 anuncia todos los porcentajes y la aclaración de las barras; también confirmó percentil, porcentaje y franja central de S02. Evidencia en `web/src/features/fichas/evidence/part-4-c-y-d/narrator-verification.json`. No se confunde esta escucha con los árboles accesibles automatizados.
   - Parte 1: `describeComparison` genera la frase del percentil, omite percentiles ausentes o inválidos y conserva los empates al describir participaciones. Pendientes gráficos y verificación con lector de pantalla.
   - Parte 3: gráficos de S01, S02, S03, S04 y S06 implementados y recorridos con el fixture en claro y oscuro; solo la frase en móvil. S03 usa el caso, la mediana y el cuartil superior publicados (criterio delegado por Sebastián), sin inventar participaciones individuales. S01 etiqueta el complemento como «hasta 1» porque puede incluir cero. Árbol accesible de S02 y S03 guardado en las evidencias; se mantiene abierta hasta el recorrido con lector de pantalla real.
 
@@ -47,9 +50,19 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 
 ## 7. Verificación del lote
 
-- [ ] 7.1 Ejecutar las pruebas de componentes y `npm run build` en verde, y recorrer una ficha completa con datos reales en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
+- [x] 7.1 Ejecutar las pruebas de componentes y `npm run build` en verde, y recorrer una ficha completa con datos reales en modo claro y oscuro. Anotar los resultados en el PR de cierre del lote.
 
 ## Workflow follow-up
+
+### Validación de C y D con datos reales · 15 de noviembre de 2026
+
+- Rama separada `lote-c/parte-4-validacion-c-y-d`, desde `origin/main` (`0fab640`), con los commits del PR #29 incorporados por autorización explícita del usuario. No se fusiona el PR ni se modifica `main`.
+- Verificada 7.1 con el paquete público de Stefano, contrato 1.1 y reglas `2026.11.2`: bandeja → ficha del proceso → explicación → decisión → asignación → reporte. Ficha del proveedor real con S03, identidad protegida y enlaces a sus procesos. Recorridos independientes en claro y oscuro.
+- S01 y la nomenclatura ya venían resueltos en el PR #29. Los cambios propios de C muestran los mínimos de calibración recibidos en S03 y S05 y agregan tres pruebas con el paquete real.
+- Las 76 señales publicadas producen explicaciones completas, sin valores ausentes literales; los mínimos se prueban con valores distintos y ausentes, sin fijar el 5 % en las plantillas.
+- Se incorporó también la actualización `d068e30` del mismo PR #29, que ordena y distingue los casos de Revisión. Comprobaciones finales desde `web/`, con Node 24.22.3 temporal: tipos y lint aprobados; 353 pruebas aprobadas en 35 archivos; build público aprobado. OpenSpec: 5 changes válidos en modo estricto.
+- Evidencia en `web/src/features/fichas/evidence/part-4-c-y-d/`: capturas claras/oscuras, impresión emulada, anchos de 375, 768 y 1280 px, reflujo a 640 px, contraste aumentado y movimiento reducido. S02 se consulta con el fixture porque está desactivada en el paquete real; S03 se consulta con datos reales.
+- Avance: 13/16. La escucha de S02 y S03 se completó de forma asistida y se cierra 4.1. Siguen pendientes los comentarios del equipo sobre diseño y comprensión (1.1 y 1.2) y las rondas con usuarios de 6.1. La entrevista y los otros lotes quedan fuera de esta entrega.
 
 ### Verificación de la parte 3 · Comparación y ficha del proveedor (14 de noviembre de 2026)
 

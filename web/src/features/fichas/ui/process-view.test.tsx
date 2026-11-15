@@ -43,6 +43,11 @@ describe("Ficha del proceso", () => {
       screen.getByText("Monto final").parentElement?.querySelector("dd")
         ?.textContent,
     ).toBe(formatSoles(process.monto_final));
+    // Contrato 1.1: la nomenclatura permite buscar el proceso en el SEACE.
+    expect(
+      screen.getByText("Nomenclatura en el SEACE").parentElement?.querySelector("dd")
+        ?.textContent,
+    ).toBe(process.nomenclatura || "Sin dato");
     expect(
       screen.getByRole("link", { name: "Volver a señales" }),
     ).toHaveAttribute("href", `/senales?entidad=${process.entidad_id}`);
