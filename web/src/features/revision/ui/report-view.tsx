@@ -6,6 +6,7 @@ import { ArrowLeft, Printer } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { describePriority } from "@/features/explicacion";
+import { SignalCard } from "@/features/explicacion/ui/signal-card";
 import { buildProcessTimeline } from "@/features/fichas";
 import { SimulatedDataBadge } from "@/features/etica";
 import { producto } from "@/config/producto";
@@ -15,7 +16,6 @@ import { formatEntero, formatFecha, SIN_DATO } from "@/lib/format";
 
 import { formatReviewDate } from "../format-date";
 import { ReviewHistory } from "./review-history";
-import { ReportExplanation } from "./report-explanation";
 import "./report-view.css";
 
 const subscribeHydration = () => () => {};
@@ -176,12 +176,19 @@ export function ReportView({
               No se encontraron señales para este proceso.
             </p>
           ) : (
+            // La misma tarjeta de la ficha del Lote C, en su variante de impresión (tarea D 5.1).
             signals.map((signal) => (
-              <ReportExplanation
+              <SignalCard
                 key={signal.id}
                 signal={signal}
-                manifest={manifest}
-                process={process}
+                context={{ manifest, process }}
+                priority={process.prioridad}
+                weight={
+                  process.prioridad?.desglose.find(
+                    (item) => item.codigo === signal.codigo,
+                  )?.peso ?? manifest.prioridad.pesos[signal.codigo]
+                }
+                variant="print"
               />
             ))
           )}
