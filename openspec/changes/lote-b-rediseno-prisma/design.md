@@ -49,7 +49,7 @@ Se cambian solo las clases de `button`, `card`, `badge`, `input`, `select`, `dia
 `NAVEGACION` gana un campo `grupo`, sin cambiar sus rutas. `TituloDePagina` (título grande, frase y espacio para acciones) queda en `components/layout/` para todas las pantallas.
 
 ### 7. Marca e ícono
-Ícono propio en SVG (`app/icon.svg`): un triángulo que separa un rayo en tres haces azul, índigo y verde azulado, dentro de un cuadrado redondeado. `app/apple-icon.png` (180 × 180) se genera una vez desde el SVG con un script local y se sube; se borra el `favicon.ico` genérico. El nombre se cambia solo en `src/config/producto.ts`.
+Ícono propio en SVG (`app/icon.svg`): el triángulo facetado del logo de Prisma (azul marino, azul y celeste, con esquinas verde azulado) sobre un cuadrado blanco redondeado; en la barra lateral va el mismo triángulo sin fondo. `app/apple-icon.png` (180 × 180) se genera una vez desde el SVG con un script local y se sube; se borra el `favicon.ico` genérico. El nombre se cambia solo en `src/config/producto.ts`.
 
 ### 8. Parte 6: filtro de prioridad como control segmentado de una sola opción
 `FiltrosBandeja.prioridades` sigue siendo un arreglo; el control segmentado escribe `[]` (Todas) o `[nivel]`. La lógica de `bandeja.ts` y sus pruebas no cambian. Las fechas pasan a un popover "Fechas" y la barra de filtros queda fija en vidrio bajo la barra superior.

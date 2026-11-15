@@ -23,7 +23,7 @@ export function SelectorEntidad({ entidades }: { entidades: EntidadResumen[] }) 
       onValueChange={(id) => router.push(conEntidad(RUTAS_POR_ENTIDAD.has(pathname) ? pathname : "/", id))}
     >
       <SelectTrigger aria-label="Entidad" className={CLASE_SELECTOR}>
-        <Building2 aria-hidden="true" className="size-4 text-primary" />
+        <Building2 aria-hidden="true" className="size-4 text-muted-foreground" />
         {/* El nombre va explícito para que se vea desde el primer render, antes de hidratar. */}
         <SelectValue>{actual.nombre}</SelectValue>
       </SelectTrigger>
@@ -41,6 +41,6 @@ export function SelectorEntidad({ entidades }: { entidades: EntidadResumen[] }) 
 /** Mientras se lee la URL. */
 export function SelectorEntidadCargando() {
   return (
-    <div aria-hidden="true" className={`${CLASE_SELECTOR} h-9 rounded-full bg-secondary motion-safe:animate-pulse`} />
+    <div aria-hidden="true" className={`${CLASE_SELECTOR} h-9 rounded-control bg-secondary motion-safe:animate-pulse`} />
   );
 }

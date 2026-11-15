@@ -11,9 +11,9 @@ export function ModoDemostracion() {
       <TooltipTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-full bg-secondary px-2.5 text-xs font-medium text-secondary-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-control border border-border bg-card px-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring contrast-more:border-borde-contraste"
         >
-          <Info aria-hidden="true" className="size-3.5" />
+          <Info aria-hidden="true" className="size-3.5 text-muted-foreground" />
           Modo demostración
         </button>
       </TooltipTrigger>

@@ -187,7 +187,7 @@ Es la pieza más importante del producto, porque concentra la explicación. Su e
    - los cinco proveedores con mayor participación.
 2. **Bandeja de señales:**
    - tabla priorizada con filtros por prioridad, categoría, método, fecha y estado de la revisión;
-   - una fila por proceso, con chips de señales.
+   - una fila por proceso, con sus señales como lista de texto (código en monoespaciada y nombre), sin cápsulas.
 3. **Ficha del proceso:**
    - cabecera con objeto, entidad, método, monto y estado;
    - línea de tiempo: convocatoria, presentación, adjudicación, contrato y culminación;
