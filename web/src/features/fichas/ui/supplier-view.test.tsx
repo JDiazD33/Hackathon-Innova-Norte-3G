@@ -69,9 +69,10 @@ describe("Ficha del proveedor", () => {
       ))!;
       const { container } = render(<SupplierView detail={detail} />);
       expect(container.innerHTML).not.toContain(personal.nombre);
-      if (mode === "publico")
-        expect(container.innerHTML).not.toContain(personal.ruc);
-      else expect(screen.getByText(`RUC: ${personal.ruc}`)).toBeVisible();
+      // En ningún modo: el RUC 10 contiene el DNI y la Ficha Única muestra el nombre.
+      expect(container.innerHTML).not.toContain(personal.ruc);
+      expect(container.innerHTML).not.toContain(personal.url_ficha_unica);
+      expect(screen.getByText("La identidad del proveedor se protege con un seudónimo.")).toBeVisible();
     },
   );
 
@@ -82,6 +83,7 @@ describe("Ficha del proveedor", () => {
       displayName: "Empresa de prueba",
       taxId: "20999999999",
       profileUrl: "https://ejemplo.gob.pe/ficha/20999999999",
+      pseudonymized: false,
     };
     render(<SupplierView detail={detail} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(

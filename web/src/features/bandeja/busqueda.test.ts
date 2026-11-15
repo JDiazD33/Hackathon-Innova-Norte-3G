@@ -85,6 +85,9 @@ describe("buscar", () => {
     const local = await indiceDe("entidad-0001", "local", proveedores);
     expect(buscar(local, "empresa demostrativa")[0]).toMatchObject({ id: "P0003", titulo: "Empresa Demostrativa SAC" });
     expect(buscar(local, "persona natural")).toEqual([]);
+    // El RUC 10 contiene el DNI: tampoco sirve para encontrar a la persona natural.
+    expect(buscar(local, "10999999991")).toEqual([]);
+    expect(buscar(local, "20999999991")[0]).toMatchObject({ id: "P0003" });
     const publico = await indiceDe("entidad-0001", "publico", proveedores);
     expect(buscar(publico, "empresa demostrativa")).toEqual([]);
     expect(buscar(publico, "20999999991")).toEqual([]);
