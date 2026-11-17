@@ -1,6 +1,6 @@
 # Parte 8 · Decisiones de señales y paquete público (tareas 1.6 y 5.4)
 
-**Rama:** `lote-a/parte-8-decisiones-y-paquete-publico`, desde `main`. **PR:** primero uno solo de documentos, con esta propuesta de decisiones. Cuando se apruebe, en la misma rama van la configuración y el paquete público, en otro PR.
+**Rama:** `lote-a/parte-8-decisiones-y-paquete-publico`, desde `main`. **PR:** la propuesta de decisiones fue el #11, solo de documentos, aprobado y fusionado el 14 de noviembre. La configuración y el paquete público se aplicaron en esta rama (PR #26) y se entregan con la [parte 10](parte-10-paquete-publico.md), que incluye estos commits.
 
 **Encargo:** [`docs/plan/fase-1/lote-a-stefano.md`](../../plan/fase-1/lote-a-stefano.md), secciones 2 y 3.
 
@@ -10,8 +10,10 @@ Que el equipo decida cada señal con los datos del spike, y que para el H2 (juev
 
 ## Tareas
 
-- [ ] 1.6 Revisar con el Lote B el contrato v1 (`docs/arquitectura/contrato-paquete-de-datos.md`) y ajustarlo a lo que mostró el spike. Verificar con la aprobación de los cuatro integrantes en el PR.
-- [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local.
+- [x] 1.6 Revisar con el Lote B el contrato v1 (`docs/arquitectura/contrato-paquete-de-datos.md`) y ajustarlo a lo que mostró el spike. Verificar con la aprobación de los cuatro integrantes en el PR.
+- [ ] 5.4 Generar el paquete público de La Libertad en `web/data/publico/` y el local en `web/data/local/`. Verificar con el Lote B que la web carga el paquete público y que `git status` no muestra el local. *El paquete está generado y validado (ver el resultado). Falta que se fusione su PR y que Joaquín confirme que la web lo carga en Vercel.*
+
+**Cómo se cerró la 1.6:** los cuatro aprobaron la propuesta en el PR #11 (Joaquín y Stefano por escrito; Sebastián y André de forma verbal, según registró Joaquín en el PR). El ajuste del contrato es el contrato 1.1 de Joaquín (PR #13, en `main`): `nomenclatura` y el significado de `numero_postores`.
 
 ## Propuesta de decisiones (tarea 1.6)
 
@@ -37,25 +39,30 @@ Las cifras son de La Libertad 2025–2026 (5 036 procesos, datos al 4 de octubre
 
 ### Detalle de S04
 
-**Qué hay que verificar.** El umbral de cada método es el monto desde el que corresponde el método superior. Están en la Ley 32069 (artículo 54.2), en su reglamento (Decreto Supremo 009-2025-EF, artículos 93 y 94, modificado por el Decreto Supremo 001-2026-EF) y en la Ley de Presupuesto de cada año. Los procesos de 2025 convocados antes de la Ley 32069 se rigen por la Ley 30225.
+**Umbrales propuestos, con su norma.** El umbral de cada método es el monto desde el que corresponde el método superior. Los fija el artículo 14 de las leyes de presupuesto, leído en sus textos consolidados del portal de leyes del Congreso el 15 de noviembre de 2026:
+
+- **Ley 32185 (2025), artículo 14.1, márgenes de la Ley 30225:** licitación pública de obras si el valor referencial es igual o superior a S/ 5 000 000,00, y adjudicación simplificada si es inferior; licitación pública de bienes y concurso público de servicios si el valor estimado es igual o superior a S/ 485 000,00, y adjudicación simplificada si es inferior.
+- **Ley 32185 (2025), artículo 14.2, márgenes de la Ley 32069**, desde su entrada en vigencia: los mismos montos, con la licitación pública abreviada (obras y bienes) y el concurso público abreviado (servicios) por debajo.
+- **Ley 32513 (2026), artículo 14, márgenes de la Ley 32069:** los mismos montos.
+
+Están cargados en `S04.umbrales` con su norma y la fecha de lectura, y S04 sigue desactivada hasta que Joaquín confirme los montos y el equipo elija una calibración. Comparación de Precios no tiene umbral en esas leyes, así que no se evalúa.
 
 | Grupo de procesos | Objeto | Umbral que se compara |
 |---|---|---|
 | Licitación Pública Abreviada | Bienes y obras | Monto desde el que corresponde la Licitación Pública |
 | Concurso Público Abreviado | Servicios | Monto desde el que corresponde el Concurso Público |
 | Adjudicación Simplificada (Ley 30225, procesos de 2025) | Bienes, servicios y obras | Monto desde el que corresponde la Licitación Pública o el Concurso Público |
-| Comparación de Precios | Bienes y servicios | Su tope |
 
-**Estimación.** Se hizo con montos que citan fuentes secundarias, sin verificar: S/ 485 000 para bienes y servicios y S/ 5 000 000 para obras (por ejemplo, [Licitaciones Perú](https://licitacionesperu.pe/guia/ley-contrataciones-32069/)). Esas fuentes no coinciden entre sí en todos los rangos, así que **no se cargan hasta verificarlos en el texto oficial**. Se calculó en una copia aparte de las tablas, sin tocar las salidas reales.
+**Estimación del volumen.** Con esos montos, calculada en una copia aparte de las tablas (sin tocar las salidas reales). La estimación del 14 de noviembre daba un grupo más (287) porque también usaba umbrales de Adjudicación Simplificada para 2026, que la Ley 32513 no fija.
 
 | Calibración | Grupos S04 | Procesos marcados |
 |---|---:|---:|
-| Ventana de 60 días, clase de 6 dígitos (configuración actual) | 287 | 843 |
-| Ventana de 30 días, clase de 6 dígitos | 225 | 634 |
-| Ventana de 60 días, producto de 8 dígitos | 257 | 736 |
-| Ventana de 30 días, producto de 8 dígitos | 203 | 542 |
+| Ventana de 60 días, clase de 6 dígitos (configuración actual) | 286 | 841 |
+| Ventana de 30 días, clase de 6 dígitos | 224 | 632 |
+| Ventana de 60 días, producto de 8 dígitos | 256 | 734 |
+| Ventana de 30 días, producto de 8 dígitos | 202 | 540 |
 
-Con la configuración actual, 145 de los 287 grupos son de concursos abreviados de servicios. Son demasiados para la bandeja: hoy hay 247 procesos con señales.
+Con la configuración actual, 145 de los 286 grupos son de concursos abreviados de servicios. Son demasiados para la bandeja: con las reglas aprobadas hay 154 procesos con señales.
 
 ### Clasificación de métodos
 
@@ -102,6 +109,49 @@ Lo que cambia es que 6 nombres pasan a "dudoso: sin señal". Para S01 no cambia 
 | Adjudicación Simplificada - Séptima Disposición Complementaria Final Reg. Ley 30225 | 1 | 0 | variante de Adjudicación Simplificada | igual | — |
 | Concurso Público para Evaluadores Expertos | 1 | 0 | competitivo | competitivo | — |
 
+## Resultado: decisiones aplicadas (15 de noviembre)
+
+| # | Cómo quedó |
+|---|---|
+| 1 | S01 se llama "Un solo participante registrado"; `unidad` = "participantes registrados" |
+| 2 | S01@2 solo evalúa procesos con adjudicación (`solo_con_adjudicacion`); los demás se cuentan como "proceso sin adjudicación" |
+| 3 | S02 sigue desactivada y S05 pasa al núcleo en el catálogo |
+| 4 | `manifest.prioridad.pesos` lista solo S01, S03 y S08, las señales activas con peso |
+| 5 | Umbrales de S04 cargados con su norma; S04 sigue desactivada hasta la confirmación y la calibración |
+| 6 | S06 sigue desactivada por cobertura (9.1%) |
+| 7 | S03@2 con `participacion_minima = 0.05` |
+| 8 | S05@2 con `proporcion_minima = 0.05` |
+| 9 | `metodos.dudosos` con los 6 nombres: quedan sin señal y en `metodos_sin_clasificar` del manifiesto (en La Libertad, 175 procesos; ajuste de la parte 10) |
+| 10 | Cada proceso trae `nomenclatura` y el manifiesto declara el contrato 1.1 |
+| 11 | JSON sin sangría y un documento por tipo en cada proceso (`paquete.documentos_por_tipo` en `pipeline.toml`) |
+
+Las reglas pasan a `2026.11.2`. También se ajustaron la spec de S01 y S03, las decisiones 3 y 5 de `design.md` y la cita de DuckDB y jsonschema en `docs/producto/referentes-internacionales.md`.
+
+**Paquete de La Libertad 2025–2026:**
+
+- **Señales:** 76 (antes 130): S01 = 33, S03 = 30, S05 = 7 y S08 = 6 (simuladas).
+- **Prioridad:** 154 procesos con señales, 1 en prioridad alta y 153 en media.
+- **Contraste con Cardinal:** R018 coincide en los 33 casos de S01 y marca 38 más, todos con su motivo (36 sin adjudicación y 2 cancelados).
+- **Contenido:** 19 778 documentos; los 5 036 procesos traen su nomenclatura.
+- **Tamaño:** 8,8 MB con `du -sh`, bajo el límite de 10 MB.
+
+**Verificación:**
+
+- `uv run pytest`: 158 passed; `uv run ruff check` y `uv run ruff format --check`, sin observaciones; `openspec validate --all --strict`, sin errores.
+- Desde `web/`: `PAQUETE_DIR=data/publico npm test -- paquete` y `PAQUETE_DIR=data/local npm test -- paquete`, 10 de 10 en cada uno.
+- `PAQUETE_DATOS=publico npm run build` y `npm run start`: el panel muestra la entidad con sus procesos, la señal S05, las categorías, la tendencia y los proveedores con seudónimo; la bandeja lista sus 21 procesos con señales, con prioridad, método, señal, fecha y monto.
+- **Privacidad:** 0 números con forma de RUC y 0 nombres de personas naturales o jurídicas en el paquete público (quedan 12 nombres de consorcios que son nombres de lugares, como en la parte 5). `git status` no muestra `web/data/local/`.
+- **Huellas:** dos ejecuciones completas de la cadena dan huellas idénticas en los 537 archivos.
+- **Con la web actual de `main`** (`fce1475`, con la ficha del proceso y la del proveedor, 15 de noviembre): `npm run typecheck`, `npm run lint`, `npm test` (333 pruebas) y la prueba de contrato del paquete, en verde. La ficha del proceso y la del proveedor cargan con los datos reales; el texto de S03 ya dice "Obtuvo 13 de los 36 procesos adjudicados".
+
+**Pendiente:**
+
+- Joaquín confirma los umbrales de S04, y el equipo elige si se activa y con qué calibración.
+- Fusionar el PR del paquete. Después, Joaquín activa `PAQUETE_DATOS=publico` en Vercel y confirma que la web carga el paquete: eso cierra la 5.4.
+- **Sebastián:**
+  - el texto de S01, que todavía dice "Oferta única" y "Este proceso recibió 1 oferta";
+  - mostrar la `nomenclatura` en la ficha del proceso, para buscarlo en el SEACE. Hoy dice "La fuente no publica un enlace para este proceso".
+
 ## Ya verificado en `main` (pendiente de la parte 7)
 
 - **Pruebas:** con `main` en `a53b161`, `uv sync` y `uv run pytest` dan 146 passed. `uv run ruff check` y `uv run ruff format --check` no tienen observaciones.
@@ -109,9 +159,9 @@ Lo que cambia es que 6 nombres pasan a "dudoso: sin señal". Para S01 no cambia 
   - `uv run pipeline fingerprint --out` y `--compare` dan huellas idénticas en los 537 archivos.
   - Además coinciden con las de la parte 7: `main` reproduce exactamente sus salidas.
 
-## Después de la aprobación (tarea 5.4)
+## Pasos de la tarea 5.4 (hechos, salvo el último)
 
-1. Aplicar las decisiones aprobadas en `pipeline/config/senales.toml` (y en el código, las que lo piden: 2, 4, 7, 8, 10 y 11), con sus pruebas. Después, regenerar con `ingest`, `normalize`, `signals`, `export --modo publico` y `export --modo local`.
+1. Aplicar las decisiones aprobadas en `pipeline/config/senales.toml` (y en el código, las que lo piden: 2, 4, 7, 8, 9, 10 y 11), con sus pruebas. Después, regenerar con `ingest`, `normalize`, `signals`, `export --modo publico` y `export --modo local`.
 2. **Validar:**
    - desde `web/`, `PAQUETE_DIR=data/publico npm test -- paquete`;
    - `PAQUETE_DATOS=publico npm run build && PAQUETE_DATOS=publico npm run start`, recorriendo el panel y la bandeja.
@@ -127,4 +177,4 @@ Lo que cambia es que 6 nombres pasan a "dudoso: sin señal". Para S01 no cambia 
 
 ## Archivos
 
-Esta ficha y el índice `docs/datos/partes-lote-a/README.md`. Después de la aprobación: `pipeline/config/senales.toml`, `pipeline/src/pipeline/` (S01, `export`), `pipeline/tests/`, `docs/datos/catalogo-de-senales.md` y `web/data/publico/` (generado).
+Primer PR (#11): esta ficha y el índice de las partes. Segundo PR: `pipeline/config/` (`senales.toml` y `pipeline.toml`), `pipeline/src/pipeline/` (S01, S03, S05, S06, `format.py`, `settings.py`, `compute.py`, `cardinal.py`, `config.py` y `export.py`), `pipeline/tests/`, `docs/datos/catalogo-de-senales.md`, esta ficha, la spec y el `design.md` del change, `docs/producto/referentes-internacionales.md` y `web/data/publico/` (generado).

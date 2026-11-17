@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from factories import item, release, write_config
+from factories import award, item, release, write_config
 from signal_helpers import (
     DATE_2025,
     OTHER_REGION,
@@ -78,7 +78,7 @@ def test_s01_flags_a_single_tenderer_in_a_competitive_method(tmp_path: Path) -> 
         tmp_path,
         [
             *group,
-            release("ocds-caso-0001", tenderers=tenderers(1)),
+            release("ocds-caso-0001", tenderers=tenderers(1), awards=[award("a1")]),
             release(
                 "ocds-directa-0001",
                 method="Contratación Directa",
@@ -100,14 +100,14 @@ def test_s01_flags_a_single_tenderer_in_a_competitive_method(tmp_path: Path) -> 
     assert signal["ocids"] == ["ocds-caso-0001"]
     assert signal["entidad_id"] == "PE-CONSUCODE-1"
     assert signal["valor"] == 1
-    assert signal["unidad"] == "postores"
+    assert signal["unidad"] == "participantes registrados"
     assert signal["umbral"] == {
         "operador": "igual",
         "valor": 1.0,
-        "descripcion": "procedimiento competitivo con un solo postor",
+        "descripcion": "procedimiento competitivo con un solo participante registrado",
     }
     assert signal["referencia"] == {"cardinal": "R018", "ocp": "Single bid received"}
-    assert signal["version_regla"] == "S01@1"
+    assert signal["version_regla"] == "S01@2"
     assert signal["entradas"] == {"numero_postores": 1, "metodo": "Adjudicación Simplificada"}
     assert signal["calidad"] == []
     assert signal["simulado"] is False
@@ -138,19 +138,38 @@ def test_s01_counts_what_it_cannot_evaluate(tmp_path: Path) -> None:
                 method_ocds="direct",
                 tenderers=tenderers(1),
             ),
+            release("ocds-convenio-0001", method="Convenio", tenderers=tenderers(1)),
+            release("ocds-desierto-0001", tenderers=tenderers(1)),
         ],
     )
     assert by_code(rows, "S01") == []
     assert exclusion(manifest, "S01", "sin dato de postores") == 1
-    assert exclusion(manifest, "S01", "método sin clasificar") == 1
+    # Doubtful methods (Convenio) are among the unclassified ones, without a signal.
+    assert exclusion(manifest, "S01", "método sin clasificar") == 2
+    assert exclusion(manifest, "S01", "proceso sin adjudicación") == 1
     assert exclusion(manifest, "S01", "proceso en estado excluido") == 1
     assert exclusion(manifest, "S01", "sin comprador") == 0
-    assert manifest["metodos_sin_clasificar"] == ["Método de Prueba"]
+    assert manifest["metodos_sin_clasificar"] == ["Convenio", "Método de Prueba"]
+    assert "Convenio" in manifest["parametros"]["metodos_dudosos"]
+
+
+def test_s01_can_evaluate_processes_without_an_award(tmp_path: Path) -> None:
+    text = SIGNALS_TOML.replace("solo_con_adjudicacion = true", "solo_con_adjudicacion = false")
+    manifest, rows = run_signals(
+        tmp_path, [release("ocds-desierto-0001", tenderers=tenderers(1))], signals_text=text
+    )
+    assert [row["id"] for row in by_code(rows, "S01")] == ["S01-ocds-desierto-0001"]
+    assert exclusion(manifest, "S01", "proceso sin adjudicación") == 0
 
 
 def test_s01_uses_the_national_group_when_the_region_is_small(tmp_path: Path) -> None:
     regional = [
-        release(f"ocds-ll25-{i:04d}", tenderers=tenderers(1 if i == 0 else 3), **DATE_2025)
+        release(
+            f"ocds-ll25-{i:04d}",
+            tenderers=tenderers(1 if i == 0 else 3),
+            awards=[award("a1", date="2025-05-01T10:00:00-05:00")],
+            **DATE_2025,
+        )
         for i in range(3)
     ]
     national = [
@@ -228,7 +247,9 @@ def test_s02_counts_processes_without_a_period(tmp_path: Path) -> None:
 
 
 def test_s02_s04_and_s06_are_deactivated_by_default(tmp_path: Path) -> None:
-    manifest, rows = run_signals(tmp_path, [release("ocds-caso-0001", tenderers=tenderers(1))])
+    manifest, rows = run_signals(
+        tmp_path, [release("ocds-caso-0001", tenderers=tenderers(1), awards=[award("a1")])]
+    )
     defaults = load_signals_config()
     assert manifest["senales_activas"] == ["S01", "S03", "S05", "S08"]
     assert manifest["senales_desactivadas"] == [
@@ -240,7 +261,7 @@ def test_s02_s04_and_s06_are_deactivated_by_default(tmp_path: Path) -> None:
             "(contracts[].implementation.finalValue); el mínimo es 10%.",
         },
     ]
-    assert manifest["versiones"] == {"S01": "S01@1", "S03": "S03@1", "S05": "S05@1", "S08": "S08@1"}
+    assert manifest["versiones"] == {"S01": "S01@2", "S03": "S03@2", "S05": "S05@2", "S08": "S08@1"}
     assert manifest["conteos"]["S01"] == 1
     assert by_code(rows, "S02") == []
     assert by_code(rows, "S04") == []
@@ -270,7 +291,7 @@ def test_changing_a_parameter_changes_the_results_without_code(tmp_path: Path) -
 
 def test_results_are_reproducible(tmp_path: Path) -> None:
     group = [release(f"ocds-grupo-{i:04d}", tenderers=tenderers(3)) for i in range(30)]
-    releases = [*group, release("ocds-caso-0001", tenderers=tenderers(1))]
+    releases = [*group, release("ocds-caso-0001", tenderers=tenderers(1), awards=[award("a1")])]
     config, data_dir = prepare_data(tmp_path, releases, [])
     settings = load_signals_config(write_signals_config(tmp_path))
     compute_signals(config, settings, data_dir)
@@ -288,7 +309,9 @@ def test_signals_need_the_normalized_tables(tmp_path: Path) -> None:
 def test_cli_signals(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     group = [release(f"ocds-grupo-{i:04d}", tenderers=tenderers(3)) for i in range(30)]
     _, data_dir = prepare_data(
-        tmp_path, [*group, release("ocds-caso-0001", tenderers=tenderers(1))], []
+        tmp_path,
+        [*group, release("ocds-caso-0001", tenderers=tenderers(1), awards=[award("a1")])],
+        [],
     )
     arguments = [
         "--config",
@@ -300,5 +323,5 @@ def test_cli_signals(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None
     ]
     assert main(["signals", *arguments]) == 0
     output = capsys.readouterr().out
-    assert "S01 (S01@1): 1 señales" in output
+    assert "S01 (S01@2): 1 señales" in output
     assert "S02 desactivada" in output

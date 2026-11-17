@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
-from factories import item, release
+from factories import award, item, release
 from signal_helpers import prepare_data, tenderers, write_signals_config
 
 from pipeline.cardinal import INPUT_FILE, NOT_INSTALLED, compare, contrast, find_cardinal
@@ -21,10 +21,11 @@ def single_tenderer_data(tmp_path: Path):
     group = [release(f"ocds-g-{i:04d}", tenderers=tenderers(3)) for i in range(30)]
     releases = [
         *group,
-        release("ocds-uno-0001", tenderers=tenderers(1)),
+        release("ocds-uno-0001", tenderers=tenderers(1), awards=[award("a1")]),
         release(
             "ocds-cancelado-0001", tenderers=tenderers(1), items=[item(status_details="CANCELADO")]
         ),
+        release("ocds-desierto-0001", tenderers=tenderers(1)),
     ]
     config, data_dir = prepare_data(tmp_path, releases, [])
     settings = load_signals_config(write_signals_config(tmp_path))
@@ -51,7 +52,7 @@ def test_contrast_without_cardinal_says_why(tmp_path: Path) -> None:
     assert report["contraste"] == "no fue posible"
     assert report["motivo"] == NOT_INSTALLED
     lines = (data_dir / "interim" / INPUT_FILE).read_text(encoding="utf-8").splitlines()
-    assert len(lines) == 32
+    assert len(lines) == 33
     first = json.loads(lines[0])
     assert first["tender"]["procurementMethod"] == "open"
     assert first["tender"]["tenderPeriod"]["startDate"].endswith("T00:00:00-05:00")
@@ -70,16 +71,17 @@ def test_contrast_with_cardinal(tmp_path: Path) -> None:
     assert report["herramienta"].startswith("ocdscardinal")
     r018 = report["R018"]
     assert r018["senal"] == 1
-    assert r018["cardinal"] == 2
+    assert r018["cardinal"] == 3
     assert r018["coincidencias"] == 1
     assert r018["solo_cardinal"] == [
-        {"ocid": "ocds-cancelado-0001", "motivo": "S01 no evalúa procesos en estado CANCELADO"}
+        {"ocid": "ocds-cancelado-0001", "motivo": "S01 no evalúa procesos en estado CANCELADO"},
+        {"ocid": "ocds-desierto-0001", "motivo": "S01 solo evalúa procesos con adjudicación"},
     ]
     r003 = report["R003"]
     assert r003["contraste"] == "no fue posible"
     assert r003["motivo"].startswith("S02 está desactivada")
-    assert r003["cardinal"] == 32
-    assert r003["procesos_con_tenderPeriod"] == 32
+    assert r003["cardinal"] == 33
+    assert r003["procesos_con_tenderPeriod"] == 33
 
 
 def test_cli_cardinal_without_the_tool(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from factories import award, contract, release
+from factories import award, contract, document, release
 from signal_helpers import prepare_data, tenderers, write_signals_config
 
 from pipeline.cli import main
@@ -308,13 +308,20 @@ def test_package_is_consistent_with_its_manifest(package_data, tmp_path: Path) -
         "proveedores": len(files["proveedores.json"]),
         "entidades": len(files["entidades.json"]),
     }
-    assert manifest["prioridad"] == {"pesos": settings.weights, "cortes": settings.cuts}
+    active = set(manifest["senales_activas"])
+    assert manifest["prioridad"] == {
+        "pesos": {code: weight for code, weight in settings.weights.items() if code in active},
+        "cortes": settings.cuts,
+    }
+    assert set(manifest["prioridad"]["pesos"]) == {"S01", "S03", "S08"}
+    assert manifest["version_contrato"] == "1.1"
     assert set(manifest["senales_activas"]) >= {s["codigo"] for s in all_signals(files).values()}
     assert all(case_file["simulado"] for case_file in files["expedientes-simulados.json"])
     assert all(s["simulado"] for s in all_signals(files).values() if s["codigo"] == "S08")
     for process in all_processes(files).values():
         assert files["indice.json"]["procesos"][process["ocid"]] == process["entidad_id"]
         assert process["fechas"]["inicio_presentacion"] is None
+        assert process["nomenclatura"].startswith("PRUEBA-")
 
 
 def test_missing_ocid_stops_the_export_naming_file_and_field(package_data) -> None:
@@ -345,3 +352,40 @@ def test_cli_export(package_data, tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     monkeypatch.setattr("pipeline.export.ENV_FILE", tmp_path / "no-existe.env")
     assert main(["export", *arguments, "--modo", "publico", "--out", str(out_dir)]) == 1
     assert "PSEUDONYM_SECRET" in capsys.readouterr().err
+
+
+def test_each_process_shows_the_latest_documents_of_each_type(tmp_path: Path) -> None:
+    older = document("bases-1")
+    newer = document("bases-2")
+    newer["datePublished"] = "2026-03-10T11:00:00-05:00"
+    query = document("consulta-1", "clarifications")
+    releases = [release("ocds-d-0001", tenderers=tenderers(2), documents=[older, newer, query])]
+    config, data_dir = prepare_data(tmp_path, releases, [])
+    settings = load_signals_config(write_signals_config(tmp_path))
+    compute_signals(config, settings, data_dir)
+    files = build_package(config, settings, data_dir, "publico", SECRET)
+    (process,) = files["procesos/PE-CONSUCODE-1.json"]
+    assert [d["titulo"] for d in process["documentos"]] == [
+        "Documento consulta-1",
+        "Documento bases-2",
+    ]
+
+
+def test_package_files_have_no_indentation(package_data, tmp_path: Path) -> None:
+    config, settings, data_dir = package_data
+    export(config, settings, data_dir, "publico", tmp_path / "publico", SECRET)
+    text = (tmp_path / "publico" / "manifest.json").read_text(encoding="utf-8")
+    assert "\n " not in text and text.endswith("}\n")
+
+
+def test_process_without_title_has_no_nomenclatura(tmp_path: Path) -> None:
+    data = release("ocds-t-0001", tenderers=tenderers(2))
+    del data["tender"]["title"]
+    config, data_dir = prepare_data(tmp_path, [data], [])
+    settings = load_signals_config(write_signals_config(tmp_path))
+    compute_signals(config, settings, data_dir)
+    files = build_package(config, settings, data_dir, "publico", SECRET)
+    validate_package(files)
+    (process,) = files["procesos/PE-CONSUCODE-1.json"]
+    assert process["nomenclatura"] is None
+    assert process["descripcion"] == "PROCESO DE PRUEBA ocds-t-0001"
