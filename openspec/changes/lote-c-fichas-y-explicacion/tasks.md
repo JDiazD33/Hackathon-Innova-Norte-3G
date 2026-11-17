@@ -7,6 +7,7 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
 - [ ] 1.1 Bocetar la ficha del proceso y la tarjeta de señal según el sistema de diseño. Verificar con los comentarios del equipo en el PR.
 - [ ] 1.2 Escribir la versión 0 de los textos de S01–S04 y S08 en los seis bloques. Verificar que no usan vocabulario prohibido y que otra persona del equipo los entiende sin explicación.
   - Parte 1: plantillas implementadas para S01–S06 y S08; pruebas de los seis bloques y del vocabulario sobre todas las señales del fixture. Pendiente la lectura de comprensión por otra persona del equipo.
+  - 15 de noviembre (parte 15 del Lote B): con la decisión 1 del Lote A, S01 pasa a "Un solo participante registrado". El texto dice "participantes registrados" y aclara que la fuente no publica las ofertas, y una prueba comprueba que ya no habla de ofertas recibidas. Además, la ficha y el reporte muestran la nomenclatura del SEACE.
 
 ## 2. C1 · Ficha del proceso
 
@@ -16,8 +17,9 @@ Lote C · Fichas y explicación · **Sebastián** · ★★★ · carpetas `src/
   - Parte 1: `buildProcessTimeline` combina y ordena fechas, conserva las fechas nulas como "Sin dato" y marca los datos simulados. Pruebas con el fixture, fechas empatadas y zonas horarias. Pendiente la presentación visual.
   - Parte 2: presentación visual y expediente simulado verificados con pruebas de componente; usa una etiqueta provisional hasta que André publique la suya.
 - [x] 2.4 Listar los documentos oficiales con sus enlaces, o el mensaje cuando no hay. Verificar con el fixture.
-- [ ] 2.5 Mostrar el historial del `ReviewStore` y el botón "Registrar revisión", que abre el diálogo del Lote D. Verificar que el botón aparece con el rol analista y no con el auditor.
+- [x] 2.5 Mostrar el historial del `ReviewStore` y el botón "Registrar revisión", que abre el diálogo del Lote D. Verificar que el botón aparece con el rol analista y no con el auditor.
   - Parte 2: historial conectado a `useRevisiones()` y comprobado con una decisión sintética persistida en el navegador. Pendientes el diálogo y el selector de rol del Lote D, que todavía no están en `main`; no se marca como terminada.
+  - Integración con el Lote D (15 de noviembre, rama `lote-b/parte-15-integracion-lote-d`): la tarjeta "Historial de revisión" usa `DecisionDialog`, `AssignmentDialog` y `ReviewHistory` del Lote D y enlaza al reporte. `process-history.test.tsx` comprueba que el analista ve "Registrar revisión" y que el auditor solo ve el historial. En el navegador, con el build de producción, se registró "Requiere atención" desde la ficha y el estado vigente cambió al instante; con el rol auditor no aparecen ni el botón ni la asignación.
 
 ## 3. C2 · Tarjeta de señal
 

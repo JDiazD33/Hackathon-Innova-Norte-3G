@@ -57,15 +57,25 @@ describe("Explicaciones sobre el paquete de prueba", () => {
     signal.valor = 2;
     signal.comparacion!.proporcion_referencia = 0.42;
     const explanation = explainSignal(signal)!;
-    expect(explanation.finding).toBe("Este proceso recibió 2 ofertas.");
+    expect(explanation.finding).toBe("Este proceso tuvo 2 participantes registrados.");
     expect(explanation.comparison).toContain(formatPorcentaje(0.42));
     expect(explanation.comparison).not.toContain("62");
+  });
+
+  it("S01 habla de participantes registrados y nunca de ofertas recibidas (decisión 1 del Lote A)", () => {
+    const signal = sample("S01");
+    signal.valor = 1;
+    const explanation = explainSignal(signal)!;
+    expect(explanation.finding).toBe("Este proceso tuvo 1 participante registrado.");
+    const text = [explanation.finding, explanation.comparison, explanation.importance, explanation.limitation].join(" ");
+    expect(text).not.toMatch(/ofertas? recibidas?|recibió/);
+    expect(explanation.dataUsed.join(" ")).toContain("La fuente no publica el número de ofertas.");
   });
 
   it("S01 no inventa una proporción cuando esta es nula", () => {
     const signal = sample("S01");
     signal.comparacion!.proporcion_referencia = null;
-    expect(explainSignal(signal)!.comparison).not.toContain("dos o más ofertas");
+    expect(explainSignal(signal)!.comparison).not.toContain("dos o más participantes");
   });
 
   it("S02 explica el plazo, el grupo nacional y el umbral recibido", () => {
